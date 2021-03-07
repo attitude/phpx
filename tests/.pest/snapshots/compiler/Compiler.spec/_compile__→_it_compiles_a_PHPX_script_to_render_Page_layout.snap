@@ -1,0 +1,1279 @@
+[
+    {
+        "$$type": "Expression",
+        "value": "L1:P0-6:<?php\n:389:<T_OPEN_TAG"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L2:P6-7:\n:392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L3:P7-15:function:310:<T_FUNCTION"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L3:P15-16: :392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L3:P16-26:PageFooter:262:<T_STRING"
+    },
+    {
+        "$$type": "Block",
+        "opening": "L3:P26-27:(:40",
+        "children": [
+            "L3:P27-32:array:341:<T_ARRAY",
+            "L3:P32-33: :392:<T_WHITESPACE",
+            "L3:P33-39:$props:266:<T_VARIABLE"
+        ],
+        "closing": "L3:P39-40:):41"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L3:P40-41:::58"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L3:P41-42: :392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L3:P42-47:array:341:<T_ARRAY"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L3:P47-48: :392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Block",
+        "opening": "L3:P48-49:{:123",
+        "children": [
+            "L3:P49-52:\n  :392:<T_WHITESPACE",
+            "L4:P52-57:$year:266:<T_VARIABLE",
+            "L4:P57-58: :392:<T_WHITESPACE",
+            "L4:P58-59:=:61",
+            "L4:P59-60: :392:<T_WHITESPACE",
+            "L4:P60-66:$props:266:<T_VARIABLE",
+            {
+                "$$type": "Block",
+                "opening": "L4:P66-67:[:91",
+                "children": [
+                    "L4:P67-73:'year':269:<T_CONSTANT_ENCAPSED_STRING"
+                ],
+                "closing": "L4:P73-74:]:93"
+            },
+            "L4:P74-75: :392:<T_WHITESPACE",
+            "L4:P75-77:??:400:<T_COALESCE",
+            "L4:P77-78: :392:<T_WHITESPACE",
+            "L4:P78-82:date:262:<T_STRING",
+            {
+                "$$type": "Block",
+                "opening": "L4:P82-83:(:40",
+                "children": [
+                    "L4:P83-86:'Y':269:<T_CONSTANT_ENCAPSED_STRING"
+                ],
+                "closing": "L4:P86-87:):41"
+            },
+            "L4:P87-88:;:59",
+            "L4:P88-92:\n\n  :392:<T_WHITESPACE",
+            "L6:P92-98:return:313:<T_RETURN",
+            "L6:P98-99: :392:<T_WHITESPACE",
+            {
+                "$$type": "Block",
+                "opening": "L6:P99-100:(:40",
+                "children": [
+                    "L6:P100-105:\n    :392:<T_WHITESPACE",
+                    {
+                        "$$type": "PHPXElement",
+                        "openingElement": [
+                            "L7:P105-106:<:60",
+                            "L7:P106-112:footer:262:<T_STRING",
+                            "L7:P112-113:>:62"
+                        ],
+                        "selfClosing": false,
+                        "attributes": [],
+                        "children": [
+                            {
+                                "$$type": "PHPXText",
+                                "tokens": [
+                                    "L7:P113-120:\n      :392:<T_WHITESPACE"
+                                ]
+                            },
+                            {
+                                "$$type": "PHPXElement",
+                                "openingElement": [
+                                    "L8:P120-121:<:60",
+                                    "L8:P121-122:p:262:<T_STRING",
+                                    "L8:P122-123:>:62"
+                                ],
+                                "selfClosing": false,
+                                "attributes": [],
+                                "children": [
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L8:P123-125:\u00a9:262:<T_STRING",
+                                            "L8:P125-126: :392:<T_WHITESPACE"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXExpressionContainer",
+                                        "expression": {
+                                            "$$type": "Block",
+                                            "opening": "L8:P126-127:{:123",
+                                            "children": [
+                                                "L8:P127-132:$year:266:<T_VARIABLE"
+                                            ],
+                                            "closing": "L8:P132-133:}:125"
+                                        }
+                                    },
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L8:P133-134: :392:<T_WHITESPACE",
+                                            "L8:P134-135:@:64",
+                                            "L8:P135-148:martin_adamko:262:<T_STRING"
+                                        ]
+                                    }
+                                ],
+                                "closingElement": [
+                                    "L8:P148-149:<:60",
+                                    "L8:P149-150:\/:47",
+                                    "L8:P150-151:p:262:<T_STRING",
+                                    "L8:P151-152:>:62"
+                                ]
+                            },
+                            {
+                                "$$type": "PHPXText",
+                                "tokens": [
+                                    "L8:P152-157:\n    :392:<T_WHITESPACE"
+                                ]
+                            }
+                        ],
+                        "closingElement": [
+                            "L9:P157-158:<:60",
+                            "L9:P158-159:\/:47",
+                            "L9:P159-165:footer:262:<T_STRING",
+                            "L9:P165-166:>:62"
+                        ]
+                    },
+                    "L9:P166-169:\n  :392:<T_WHITESPACE"
+                ],
+                "closing": "L10:P169-170:):41"
+            },
+            "L10:P170-171:;:59",
+            "L10:P171-172:\n:392:<T_WHITESPACE"
+        ],
+        "closing": "L11:P172-173:}:125"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L11:P173-175:\n\n:392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L13:P175-183:function:310:<T_FUNCTION"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L13:P183-184: :392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L13:P184-192:PageMain:262:<T_STRING"
+    },
+    {
+        "$$type": "Block",
+        "opening": "L13:P192-193:(:40",
+        "children": [
+            "L13:P193-198:array:341:<T_ARRAY",
+            "L13:P198-199: :392:<T_WHITESPACE",
+            "L13:P199-205:$items:266:<T_VARIABLE"
+        ],
+        "closing": "L13:P205-206:):41"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L13:P206-207:::58"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L13:P207-208: :392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L13:P208-213:array:341:<T_ARRAY"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L13:P213-214: :392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Block",
+        "opening": "L13:P214-215:{:123",
+        "children": [
+            "L13:P215-218:\n  :392:<T_WHITESPACE",
+            {
+                "$$type": "Block",
+                "opening": "L14:P218-219:[:91",
+                "children": [
+                    "L14:P219-226:'items':269:<T_CONSTANT_ENCAPSED_STRING",
+                    "L14:P226-227: :392:<T_WHITESPACE",
+                    "L14:P227-229:=>:386:<T_DOUBLE_ARROW",
+                    "L14:P229-230: :392:<T_WHITESPACE",
+                    "L14:P230-236:$items:266:<T_VARIABLE",
+                    "L14:P236-237:,:44",
+                    "L14:P237-238: :392:<T_WHITESPACE",
+                    "L14:P238-247:'content':269:<T_CONSTANT_ENCAPSED_STRING",
+                    "L14:P247-248: :392:<T_WHITESPACE",
+                    "L14:P248-250:=>:386:<T_DOUBLE_ARROW",
+                    "L14:P250-251: :392:<T_WHITESPACE",
+                    "L14:P251-259:$content:266:<T_VARIABLE"
+                ],
+                "closing": "L14:P259-260:]:93"
+            },
+            "L14:P260-261: :392:<T_WHITESPACE",
+            "L14:P261-262:=:61",
+            "L14:P262-263: :392:<T_WHITESPACE",
+            "L14:P263-269:$items:266:<T_VARIABLE",
+            "L14:P269-270: :392:<T_WHITESPACE",
+            "L14:P270-272:??:400:<T_COALESCE",
+            "L14:P272-273: :392:<T_WHITESPACE",
+            {
+                "$$type": "Block",
+                "opening": "L14:P273-274:[:91",
+                "children": [
+                    "L14:P274-281:'items':269:<T_CONSTANT_ENCAPSED_STRING",
+                    "L14:P281-282: :392:<T_WHITESPACE",
+                    "L14:P282-284:=>:386:<T_DOUBLE_ARROW",
+                    "L14:P284-285: :392:<T_WHITESPACE",
+                    {
+                        "$$type": "Block",
+                        "opening": "L14:P285-286:[:91",
+                        "children": [],
+                        "closing": "L14:P286-287:]:93"
+                    },
+                    "L14:P287-288:,:44",
+                    "L14:P288-289: :392:<T_WHITESPACE",
+                    "L14:P289-298:'content':269:<T_CONSTANT_ENCAPSED_STRING",
+                    "L14:P298-299: :392:<T_WHITESPACE",
+                    "L14:P299-301:=>:386:<T_DOUBLE_ARROW",
+                    "L14:P301-302: :392:<T_WHITESPACE",
+                    "L14:P302-306:null:262:<T_STRING",
+                    "L14:P306-307: :392:<T_WHITESPACE"
+                ],
+                "closing": "L14:P307-308:]:93"
+            },
+            "L14:P308-309:;:59",
+            "L14:P309-313:\n\n  :392:<T_WHITESPACE",
+            "L16:P313-319:return:313:<T_RETURN",
+            "L16:P319-320: :392:<T_WHITESPACE",
+            {
+                "$$type": "Block",
+                "opening": "L16:P320-321:(:40",
+                "children": [
+                    "L16:P321-326:\n    :392:<T_WHITESPACE",
+                    {
+                        "$$type": "PHPXElement",
+                        "openingElement": [
+                            "L17:P326-327:<:60",
+                            "L17:P327-331:main:262:<T_STRING",
+                            "L17:P331-332:>:62"
+                        ],
+                        "selfClosing": false,
+                        "attributes": [],
+                        "children": [
+                            {
+                                "$$type": "PHPXText",
+                                "tokens": [
+                                    "L17:P332-339:\n      :392:<T_WHITESPACE"
+                                ]
+                            },
+                            {
+                                "$$type": "PHPXElement",
+                                "openingElement": [
+                                    "L18:P339-340:<:60",
+                                    "L18:P340-342:ul:262:<T_STRING",
+                                    "L18:P342-343:>:62"
+                                ],
+                                "selfClosing": false,
+                                "attributes": [],
+                                "children": [
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L18:P343-352:\n        :392:<T_WHITESPACE"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXExpressionContainer",
+                                        "expression": {
+                                            "$$type": "Block",
+                                            "opening": "L19:P352-353:{:123",
+                                            "children": [
+                                                "L19:P353-362:array_map:262:<T_STRING",
+                                                {
+                                                    "$$type": "Block",
+                                                    "opening": "L19:P362-363:(:40",
+                                                    "children": [
+                                                        "L19:P363-365:fn:311:<T_FN",
+                                                        {
+                                                            "$$type": "Block",
+                                                            "opening": "L19:P365-366:(:40",
+                                                            "children": [
+                                                                "L19:P366-371:$item:266:<T_VARIABLE"
+                                                            ],
+                                                            "closing": "L19:P371-372:):41"
+                                                        },
+                                                        "L19:P372-373: :392:<T_WHITESPACE",
+                                                        "L19:P373-375:=>:386:<T_DOUBLE_ARROW",
+                                                        "L19:P375-376: :392:<T_WHITESPACE",
+                                                        {
+                                                            "$$type": "Block",
+                                                            "opening": "L19:P376-377:(:40",
+                                                            "children": [
+                                                                "L19:P377-388:\n          :392:<T_WHITESPACE",
+                                                                {
+                                                                    "$$type": "PHPXElement",
+                                                                    "openingElement": [
+                                                                        "L20:P388-389:<:60",
+                                                                        "L20:P389-391:li:262:<T_STRING",
+                                                                        "L20:P391-392:>:62"
+                                                                    ],
+                                                                    "selfClosing": false,
+                                                                    "attributes": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "$$type": "PHPXExpressionContainer",
+                                                                            "expression": {
+                                                                                "$$type": "Block",
+                                                                                "opening": "L20:P392-393:{:123",
+                                                                                "children": [
+                                                                                    "L20:P393-398:$item:266:<T_VARIABLE"
+                                                                                ],
+                                                                                "closing": "L20:P398-399:}:125"
+                                                                            }
+                                                                        }
+                                                                    ],
+                                                                    "closingElement": [
+                                                                        "L20:P399-400:<:60",
+                                                                        "L20:P400-401:\/:47",
+                                                                        "L20:P401-403:li:262:<T_STRING",
+                                                                        "L20:P403-404:>:62"
+                                                                    ]
+                                                                },
+                                                                "L20:P404-413:\n        :392:<T_WHITESPACE"
+                                                            ],
+                                                            "closing": "L21:P413-414:):41"
+                                                        },
+                                                        "L21:P414-415:,:44",
+                                                        "L21:P415-416: :392:<T_WHITESPACE",
+                                                        "L21:P416-422:$items:266:<T_VARIABLE"
+                                                    ],
+                                                    "closing": "L21:P422-423:):41"
+                                                }
+                                            ],
+                                            "closing": "L21:P423-424:}:125"
+                                        }
+                                    },
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L21:P424-431:\n      :392:<T_WHITESPACE"
+                                        ]
+                                    }
+                                ],
+                                "closingElement": [
+                                    "L22:P431-432:<:60",
+                                    "L22:P432-433:\/:47",
+                                    "L22:P433-435:ul:262:<T_STRING",
+                                    "L22:P435-436:>:62"
+                                ]
+                            },
+                            {
+                                "$$type": "PHPXText",
+                                "tokens": [
+                                    "L22:P436-443:\n      :392:<T_WHITESPACE"
+                                ]
+                            },
+                            {
+                                "$$type": "PHPXExpressionContainer",
+                                "expression": {
+                                    "$$type": "Block",
+                                    "opening": "L23:P443-444:{:123",
+                                    "children": [
+                                        "L23:P444-452:$content:266:<T_VARIABLE"
+                                    ],
+                                    "closing": "L23:P452-453:}:125"
+                                }
+                            },
+                            {
+                                "$$type": "PHPXText",
+                                "tokens": [
+                                    "L23:P453-458:\n    :392:<T_WHITESPACE"
+                                ]
+                            }
+                        ],
+                        "closingElement": [
+                            "L24:P458-459:<:60",
+                            "L24:P459-460:\/:47",
+                            "L24:P460-464:main:262:<T_STRING",
+                            "L24:P464-465:>:62"
+                        ]
+                    },
+                    "L24:P465-468:\n  :392:<T_WHITESPACE"
+                ],
+                "closing": "L25:P468-469:):41"
+            },
+            "L25:P469-470:;:59",
+            "L25:P470-471:\n:392:<T_WHITESPACE"
+        ],
+        "closing": "L26:P471-472:}:125"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L26:P472-474:\n\n:392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L28:P474-482:function:310:<T_FUNCTION"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L28:P482-483: :392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L28:P483-493:PageHeader:262:<T_STRING"
+    },
+    {
+        "$$type": "Block",
+        "opening": "L28:P493-494:(:40",
+        "children": [
+            "L28:P494-499:array:341:<T_ARRAY",
+            "L28:P499-500: :392:<T_WHITESPACE",
+            "L28:P500-506:$props:266:<T_VARIABLE"
+        ],
+        "closing": "L28:P506-507:):41"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L28:P507-508:::58"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L28:P508-509: :392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L28:P509-514:array:341:<T_ARRAY"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L28:P514-515: :392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Block",
+        "opening": "L28:P515-516:{:123",
+        "children": [
+            "L28:P516-519:\n  :392:<T_WHITESPACE",
+            "L29:P519-525:$title:266:<T_VARIABLE",
+            "L29:P525-526: :392:<T_WHITESPACE",
+            "L29:P526-527:=:61",
+            "L29:P527-528: :392:<T_WHITESPACE",
+            "L29:P528-534:$props:266:<T_VARIABLE",
+            {
+                "$$type": "Block",
+                "opening": "L29:P534-535:[:91",
+                "children": [
+                    "L29:P535-542:'title':269:<T_CONSTANT_ENCAPSED_STRING"
+                ],
+                "closing": "L29:P542-543:]:93"
+            },
+            "L29:P543-544: :392:<T_WHITESPACE",
+            "L29:P544-546:??:400:<T_COALESCE",
+            "L29:P546-547: :392:<T_WHITESPACE",
+            "L29:P547-557:'Untitled':269:<T_CONSTANT_ENCAPSED_STRING",
+            "L29:P557-558:;:59",
+            "L29:P558-561:\n  :392:<T_WHITESPACE",
+            "L30:P561-566:$tags:266:<T_VARIABLE",
+            "L30:P566-567: :392:<T_WHITESPACE",
+            "L30:P567-568:=:61",
+            "L30:P568-569: :392:<T_WHITESPACE",
+            "L30:P569-575:$props:266:<T_VARIABLE",
+            {
+                "$$type": "Block",
+                "opening": "L30:P575-576:[:91",
+                "children": [
+                    "L30:P576-582:'tags':269:<T_CONSTANT_ENCAPSED_STRING"
+                ],
+                "closing": "L30:P582-583:]:93"
+            },
+            "L30:P583-584: :392:<T_WHITESPACE",
+            "L30:P584-586:??:400:<T_COALESCE",
+            "L30:P586-587: :392:<T_WHITESPACE",
+            {
+                "$$type": "Block",
+                "opening": "L30:P587-588:[:91",
+                "children": [],
+                "closing": "L30:P588-589:]:93"
+            },
+            "L30:P589-590:;:59",
+            "L30:P590-594:\n\n  :392:<T_WHITESPACE",
+            "L32:P594-600:return:313:<T_RETURN",
+            "L32:P600-601: :392:<T_WHITESPACE",
+            {
+                "$$type": "Block",
+                "opening": "L32:P601-602:(:40",
+                "children": [
+                    "L32:P602-607:\n    :392:<T_WHITESPACE",
+                    {
+                        "$$type": "PHPXElement",
+                        "openingElement": [
+                            "L33:P607-608:<:60",
+                            "L33:P608-614:header:262:<T_STRING",
+                            "L33:P614-615:>:62"
+                        ],
+                        "selfClosing": false,
+                        "attributes": [],
+                        "children": [
+                            {
+                                "$$type": "PHPXText",
+                                "tokens": [
+                                    "L33:P615-622:\n      :392:<T_WHITESPACE"
+                                ]
+                            },
+                            {
+                                "$$type": "PHPXElement",
+                                "openingElement": [
+                                    "L34:P622-623:<:60",
+                                    "L34:P623-624:a:262:<T_STRING",
+                                    "L34:P633-634:>:62"
+                                ],
+                                "selfClosing": false,
+                                "attributes": [
+                                    "L34:P624-625: :392:<T_WHITESPACE",
+                                    {
+                                        "$$type": "PHPXAttribute",
+                                        "name": "L34:P625-629:href:262:<T_STRING",
+                                        "assignment": "L34:P629-630:=:61",
+                                        "value": "L34:P630-633:\"\/\":269:<T_CONSTANT_ENCAPSED_STRING"
+                                    }
+                                ],
+                                "children": [
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L34:P634-638:Home:262:<T_STRING"
+                                        ]
+                                    }
+                                ],
+                                "closingElement": [
+                                    "L34:P638-639:<:60",
+                                    "L34:P639-640:\/:47",
+                                    "L34:P640-641:a:262:<T_STRING",
+                                    "L34:P641-642:>:62"
+                                ]
+                            },
+                            {
+                                "$$type": "PHPXText",
+                                "tokens": [
+                                    "L34:P642-649:\n      :392:<T_WHITESPACE"
+                                ]
+                            },
+                            {
+                                "$$type": "PHPXElement",
+                                "openingElement": [
+                                    "L35:P649-650:<:60",
+                                    "L35:P650-652:h1:262:<T_STRING",
+                                    "L35:P652-653:>:62"
+                                ],
+                                "selfClosing": false,
+                                "attributes": [],
+                                "children": [
+                                    {
+                                        "$$type": "PHPXExpressionContainer",
+                                        "expression": {
+                                            "$$type": "Block",
+                                            "opening": "L35:P653-654:{:123",
+                                            "children": [
+                                                "L35:P654-660:$title:266:<T_VARIABLE"
+                                            ],
+                                            "closing": "L35:P660-661:}:125"
+                                        }
+                                    }
+                                ],
+                                "closingElement": [
+                                    "L35:P661-662:<:60",
+                                    "L35:P662-663:\/:47",
+                                    "L35:P663-665:h1:262:<T_STRING",
+                                    "L35:P665-666:>:62"
+                                ]
+                            },
+                            {
+                                "$$type": "PHPXText",
+                                "tokens": [
+                                    "L35:P666-673:\n      :392:<T_WHITESPACE"
+                                ]
+                            },
+                            {
+                                "$$type": "PHPXElement",
+                                "openingElement": [
+                                    "L36:P673-674:<:60",
+                                    "L36:P674-676:ul:262:<T_STRING",
+                                    "L36:P676-677:>:62"
+                                ],
+                                "selfClosing": false,
+                                "attributes": [],
+                                "children": [
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L36:P677-686:\n        :392:<T_WHITESPACE"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXExpressionContainer",
+                                        "expression": {
+                                            "$$type": "Block",
+                                            "opening": "L37:P686-687:{:123",
+                                            "children": [
+                                                "L37:P687-696:array_map:262:<T_STRING",
+                                                {
+                                                    "$$type": "Block",
+                                                    "opening": "L37:P696-697:(:40",
+                                                    "children": [
+                                                        "L37:P697-699:fn:311:<T_FN",
+                                                        {
+                                                            "$$type": "Block",
+                                                            "opening": "L37:P699-700:(:40",
+                                                            "children": [
+                                                                "L37:P700-704:$tag:266:<T_VARIABLE"
+                                                            ],
+                                                            "closing": "L37:P704-705:):41"
+                                                        },
+                                                        "L37:P705-706: :392:<T_WHITESPACE",
+                                                        "L37:P706-708:=>:386:<T_DOUBLE_ARROW",
+                                                        "L37:P708-709: :392:<T_WHITESPACE",
+                                                        {
+                                                            "$$type": "Block",
+                                                            "opening": "L37:P709-710:(:40",
+                                                            "children": [
+                                                                "L37:P710-721:\n          :392:<T_WHITESPACE",
+                                                                {
+                                                                    "$$type": "PHPXElement",
+                                                                    "openingElement": [
+                                                                        "L38:P721-722:<:60",
+                                                                        "L38:P722-724:li:262:<T_STRING",
+                                                                        "L38:P724-725:>:62"
+                                                                    ],
+                                                                    "selfClosing": false,
+                                                                    "attributes": [],
+                                                                    "children": [
+                                                                        {
+                                                                            "$$type": "PHPXExpressionContainer",
+                                                                            "expression": {
+                                                                                "$$type": "Block",
+                                                                                "opening": "L38:P725-726:{:123",
+                                                                                "children": [
+                                                                                    "L38:P726-730:$tag:266:<T_VARIABLE"
+                                                                                ],
+                                                                                "closing": "L38:P730-731:}:125"
+                                                                            }
+                                                                        }
+                                                                    ],
+                                                                    "closingElement": [
+                                                                        "L38:P731-732:<:60",
+                                                                        "L38:P732-733:\/:47",
+                                                                        "L38:P733-735:li:262:<T_STRING",
+                                                                        "L38:P735-736:>:62"
+                                                                    ]
+                                                                },
+                                                                "L38:P736-745:\n        :392:<T_WHITESPACE"
+                                                            ],
+                                                            "closing": "L39:P745-746:):41"
+                                                        },
+                                                        "L39:P746-747:,:44",
+                                                        "L39:P747-748: :392:<T_WHITESPACE",
+                                                        "L39:P748-753:$tags:266:<T_VARIABLE"
+                                                    ],
+                                                    "closing": "L39:P753-754:):41"
+                                                }
+                                            ],
+                                            "closing": "L39:P754-755:}:125"
+                                        }
+                                    },
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L39:P755-762:\n      :392:<T_WHITESPACE"
+                                        ]
+                                    }
+                                ],
+                                "closingElement": [
+                                    "L40:P762-763:<:60",
+                                    "L40:P763-764:\/:47",
+                                    "L40:P764-766:ul:262:<T_STRING",
+                                    "L40:P766-767:>:62"
+                                ]
+                            },
+                            {
+                                "$$type": "PHPXText",
+                                "tokens": [
+                                    "L40:P767-772:\n    :392:<T_WHITESPACE"
+                                ]
+                            }
+                        ],
+                        "closingElement": [
+                            "L41:P772-773:<:60",
+                            "L41:P773-774:\/:47",
+                            "L41:P774-780:header:262:<T_STRING",
+                            "L41:P780-781:>:62"
+                        ]
+                    },
+                    "L41:P781-784:\n  :392:<T_WHITESPACE"
+                ],
+                "closing": "L42:P784-785:):41"
+            },
+            "L42:P785-786:;:59",
+            "L42:P786-787:\n:392:<T_WHITESPACE"
+        ],
+        "closing": "L43:P787-788:}:125"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L43:P788-790:\n\n:392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L45:P790-798:function:310:<T_FUNCTION"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L45:P798-799: :392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L45:P799-803:Page:262:<T_STRING"
+    },
+    {
+        "$$type": "Block",
+        "opening": "L45:P803-804:(:40",
+        "children": [],
+        "closing": "L45:P804-805:):41"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L45:P805-806:::58"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L45:P806-807: :392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L45:P807-812:array:341:<T_ARRAY"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L45:P812-813: :392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Block",
+        "opening": "L45:P813-814:{:123",
+        "children": [
+            "L45:P814-817:\n  :392:<T_WHITESPACE",
+            "L46:P817-823:$title:266:<T_VARIABLE",
+            "L46:P823-824: :392:<T_WHITESPACE",
+            "L46:P824-825:=:61",
+            "L46:P825-826: :392:<T_WHITESPACE",
+            "L46:P826-839:'Hello World':269:<T_CONSTANT_ENCAPSED_STRING",
+            "L46:P839-840:;:59",
+            "L46:P840-843:\n  :392:<T_WHITESPACE",
+            "L47:P843-855:$description:266:<T_VARIABLE",
+            "L47:P855-856: :392:<T_WHITESPACE",
+            "L47:P856-857:=:61",
+            "L47:P857-858: :392:<T_WHITESPACE",
+            "L47:P858-879:'This is a test page':269:<T_CONSTANT_ENCAPSED_STRING",
+            "L47:P879-880:;:59",
+            "L47:P880-883:\n  :392:<T_WHITESPACE",
+            "L48:P883-887:$css:266:<T_VARIABLE",
+            "L48:P887-888: :392:<T_WHITESPACE",
+            "L48:P888-889:=:61",
+            "L48:P889-890: :392:<T_WHITESPACE",
+            "L48:P890-903:'\/styles.css':269:<T_CONSTANT_ENCAPSED_STRING",
+            "L48:P903-904:;:59",
+            "L48:P904-908:\n\n  :392:<T_WHITESPACE",
+            "L50:P908-914:return:313:<T_RETURN",
+            "L50:P914-915: :392:<T_WHITESPACE",
+            {
+                "$$type": "Block",
+                "opening": "L50:P915-916:(:40",
+                "children": [
+                    "L50:P916-921:\n    :392:<T_WHITESPACE",
+                    {
+                        "$$type": "PHPXElement",
+                        "openingElement": [
+                            "L51:P921-922:<:60",
+                            "L51:P922-926:html:262:<T_STRING",
+                            "L51:P936-937:>:62"
+                        ],
+                        "selfClosing": false,
+                        "attributes": [
+                            "L51:P926-927: :392:<T_WHITESPACE",
+                            {
+                                "$$type": "PHPXAttribute",
+                                "name": "L51:P927-931:lang:262:<T_STRING",
+                                "assignment": "L51:P931-932:=:61",
+                                "value": "L51:P932-936:\"en\":269:<T_CONSTANT_ENCAPSED_STRING"
+                            }
+                        ],
+                        "children": [
+                            {
+                                "$$type": "PHPXText",
+                                "tokens": [
+                                    "L51:P937-944:\n      :392:<T_WHITESPACE"
+                                ]
+                            },
+                            {
+                                "$$type": "PHPXElement",
+                                "openingElement": [
+                                    "L52:P944-945:<:60",
+                                    "L52:P945-949:head:262:<T_STRING",
+                                    "L52:P949-950:>:62"
+                                ],
+                                "selfClosing": false,
+                                "attributes": [],
+                                "children": [
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L52:P950-959:\n        :392:<T_WHITESPACE"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXElement",
+                                        "openingElement": [
+                                            "L53:P959-960:<:60",
+                                            "L53:P960-964:meta:262:<T_STRING"
+                                        ],
+                                        "selfClosing": true,
+                                        "attributes": [
+                                            "L53:P964-965: :392:<T_WHITESPACE",
+                                            {
+                                                "$$type": "PHPXAttribute",
+                                                "name": "L53:P965-972:charset:262:<T_STRING",
+                                                "assignment": "L53:P972-973:=:61",
+                                                "value": "L53:P973-980:\"UTF-8\":269:<T_CONSTANT_ENCAPSED_STRING"
+                                            },
+                                            "L53:P980-981: :392:<T_WHITESPACE"
+                                        ],
+                                        "closingElement": [
+                                            "L53:P981-982:\/:47",
+                                            "L53:P982-983:>:62"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L53:P983-992:\n        :392:<T_WHITESPACE"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXElement",
+                                        "openingElement": [
+                                            "L54:P992-993:<:60",
+                                            "L54:P993-997:meta:262:<T_STRING"
+                                        ],
+                                        "selfClosing": true,
+                                        "attributes": [
+                                            "L54:P997-998: :392:<T_WHITESPACE",
+                                            {
+                                                "$$type": "PHPXAttribute",
+                                                "name": "L54:P998-1002:name:262:<T_STRING",
+                                                "assignment": "L54:P1002-1003:=:61",
+                                                "value": "L54:P1003-1013:\"viewport\":269:<T_CONSTANT_ENCAPSED_STRING"
+                                            },
+                                            "L54:P1013-1014: :392:<T_WHITESPACE",
+                                            {
+                                                "$$type": "PHPXAttribute",
+                                                "name": "L54:P1014-1021:content:262:<T_STRING",
+                                                "assignment": "L54:P1021-1022:=:61",
+                                                "value": "L54:P1022-1061:\"width=device-width, initial-scale=1.0\":269:<T_CONSTANT_ENCAPSED_STRING"
+                                            },
+                                            "L54:P1061-1062: :392:<T_WHITESPACE"
+                                        ],
+                                        "closingElement": [
+                                            "L54:P1062-1063:\/:47",
+                                            "L54:P1063-1064:>:62"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L54:P1064-1073:\n        :392:<T_WHITESPACE"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXElement",
+                                        "openingElement": [
+                                            "L55:P1073-1074:<:60",
+                                            "L55:P1074-1079:title:262:<T_STRING",
+                                            "L55:P1079-1080:>:62"
+                                        ],
+                                        "selfClosing": false,
+                                        "attributes": [],
+                                        "children": [
+                                            {
+                                                "$$type": "PHPXExpressionContainer",
+                                                "expression": {
+                                                    "$$type": "Block",
+                                                    "opening": "L55:P1080-1081:{:123",
+                                                    "children": [
+                                                        "L55:P1081-1087:$title:266:<T_VARIABLE",
+                                                        "L55:P1087-1088: :392:<T_WHITESPACE",
+                                                        "L55:P1088-1090:??:400:<T_COALESCE",
+                                                        "L55:P1090-1091: :392:<T_WHITESPACE",
+                                                        "L55:P1091-1097:'None':269:<T_CONSTANT_ENCAPSED_STRING"
+                                                    ],
+                                                    "closing": "L55:P1097-1098:}:125"
+                                                }
+                                            },
+                                            {
+                                                "$$type": "PHPXText",
+                                                "tokens": [
+                                                    "L55:P1098-1099: :392:<T_WHITESPACE",
+                                                    "L55:P1099-1101:by:262:<T_STRING",
+                                                    "L55:P1101-1102: :392:<T_WHITESPACE",
+                                                    "L55:P1102-1110:Attitude:262:<T_STRING"
+                                                ]
+                                            }
+                                        ],
+                                        "closingElement": [
+                                            "L55:P1110-1111:<:60",
+                                            "L55:P1111-1112:\/:47",
+                                            "L55:P1112-1117:title:262:<T_STRING",
+                                            "L55:P1117-1118:>:62"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L55:P1118-1127:\n        :392:<T_WHITESPACE"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXElement",
+                                        "openingElement": [
+                                            "L56:P1127-1128:<:60",
+                                            "L56:P1128-1132:meta:262:<T_STRING"
+                                        ],
+                                        "selfClosing": true,
+                                        "attributes": [
+                                            "L56:P1132-1133: :392:<T_WHITESPACE",
+                                            {
+                                                "$$type": "PHPXAttribute",
+                                                "name": "L56:P1133-1137:name:262:<T_STRING",
+                                                "assignment": "L56:P1137-1138:=:61",
+                                                "value": "L56:P1138-1151:\"description\":269:<T_CONSTANT_ENCAPSED_STRING"
+                                            },
+                                            "L56:P1151-1152: :392:<T_WHITESPACE",
+                                            {
+                                                "$$type": "PHPXAttribute",
+                                                "name": "L56:P1152-1159:content:262:<T_STRING",
+                                                "assignment": "L56:P1159-1160:=:61",
+                                                "value": {
+                                                    "$$type": "Block",
+                                                    "opening": "L56:P1160-1161:{:123",
+                                                    "children": [
+                                                        "L56:P1161-1173:$description:266:<T_VARIABLE"
+                                                    ],
+                                                    "closing": "L56:P1173-1174:}:125"
+                                                }
+                                            },
+                                            "L56:P1174-1175: :392:<T_WHITESPACE"
+                                        ],
+                                        "closingElement": [
+                                            "L56:P1175-1176:\/:47",
+                                            "L56:P1176-1177:>:62"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L56:P1177-1186:\n        :392:<T_WHITESPACE"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXElement",
+                                        "openingElement": [
+                                            "L57:P1186-1187:<:60",
+                                            "L57:P1187-1191:link:262:<T_STRING"
+                                        ],
+                                        "selfClosing": true,
+                                        "attributes": [
+                                            "L57:P1191-1192: :392:<T_WHITESPACE",
+                                            {
+                                                "$$type": "PHPXAttribute",
+                                                "name": "L57:P1192-1195:rel:262:<T_STRING",
+                                                "assignment": "L57:P1195-1196:=:61",
+                                                "value": "L57:P1196-1208:\"stylesheet\":269:<T_CONSTANT_ENCAPSED_STRING"
+                                            },
+                                            "L57:P1208-1209: :392:<T_WHITESPACE",
+                                            {
+                                                "$$type": "PHPXAttribute",
+                                                "name": "L57:P1209-1213:href:262:<T_STRING",
+                                                "assignment": "L57:P1213-1214:=:61",
+                                                "value": {
+                                                    "$$type": "Block",
+                                                    "opening": "L57:P1214-1215:{:123",
+                                                    "children": [
+                                                        "L57:P1215-1219:$css:266:<T_VARIABLE"
+                                                    ],
+                                                    "closing": "L57:P1219-1220:}:125"
+                                                }
+                                            },
+                                            "L57:P1220-1221: :392:<T_WHITESPACE"
+                                        ],
+                                        "closingElement": [
+                                            "L57:P1221-1222:\/:47",
+                                            "L57:P1222-1223:>:62"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L57:P1223-1230:\n      :392:<T_WHITESPACE"
+                                        ]
+                                    }
+                                ],
+                                "closingElement": [
+                                    "L58:P1230-1231:<:60",
+                                    "L58:P1231-1232:\/:47",
+                                    "L58:P1232-1236:head:262:<T_STRING",
+                                    "L58:P1236-1237:>:62"
+                                ]
+                            },
+                            {
+                                "$$type": "PHPXText",
+                                "tokens": [
+                                    "L58:P1237-1244:\n      :392:<T_WHITESPACE"
+                                ]
+                            },
+                            {
+                                "$$type": "PHPXElement",
+                                "openingElement": [
+                                    "L59:P1244-1245:<:60",
+                                    "L59:P1245-1249:body:262:<T_STRING",
+                                    "L59:P1249-1250:>:62"
+                                ],
+                                "selfClosing": false,
+                                "attributes": [],
+                                "children": [
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L59:P1250-1259:\n        :392:<T_WHITESPACE"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXExpressionContainer",
+                                        "expression": {
+                                            "$$type": "Block",
+                                            "opening": "L60:P1259-1260:{:123",
+                                            "children": [
+                                                "L60:P1260-1270:PageHeader:262:<T_STRING",
+                                                {
+                                                    "$$type": "Block",
+                                                    "opening": "L60:P1270-1271:(:40",
+                                                    "children": [
+                                                        {
+                                                            "$$type": "Block",
+                                                            "opening": "L60:P1271-1272:[:91",
+                                                            "children": [
+                                                                "L60:P1272-1279:'title':269:<T_CONSTANT_ENCAPSED_STRING",
+                                                                "L60:P1279-1280: :392:<T_WHITESPACE",
+                                                                "L60:P1280-1282:=>:386:<T_DOUBLE_ARROW",
+                                                                "L60:P1282-1283: :392:<T_WHITESPACE",
+                                                                "L60:P1283-1289:$title:266:<T_VARIABLE",
+                                                                "L60:P1289-1290:,:44",
+                                                                "L60:P1290-1291: :392:<T_WHITESPACE",
+                                                                "L60:P1291-1297:'tags':269:<T_CONSTANT_ENCAPSED_STRING",
+                                                                "L60:P1297-1298: :392:<T_WHITESPACE",
+                                                                "L60:P1298-1300:=>:386:<T_DOUBLE_ARROW",
+                                                                "L60:P1300-1301: :392:<T_WHITESPACE",
+                                                                {
+                                                                    "$$type": "Block",
+                                                                    "opening": "L60:P1301-1302:[:91",
+                                                                    "children": [
+                                                                        "L60:P1302-1308:'test':269:<T_CONSTANT_ENCAPSED_STRING",
+                                                                        "L60:P1308-1309:,:44",
+                                                                        "L60:P1309-1310: :392:<T_WHITESPACE",
+                                                                        "L60:P1310-1319:'example':269:<T_CONSTANT_ENCAPSED_STRING"
+                                                                    ],
+                                                                    "closing": "L60:P1319-1320:]:93"
+                                                                }
+                                                            ],
+                                                            "closing": "L60:P1320-1321:]:93"
+                                                        }
+                                                    ],
+                                                    "closing": "L60:P1321-1322:):41"
+                                                }
+                                            ],
+                                            "closing": "L60:P1322-1323:}:125"
+                                        }
+                                    },
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L60:P1323-1332:\n        :392:<T_WHITESPACE"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXExpressionContainer",
+                                        "expression": {
+                                            "$$type": "Block",
+                                            "opening": "L61:P1332-1333:{:123",
+                                            "children": [
+                                                "L61:P1333-1341:PageMain:262:<T_STRING",
+                                                {
+                                                    "$$type": "Block",
+                                                    "opening": "L61:P1341-1342:(:40",
+                                                    "children": [
+                                                        {
+                                                            "$$type": "Block",
+                                                            "opening": "L61:P1342-1343:[:91",
+                                                            "children": [
+                                                                "L61:P1343-1350:'items':269:<T_CONSTANT_ENCAPSED_STRING",
+                                                                "L61:P1350-1351: :392:<T_WHITESPACE",
+                                                                "L61:P1351-1353:=>:386:<T_DOUBLE_ARROW",
+                                                                "L61:P1353-1354: :392:<T_WHITESPACE",
+                                                                {
+                                                                    "$$type": "Block",
+                                                                    "opening": "L61:P1354-1355:[:91",
+                                                                    "children": [
+                                                                        "L61:P1355-1363:'Item 1':269:<T_CONSTANT_ENCAPSED_STRING",
+                                                                        "L61:P1363-1364:,:44",
+                                                                        "L61:P1364-1365: :392:<T_WHITESPACE",
+                                                                        "L61:P1365-1373:'Item 2':269:<T_CONSTANT_ENCAPSED_STRING",
+                                                                        "L61:P1373-1374:,:44",
+                                                                        "L61:P1374-1375: :392:<T_WHITESPACE",
+                                                                        "L61:P1375-1383:'Item 3':269:<T_CONSTANT_ENCAPSED_STRING"
+                                                                    ],
+                                                                    "closing": "L61:P1383-1384:]:93"
+                                                                }
+                                                            ],
+                                                            "closing": "L61:P1384-1385:]:93"
+                                                        }
+                                                    ],
+                                                    "closing": "L61:P1385-1386:):41"
+                                                }
+                                            ],
+                                            "closing": "L61:P1386-1387:}:125"
+                                        }
+                                    },
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L61:P1387-1396:\n        :392:<T_WHITESPACE"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXExpressionContainer",
+                                        "expression": {
+                                            "$$type": "Block",
+                                            "opening": "L62:P1396-1397:{:123",
+                                            "children": [
+                                                "L62:P1397-1407:PageFooter:262:<T_STRING",
+                                                {
+                                                    "$$type": "Block",
+                                                    "opening": "L62:P1407-1408:(:40",
+                                                    "children": [
+                                                        {
+                                                            "$$type": "Block",
+                                                            "opening": "L62:P1408-1409:[:91",
+                                                            "children": [
+                                                                "L62:P1409-1415:'year':269:<T_CONSTANT_ENCAPSED_STRING",
+                                                                "L62:P1415-1416: :392:<T_WHITESPACE",
+                                                                "L62:P1416-1418:=>:386:<T_DOUBLE_ARROW",
+                                                                "L62:P1418-1419: :392:<T_WHITESPACE",
+                                                                "L62:P1419-1423:2021:260:<T_LNUMBER"
+                                                            ],
+                                                            "closing": "L62:P1423-1424:]:93"
+                                                        }
+                                                    ],
+                                                    "closing": "L62:P1424-1425:):41"
+                                                }
+                                            ],
+                                            "closing": "L62:P1425-1426:}:125"
+                                        }
+                                    },
+                                    {
+                                        "$$type": "PHPXText",
+                                        "tokens": [
+                                            "L62:P1426-1433:\n      :392:<T_WHITESPACE"
+                                        ]
+                                    }
+                                ],
+                                "closingElement": [
+                                    "L63:P1433-1434:<:60",
+                                    "L63:P1434-1435:\/:47",
+                                    "L63:P1435-1439:body:262:<T_STRING",
+                                    "L63:P1439-1440:>:62"
+                                ]
+                            },
+                            {
+                                "$$type": "PHPXText",
+                                "tokens": [
+                                    "L63:P1440-1445:\n    :392:<T_WHITESPACE"
+                                ]
+                            }
+                        ],
+                        "closingElement": [
+                            "L64:P1445-1446:<:60",
+                            "L64:P1446-1447:\/:47",
+                            "L64:P1447-1451:html:262:<T_STRING",
+                            "L64:P1451-1452:>:62"
+                        ]
+                    },
+                    "L64:P1452-1455:\n  :392:<T_WHITESPACE"
+                ],
+                "closing": "L65:P1455-1456:):41"
+            },
+            "L65:P1456-1457:;:59",
+            "L65:P1457-1458:\n:392:<T_WHITESPACE"
+        ],
+        "closing": "L66:P1458-1459:}:125"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L66:P1459-1461:\n\n:392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L68:P1461-1467:return:313:<T_RETURN"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L68:P1467-1468: :392:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L68:P1468-1472:Page:262:<T_STRING"
+    },
+    {
+        "$$type": "Block",
+        "opening": "L68:P1472-1473:(:40",
+        "children": [],
+        "closing": "L68:P1473-1474:):41"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L68:P1474-1475:;:59"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L68:P1475-1476:\n:392:<T_WHITESPACE"
+    }
+]

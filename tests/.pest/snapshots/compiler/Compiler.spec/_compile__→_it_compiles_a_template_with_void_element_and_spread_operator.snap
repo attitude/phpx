@@ -1,0 +1,50 @@
+[
+    {
+        "$$type": "PHPXElement",
+        "openingElement": [
+            "L1:P0-1:<:60",
+            "L1:P1-4:img:262:<T_STRING"
+        ],
+        "selfClosing": true,
+        "attributes": [
+            "L1:P4-5: :392:<T_WHITESPACE",
+            {
+                "$$type": "Block",
+                "opening": "L1:P5-6:{:123",
+                "children": [
+                    "L1:P6-14:$loading:266:<T_VARIABLE"
+                ],
+                "closing": "L1:P14-15:}:125"
+            },
+            "L1:P15-16: :392:<T_WHITESPACE",
+            {
+                "$$type": "PHPXAttribute",
+                "name": "L1:P16-19:src:262:<T_STRING",
+                "assignment": "L1:P19-20:=:61",
+                "value": "L1:P20-33:\"about:blank\":269:<T_CONSTANT_ENCAPSED_STRING"
+            },
+            "L1:P33-34: :392:<T_WHITESPACE",
+            {
+                "$$type": "Block",
+                "opening": "L1:P34-35:{:123",
+                "children": [
+                    "L1:P35-38:...:399:<T_ELLIPSIS",
+                    "L1:P38-44:$props:266:<T_VARIABLE"
+                ],
+                "closing": "L1:P44-45:}:125"
+            },
+            "L1:P45-46: :392:<T_WHITESPACE",
+            {
+                "$$type": "PHPXAttribute",
+                "name": "L1:P46-49:alt:262:<T_STRING",
+                "assignment": "L1:P49-50:=:61",
+                "value": "L1:P50-72:'Never overridden alt':269:<T_CONSTANT_ENCAPSED_STRING"
+            },
+            "L1:P72-73: :392:<T_WHITESPACE"
+        ],
+        "closingElement": [
+            "L1:P73-74:\/:47",
+            "L1:P74-75:>:62"
+        ]
+    }
+]

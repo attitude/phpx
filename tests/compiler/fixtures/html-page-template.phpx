@@ -1,0 +1,27 @@
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{$title ?? 'None'} by Attitude</title>
+		<meta name="description" content={$description} />
+		<link rel="stylesheet" href={$css} />
+	</head>
+	<body>
+		<header>
+			<a href="/">Home</a>
+			<h1>{$title}</h1>
+			<ul>{$tagsHTML}</ul>
+		</header>
+		<main>
+			<ul>
+				{$items->map(fn($item) => (
+					<li>{$item}</li>
+				))}
+			</ul>
+			{$content}
+		</main>
+		<footer>
+			<p>©{$year} @martin_adamko</p>
+		</footer>
+	</body>
+</html>

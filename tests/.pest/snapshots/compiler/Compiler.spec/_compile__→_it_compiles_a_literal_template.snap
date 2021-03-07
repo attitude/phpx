@@ -1,0 +1,36 @@
+[
+    {
+        "$$type": "TemplateLiteral",
+        "opening": "L1:P0-1:`:96",
+        "children": [
+            "L1:P1-19:Hello, my name is :268:<T_ENCAPSED_AND_WHITESPACE",
+            {
+                "$$type": "Block",
+                "opening": "L1:P19-20:{:396:<T_CURLY_OPEN",
+                "children": [
+                    "L1:P20-25:$name:266:<T_VARIABLE",
+                    "L1:P25-26: :392:<T_WHITESPACE",
+                    "L1:P26-28:??:400:<T_COALESCE",
+                    "L1:P28-29: :392:<T_WHITESPACE",
+                    "L1:P29-48:'yet to be defined':269:<T_CONSTANT_ENCAPSED_STRING"
+                ],
+                "closing": "L1:P48-49:}:125"
+            },
+            "L1:P49-67:, and I come from :268:<T_ENCAPSED_AND_WHITESPACE",
+            {
+                "$$type": "Block",
+                "opening": "L1:P67-68:{:396:<T_CURLY_OPEN",
+                "children": [
+                    "L1:P68-76:$country:266:<T_VARIABLE",
+                    "L1:P76-77: :392:<T_WHITESPACE",
+                    "L1:P77-79:??:400:<T_COALESCE",
+                    "L1:P79-80: :392:<T_WHITESPACE",
+                    "L1:P80-87:'Earth':269:<T_CONSTANT_ENCAPSED_STRING"
+                ],
+                "closing": "L1:P87-88:}:125"
+            },
+            "L1:P88-89:!:268:<T_ENCAPSED_AND_WHITESPACE"
+        ],
+        "closing": "L1:P89-90:`:96"
+    }
+]

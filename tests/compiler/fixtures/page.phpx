@@ -1,0 +1,68 @@
+<?php
+
+function PageFooter(array $props): array {
+  $year = $props['year'] ?? date('Y');
+
+  return (
+    <footer>
+      <p>© {$year} @martin_adamko</p>
+    </footer>
+  );
+}
+
+function PageMain(array $items): array {
+  ['items' => $items, 'content' => $content] = $items ?? ['items' => [], 'content' => null ];
+
+  return (
+    <main>
+      <ul>
+        {array_map(fn($item) => (
+          <li>{$item}</li>
+        ), $items)}
+      </ul>
+      {$content}
+    </main>
+  );
+}
+
+function PageHeader(array $props): array {
+  $title = $props['title'] ?? 'Untitled';
+  $tags = $props['tags'] ?? [];
+
+  return (
+    <header>
+      <a href="/">Home</a>
+      <h1>{$title}</h1>
+      <ul>
+        {array_map(fn($tag) => (
+          <li>{$tag}</li>
+        ), $tags)}
+      </ul>
+    </header>
+  );
+}
+
+function Page(): array {
+  $title = 'Hello World';
+  $description = 'This is a test page';
+  $css = '/styles.css';
+
+  return (
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{$title ?? 'None'} by Attitude</title>
+        <meta name="description" content={$description} />
+        <link rel="stylesheet" href={$css} />
+      </head>
+      <body>
+        {PageHeader(['title' => $title, 'tags' => ['test', 'example']])}
+        {PageMain(['items' => ['Item 1', 'Item 2', 'Item 3']])}
+        {PageFooter(['year' => 2021])}
+      </body>
+    </html>
+  );
+}
+
+return Page();

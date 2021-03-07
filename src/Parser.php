@@ -1,0 +1,317 @@
+<?php declare(strict_types = 1);
+
+namespace PHPX\PHPX;
+
+use Psr\Log\LoggerInterface;
+
+final class Parser {
+	public ?LoggerInterface $logger = null;
+  protected TokensList $tokens;
+  protected array $ast;
+  public function __construct() {}
+
+  public function parse(TokensList $tokens): array {
+		$this->ast = [];
+    $this->tokens = $tokens;
+
+		$this->logger?->debug('Parse TokensList', (array) $this->tokens);
+		$this->tokens->rewind();
+
+		while ($this->tokens->exist()) {
+			$this->debugCurrentToken(__FUNCTION__);
+
+			$this->ast[] = match($this->tokens->tokenAtCursor()->id) {
+				T_CURLY_OPEN,
+				T_DOLLAR_OPEN_CURLY_BRACES,
+				TX_CURLY_BRACKET_OPEN,
+				TX_PARENTHESIS_OPEN,
+				TX_SQUARE_BRACKET_OPEN => $this->parseParentheses(),
+				TX_FRAGMENT_ELEMENT_OPEN => $this->parseFragmentElement(),
+				TX_ELEMENT_OPENING_OPEN => $this->parseElement(),
+				TX_TEMPLATE_LITERAL => $this->parseTemplateLiteral(),
+				default => ['$$type' => NodeType::EXPRESSION, 'value' => $this->tokens->tokenAtCursorAndForward()],
+			};
+		}
+
+		$this->logger?->debug('AST', $this->ast);
+
+		return $this->ast;
+	}
+
+  protected function parseFragmentElement(): array {
+		return [
+			'$$type' => NodeType::PHPX_FRAGMENT,
+			'openingElement' => $this->tokens->tokenAtCursorAndForward(),
+			'children' => $this->parseElementChildren(),
+			'closingElement' => match(!!$this->tokens->tokenAtCursorMatching(TX_FRAGMENT_ELEMENT_CLOSING_SEQUENCE)) {
+				true => [
+					$this->tokens->tokenAtCursorAndForward(),
+					$this->tokens->tokenAtCursorAndForward(),
+					$this->tokens->tokenAtCursorAndForward(),
+				],
+				false => throw new \ParseError("Expected fragment element closer"),
+			},
+		];
+	}
+
+  protected function parseElement(): array {
+		$this->debugCurrentToken(__FUNCTION__);
+		$openingElementStart = $this->tokens->tokenAtCursorAndForward();
+		assert($openingElementStart->id === TX_ELEMENT_OPENING_OPEN);
+
+		$this->debugCurrentToken(__FUNCTION__);
+		$elementName = $this->tokens->tokenAtCursorAndForward();
+		assert($elementName->id === T_STRING);
+
+		$attributes = $this->parseElementAttributes();
+
+		if ($this->tokens->tokenAtCursorMatching(TX_ELEMENT_SELF_CLOSING_SEQUENCE)) {
+			$this->debugCurrentToken(__FUNCTION__);
+			$closingElementSlash = $this->tokens->tokenAtCursorAndForward();
+			assert($closingElementSlash->text === '/');
+
+			$this->debugCurrentToken(__FUNCTION__);
+			$closingElementEnd = $this->tokens->tokenAtCursorAndForward();
+			assert($closingElementEnd->text === '>');
+
+			return [
+				'$$type' => NodeType::PHPX_ELEMENT,
+				'openingElement' => [$openingElementStart, $elementName],
+				'selfClosing' => true,
+				'attributes' => $attributes,
+				'closingElement' => [$closingElementSlash, $closingElementEnd],
+			];
+		} else if ($this->tokens->tokenAtCursorMatching(TX_ELEMENT_OPENING_CLOSE)) {
+			$this->debugCurrentToken(__FUNCTION__);
+			$openingElementEnd = $this->tokens->tokenAtCursorAndForward();
+      assert($openingElementEnd->id === TX_ELEMENT_OPENING_CLOSE);
+
+      $children = $this->parseElementChildren();
+
+      $this->debugCurrentToken(__FUNCTION__);
+      $closingElementStart = $this->tokens->tokenAtCursorAndForward();
+      assert($closingElementStart->text === TX_ELEMENT_CLOSING_SEQUENCE[0]);
+
+      $this->debugCurrentToken(__FUNCTION__);
+      $closingElementSlash = $this->tokens->tokenAtCursorAndForward();
+      assert($closingElementSlash->text === TX_ELEMENT_CLOSING_SEQUENCE[1]);
+
+      $this->debugCurrentToken(__FUNCTION__);
+      $closingElementName = $this->tokens->tokenAtCursorAndForward();
+      assert($closingElementName->id === TX_ELEMENT_CLOSING_SEQUENCE[2]);
+      assert($closingElementName->text === $elementName->text, new \ParseError(
+				"Expected closing tag to match opening tag name '{$elementName->text}' at line {$elementName->line}"
+			));
+
+      $this->debugCurrentToken(__FUNCTION__);
+      $closingElementEnd = $this->tokens->tokenAtCursorAndForward();
+      assert($closingElementEnd->text === TX_ELEMENT_CLOSING_SEQUENCE[3]);
+
+			return [
+        '$$type' => NodeType::PHPX_ELEMENT,
+        'openingElement' => [$openingElementStart, $elementName, $openingElementEnd],
+				'selfClosing' => false,
+        'attributes' => $attributes,
+        'children' => $children,
+        'closingElement' => [
+          $closingElementStart,
+          $closingElementSlash,
+          $closingElementName,
+          $closingElementEnd,
+        ],
+      ];
+		}
+
+		throw new \ParseError("Not implemented");
+	}
+
+	protected function parseExpressionContainer(): array {
+		$this->debugCurrentToken(__FUNCTION__);
+		assert($this->tokens->tokenAtCursorMatching(TX_CURLY_BRACKET_OPEN));
+
+		return [
+			'$$type' => NodeType::PHPX_EXPRESSION_CONTAINER,
+			'expression' => $this->parseParentheses(),
+		];
+	}
+
+  protected function parseTextNode(): array {
+		$value = [];
+
+		while (
+			$this->tokens->exist()
+			&& !$this->tokens->tokenAtCursorMatching(TX_FRAGMENT_ELEMENT_OPEN)
+			&& !$this->tokens->tokenAtCursorMatching(TX_FRAGMENT_ELEMENT_CLOSING_SEQUENCE)
+			&& !$this->tokens->tokenAtCursorMatching(TX_ELEMENT_OPENING_OPEN_SEQUENCE)
+			&& !$this->tokens->tokenAtCursorMatching(TX_ELEMENT_CLOSING_SEQUENCE)
+			&& !$this->tokens->tokenAtCursorMatching(TX_CURLY_BRACKET_OPEN)
+		) {
+			$this->debugCurrentToken(__FUNCTION__);
+
+			$value[] = $this->tokens->tokenAtCursorAndForward();
+		};
+
+		return ['$$type' => NodeType::PHPX_TEXT, 'tokens' => $value];
+	}
+
+  protected function parseTemplateLiteral(): array {
+		$opener = $this->tokens->tokenAtCursorAndForward();
+		$children = [];
+
+		while (
+			$this->tokens->exist()
+			&& !$this->tokens->tokenAtCursorMatching(TX_TEMPLATE_LITERAL)
+		) {
+			$this->debugCurrentToken(__FUNCTION__);
+
+			$children[] = match($this->tokens->tokenAtCursor()->id) {
+				T_CURLY_OPEN,
+				TX_CURLY_BRACKET_OPEN => $this->parseParentheses(),
+				default => $this->tokens->tokenAtCursorAndForward(),
+			};
+		}
+
+		$closer = $this->tokens->tokenAtCursorAndForward();
+		assert($closer->id === TX_TEMPLATE_LITERAL);
+
+		return [
+			'$$type' => NodeType::TEMPLATE_LITERAL,
+			'opening' => $opener,
+			'children' => $children,
+			'closing' => $closer,
+		];
+	}
+
+  protected function parseElementChildren(): array {
+		$children = [];
+
+		while (
+			$this->tokens->exist()
+			&& !$this->tokens->tokenAtCursorMatching(TX_FRAGMENT_ELEMENT_CLOSING_SEQUENCE)
+			&& !$this->tokens->tokenAtCursorMatching(TX_ELEMENT_CLOSING_SEQUENCE)
+		) {
+			$this->debugCurrentToken(__FUNCTION__);
+
+			$children[] = match($this->tokens->tokenAtCursor()->id) {
+				TX_CURLY_BRACKET_OPEN => $this->parseExpressionContainer(),
+				TX_PARENTHESIS_OPEN => $this->parseParentheses(),
+				TX_FRAGMENT_ELEMENT_OPEN => $this->parseFragmentElement(),
+				default => match(!!$this->tokens->tokenAtCursorMatching(TX_ELEMENT_OPENING_OPEN_SEQUENCE)) {
+					true => $this->parseElement(),
+					false => $this->parseTextNode(),
+				},
+			};
+		}
+
+		return $children;
+	}
+
+  protected function parseElementAttributes(): array {
+		$attributes = [];
+
+		while (
+			$this->tokens->exist()
+			&& !$this->tokens->tokenAtCursorMatching(TX_ELEMENT_SELF_CLOSING_SEQUENCE)
+			&& !$this->tokens->tokenAtCursorMatching(TX_ELEMENT_OPENING_CLOSE)
+		) {
+			$this->debugCurrentToken(__FUNCTION__);
+			$attributes[] = match($this->tokens->tokenAtCursor()->id) {
+				T_WHITESPACE => $this->tokens->tokenAtCursorAndForward(),
+				T_STRING => $this->parseElementAttribute(),
+				T_CURLY_OPEN,
+				TX_CURLY_BRACKET_OPEN => $this->parseParentheses(),
+				T_CLASS => throw new \ParseError("Use `className` instead of `class`"),
+				default => throw new \ParseError($this->unexpectedTokenMessage()),
+			};
+		}
+
+		return $attributes;
+	}
+
+  protected function parseElementAttribute(): array {
+		$this->debugCurrentToken(__FUNCTION__);
+
+		$name = $this->tokens->tokenAtCursorAndForward();
+		assert($name->id === T_STRING);
+
+		$assignment = null;
+		$value = true;
+
+		if ($this->tokens->tokenAtCursorMatching('=')) {
+			$assignment = $this->tokens->tokenAtCursorAndForward();
+			$value = match($this->tokens->tokenAtCursor()->id) {
+				T_CURLY_OPEN,
+				TX_CURLY_BRACKET_OPEN => $this->parseParentheses(),
+				T_CONSTANT_ENCAPSED_STRING => $this->tokens->tokenAtCursorAndForward(),
+				default => throw new \ParseError($this->unexpectedTokenMessage('attribute "value" or {expression}')),
+			};
+		} else if (!(
+			$this->tokens->tokenAtCursorMatching(T_WHITESPACE)
+			|| $this->tokens->tokenAtCursorMatching('/')
+		)) {
+			throw new \ParseError($this->unexpectedTokenMessage('"=" (attribute assignment)'));
+		}
+
+		return [
+			'$$type' => NodeType::PHPX_ATTRIBUTE,
+			'name' => $name,
+			'assignment' => $assignment,
+			'value' => $value,
+		];
+	}
+
+  protected function parseParentheses(): array {
+		$this->debugCurrentToken(__FUNCTION__);
+		$opener = $this->tokens->tokenAtCursorAndForward();
+
+		$closerId = match($opener->id) {
+			T_CURLY_OPEN => TX_CURLY_BRACKET_CLOSE,
+			T_DOLLAR_OPEN_CURLY_BRACES => TX_CURLY_BRACKET_CLOSE,
+			TX_CURLY_BRACKET_OPEN => TX_CURLY_BRACKET_CLOSE,
+			TX_PARENTHESIS_OPEN => TX_PARENTHESIS_CLOSE,
+			TX_SQUARE_BRACKET_OPEN => TX_SQUARE_BRACKET_CLOSE,
+			default => throw new \UnhandledMatchError("Unexpected parenthesis opener: {$opener}"),
+		};
+
+		$children = [];
+
+		while (!$this->tokens->tokenAtCursorMatching($closerId)) {
+			$this->debugCurrentToken(__FUNCTION__);
+
+			$children[] = match($this->tokens->tokenAtCursor()->id) {
+				T_CURLY_OPEN,
+				T_DOLLAR_OPEN_CURLY_BRACES,
+				TX_CURLY_BRACKET_OPEN,
+				TX_PARENTHESIS_OPEN,
+				TX_SQUARE_BRACKET_OPEN => $this->parseParentheses(),
+				TX_FRAGMENT_ELEMENT_OPEN => $this->parseFragmentElement(),
+				TX_ELEMENT_OPENING_OPEN => $this->parseElement(),
+				default => $this->tokens->tokenAtCursorAndForward(),
+			};
+		}
+
+    $this->debugCurrentToken(__FUNCTION__);
+		$closer = $this->tokens->tokenAtCursorAndForward();
+
+		return [
+			'$$type' => NodeType::BLOCK,
+			'opening' => $opener,
+			'children' => $children,
+			'closing' => $closer,
+		];
+	}
+
+  protected function unexpectedTokenMessage(string $expected = null): string {
+		return "Unexpected token #{$this->tokens->index()} => {$this->tokens->tokenAtCursor()} at line {$this->tokens->tokenAtCursor()->line}".(
+			$expected ? ", expected {$expected} instead" : ''
+		);
+	}
+
+	protected function debugCurrentToken(string $method): void {
+		$this->logger?->debug("Token#{$this->tokens->index()}", [
+			'text' => $this->tokens->tokenAtCursor()->text,
+			'name' => $this->tokens->tokenAtCursor()->getTokenName(),
+			'method' => $method,
+		]);
+	}
+}
