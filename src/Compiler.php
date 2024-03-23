@@ -31,7 +31,6 @@ final class Compiler {
 				NodeType::PHPX_ELEMENT => $this->compilePHPXElement($node),
 				NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($node),
 				NodeType::PHPX_ATTRIBUTE => $this->compilePHPXAttribute($node),
-				NodeType::PHPX_TEXT => $this->compilePHPXText($node),
 				default => throw new \RuntimeException("Unknown node type: {$node['$$type']}"),
 			};
 		}
@@ -46,16 +45,24 @@ final class Compiler {
 		return $value->text;
 	}
 
+	protected static function trimChildren(string $string): string {
+		if (strstr($string, "\n")) {
+			return strtr($string, [", \n" => ",\n"]);
+		} else {
+			return trim($string, ', ');
+		}
+	}
+
 	protected function compilePHPXChildrenArray(array $children): string {
 		$this->logger?->debug('compilePHPXChildrenArray', $children);
 
-		return '['.implode(', ', array_map(fn(array|Token $child) => match($child['$$type']) {
-			NodeType::BLOCK => $this->compileBlock($child),
-			NodeType::PHPX_ELEMENT => $this->compilePHPXElement($child),
-			NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($child),
+		return '['.self::trimChildren(implode('', array_map(fn(array|Token $child) => match($child['$$type']) {
+			NodeType::BLOCK => $this->compileBlock($child).', ',
+			NodeType::PHPX_ELEMENT => $this->compilePHPXElement($child).', ',
+			NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($child).', ',
 			NodeType::PHPX_TEXT => $this->compilePHPXText($child),
-			NodeType::PHPX_EXPRESSION_CONTAINER => $this->compilePHPXExpressionContainer($child),
-		}, $children)).']';
+			NodeType::PHPX_EXPRESSION_CONTAINER => $this->compilePHPXExpressionContainer($child).', ',
+		}, $children))).']';
 	}
 
 	protected function compilePHPXFragmentElement(array $node): string {
@@ -230,7 +237,6 @@ final class Compiler {
 					NodeType::BLOCK => $this->compileBlock($value),
 					NodeType::PHPX_ELEMENT => $this->compilePHPXElement($value),
 					NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($value),
-					NodeType::PHPX_TEXT => $this->compilePHPXText($value),
 					NodeType::PHPX_EXPRESSION_CONTAINER => $this->compilePHPXExpressionContainer($value),
 					default => throw new \RuntimeException("Unknown child type: {$value['$$type']}"),
 				},
@@ -258,7 +264,18 @@ final class Compiler {
 		$this->logger?->debug('compilePHPXText', [$node]);
 
 		['tokens' => $tokens] = $node;
-		return '\''.implode('', array_map(fn($token) => $token->text, $tokens)).'\'';
+
+		if (count($tokens) === 1) {
+			$token = $tokens[0];
+
+			if ($token->id === T_WHITESPACE) {
+				return $token->text;
+			} else {
+				return '\''.$token->text.'\', ';
+			}
+		} else {
+			return '\''.implode('', array_map(fn($token) => $token->text, $tokens)).'\', ';
+		}
 	}
 
 	public function __toString(): string {

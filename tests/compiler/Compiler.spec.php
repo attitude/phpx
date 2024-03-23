@@ -141,26 +141,26 @@ PHPX
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
 <<<'PHP'
-['
-  ', ['$', 'h1', ['className'=>"title"], ['Hello, ', ($name ?? ucfirst($type)), '!']], '
-  ', ['$', 'p', null, ['
-    Welcome to the world of PHPX, where you can write PHP code in a JSX-like syntax.
-    ', ['$', 'img', ['src'=>"about:blank", 'alt'=>"Happy coding!"]], ' forever!
-  ']], '
-']
+[
+  ['$', 'h1', ['className'=>"title"], ['Hello, ', ($name ?? ucfirst($type)), '!']],
+  ['$', 'p', null, [
+    'Welcome to the world of PHPX, where you can write PHP code in a JSX-like syntax.',
+    ['$', 'img', ['src'=>"about:blank", 'alt'=>"Happy coding!"]], ' forever!',
+  ]],
+]
 PHP
     );
   });
 
   it('compiles a html page template', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: true), withLogger: false);
+    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
     $compiler->compile(file_get_contents(__DIR__.'/fixtures/html-page-template.phpx'));
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toMatchSnapshot();
   });
 
   it('compiles a PHPX script to render Page layout', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: true), withLogger: true);
+    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
     $compiler->compile(file_get_contents(__DIR__.'/fixtures/page.phpx'));
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toMatchSnapshot();

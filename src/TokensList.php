@@ -98,7 +98,7 @@ final class TokensList implements \JsonSerializable, \Iterator {
 
 	public function tokenAtCursorAndForward(): Token|null {
 		$token = $this->tokenAtCursor();
-		$this->forward();
+		$this->move();
 
 		return $token;
 	}
@@ -107,14 +107,8 @@ final class TokensList implements \JsonSerializable, \Iterator {
 		return $this->cursor;
 	}
 
-	public function forward(bool $skipWhiteSpace = false): void {
-		if ($skipWhiteSpace) {
-			while ($this->tokens[$this->cursor + 1]?->id === T_WHITESPACE) {
-				$this->cursor++;
-			}
-		}
-
-		$this->cursor++;
+	public function move(int $offset = 1): void {
+		$this->cursor = $this->cursor + $offset;
 	}
 
 	public function exist(int $offset = 0): bool {

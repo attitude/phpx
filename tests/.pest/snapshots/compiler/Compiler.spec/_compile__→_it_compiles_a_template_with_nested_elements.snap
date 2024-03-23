@@ -91,7 +91,12 @@
                     {
                         "$$type": "PHPXText",
                         "tokens": [
-                            "L3:P71-76:\n    :392:<T_WHITESPACE",
+                            "L3:P71-76:\n    :392:<T_WHITESPACE"
+                        ]
+                    },
+                    {
+                        "$$type": "PHPXText",
+                        "tokens": [
                             "L4:P76-83:Welcome:262:<T_STRING",
                             "L4:P83-84: :392:<T_WHITESPACE",
                             "L4:P84-86:to:262:<T_STRING",
@@ -126,7 +131,12 @@
                             "L4:P144-148:like:262:<T_STRING",
                             "L4:P148-149: :392:<T_WHITESPACE",
                             "L4:P149-155:syntax:262:<T_STRING",
-                            "L4:P155-156:.:46",
+                            "L4:P155-156:.:46"
+                        ]
+                    },
+                    {
+                        "$$type": "PHPXText",
+                        "tokens": [
                             "L4:P156-161:\n    :392:<T_WHITESPACE"
                         ]
                     },
@@ -164,7 +174,12 @@
                         "tokens": [
                             "L5:P206-207: :392:<T_WHITESPACE",
                             "L5:P207-214:forever:262:<T_STRING",
-                            "L5:P214-215:!:33",
+                            "L5:P214-215:!:33"
+                        ]
+                    },
+                    {
+                        "$$type": "PHPXText",
+                        "tokens": [
                             "L5:P215-218:\n  :392:<T_WHITESPACE"
                         ]
                     }

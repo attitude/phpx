@@ -136,6 +136,11 @@ final class Parser {
 	}
 
   protected function parseTextNode(): array {
+		if ($this->tokens->tokenAtCursorMatching(T_WHITESPACE) && strstr($this->tokens->tokenAtCursor()->text, "\n")) {
+			$this->debugCurrentToken(__FUNCTION__);
+			return ['$$type' => NodeType::PHPX_TEXT, 'tokens' => [$this->tokens->tokenAtCursorAndForward()]];
+		}
+
 		$value = [];
 
 		while (
@@ -150,6 +155,11 @@ final class Parser {
 
 			$value[] = $this->tokens->tokenAtCursorAndForward();
 		};
+
+		if ($this->tokens->tokenAtCursor(-1)->id === T_WHITESPACE && strstr($value[count($value) - 1]->text, "\n")) {
+			array_pop($value);
+			$this->tokens->move(-1);
+		}
 
 		return ['$$type' => NodeType::PHPX_TEXT, 'tokens' => $value];
 	}
