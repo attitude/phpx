@@ -17,7 +17,8 @@
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "PHPX\\PHPX\\": "src/"
+            "PHPX\\PHPX\\": "src/",
+            "PHPX\\React\\": "src/examples/"
         }
     },
     "require": {

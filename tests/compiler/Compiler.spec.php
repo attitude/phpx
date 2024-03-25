@@ -87,7 +87,7 @@ PHP
     $compiler->compile('<img src={$src} alt="An image of PHPX" />');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
-      "['$', 'img', ['src'=>(\$src), 'alt'=>\"An image of PHPX\"]]"
+      "['img', ['src'=>(\$src), 'alt'=>\"An image of PHPX\"]]"
     );
   });
 
@@ -96,7 +96,7 @@ PHP
     $compiler->compile('<input type="checkbox" checked={$checked} disabled />');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
-      "['$', 'input', ['type'=>\"checkbox\", 'checked'=>(\$checked), 'disabled'=>true]]"
+      "['input', ['type'=>\"checkbox\", 'checked'=>(\$checked), 'disabled'=>true]]"
     );
   });
 
@@ -105,7 +105,7 @@ PHP
     $compiler->compile('<img {$loading} src="about:blank" {...$props} alt=\'Never overridden alt\' />');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
-      "['$', 'img', ['loading'=>\$loading, 'src'=>\"about:blank\", ...\$props, 'alt'=>'Never overridden alt']]"
+      "['img', ['loading'=>\$loading, 'src'=>\"about:blank\", ...\$props, 'alt'=>'Never overridden alt']]"
     );
   });
 
@@ -119,7 +119,7 @@ PHPX
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
 <<<'PHP'
-  ['$', 'h1', ['className'=>"title"], ['Hello, ', ($name ?? ucfirst($type)), '!']]
+  ['h1', ['className'=>"title"], ['Hello, ', ($name ?? ucfirst($type)), '!']]
 PHP
     );
   });
@@ -142,10 +142,10 @@ PHPX
     expect($compiler->getCompiled())->toBe(
 <<<'PHP'
 [
-  ['$', 'h1', ['className'=>"title"], ['Hello, ', ($name ?? ucfirst($type)), '!']],
-  ['$', 'p', null, [
+  ['h1', ['className'=>"title"], ['Hello, ', ($name ?? ucfirst($type)), '!']],
+  ['p', null, [
     'Welcome to the world of PHPX, where you can write PHP code in a JSX-like syntax.',
-    ['$', 'img', ['src'=>"about:blank", 'alt'=>"Happy coding!"]], ' forever!',
+    ['img', ['src'=>"about:blank", 'alt'=>"Happy coding!"]], ' forever!',
   ]],
 ]
 PHP
@@ -171,7 +171,7 @@ PHP
     $compiler->compile('<div></div>');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
-      "['$', 'div']"
+      "['div']"
     );
   });
 
@@ -203,7 +203,7 @@ PHPX
 <?php
 // A normal comment
 $message = (
-  ['$', 'p', null, [
+  ['p', null, [
     'URL address should start with https:// prefix',
   ]]
 );

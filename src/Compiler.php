@@ -8,14 +8,17 @@ final class Compiler {
 	public ?LoggerInterface $logger = null;
 	protected TokensList $tokens;
 	protected Parser $parser;
+	protected Formatter $formatter;
 	protected string $source;
 	protected array $ast;
 	protected string $compiled;
 
 	public function __construct(
-		Parser $parser = null
+		Parser $parser = null,
+		Formatter $formatter = null,
 	) {
 		$this->parser = $parser ?? new Parser();
+		$this->formatter = $formatter ?? new Formatter();
 	}
 
 	public function compile(string $source): string {
@@ -71,7 +74,9 @@ final class Compiler {
 		$this->logger?->debug('compilePHPXFragmentElement', $node);
 		assert($node['$$type'] === NodeType::PHPX_FRAGMENT);
 
-		return $this->compilePHPXChildrenArray($node['children']);
+		return $this->formatter->formatFragment(
+			$this->compilePHPXChildrenArray($node['children'])
+		);
 	}
 
 	protected function compilePHPXAttribute(array $node): string {
@@ -85,13 +90,14 @@ final class Compiler {
 
 		if (!$assignment) {
 			assert($value === true);
-			return "'{$name->text}'=>true";
+			return $this->formatter->formatAttributeExpression($name->text, 'true');
 		} else if ($assignment->text === '=') {
 			if ($value instanceof Token) {
-				return "'{$name->text}'=>{$value->text}";
+				return $this->formatter->formatAttributeExpression($name->text, $value->text);
 			} else {
 				$expression = $this->compileBlock($value, '(', ')');
-				return "'{$name->text}'=>{$expression}";
+
+				return $this->formatter->formatAttributeExpression($name->text, $expression);
 			}
 		} else {
 			throw new \RuntimeException("Unknown assignment type: {$assignment->text}");
@@ -112,7 +118,7 @@ final class Compiler {
 				if ($child->id === T_VARIABLE) {
 					$attribute = strtolower(substr($child->text, 1));
 
-					return "'{$attribute}'=>{$child->text}";
+					return $this->formatter->formatAttributeExpression($attribute, $child->text);
 				} else {
 					throw new \RuntimeException("Unknown block child type: {$child}");
 				}
@@ -149,24 +155,11 @@ final class Compiler {
 			'closingElement' => $closingElement,
 		] = ['children' => [], ...$node];
 
-		$compiled = [
-			"'$'",
-			"'{$name->text}'",
+		return $this->formatter->formatElement(
+			$name->text,
 			(!empty($attributes) ? $this->compilePHPXAttributes($attributes) : null),
 			(!empty($children) ? $this->compilePHPXChildrenArray($children) : null),
-		];
-
-		if (empty($compiled[3])) {
-			array_pop($compiled);
-
-			if (empty($compiled[2])) {
-				array_pop($compiled);
-			}
-		} else if (empty($compiled[2])) {
-			$compiled[2] = 'null';
-		}
-
-		return '['.implode(', ', $compiled).']';
+		);
 	}
 
 	protected static function combineStringArrayMembers(array $array): array {
