@@ -37,12 +37,14 @@ final class Token extends \PhpToken implements \JsonSerializable {
 			$offset = 6;
 		}
 
-		$tokens = parent::tokenize($source);
+		$tokens = parent::tokenize($source, $flags);
 		if (!$startsWithOpenTag) {
 			array_shift($tokens);
 		}
 
 		return array_map(function (Token $token) use ($offset, $source) {
+			$token->pos = $token->pos - $offset;
+
 			$text = $token->text;
 			$id = $token->id;
 			$line = $token->line;
@@ -65,21 +67,23 @@ final class Token extends \PhpToken implements \JsonSerializable {
 			}
 
 			if ($id === T_IS_NOT_EQUAL && $text === '<>') {
-				return new Token(id: TX_FRAGMENT_ELEMENT_OPEN, text: '<>', line: $line, pos: $position);
+				$token->id = TX_FRAGMENT_ELEMENT_OPEN;
 			} else if ($text === '`') {
 				assert($id === TX_TEMPLATE_LITERAL);
-
-				return match($offset) {
-					0 => $token,
-					default => new Token(id: $id, text: $text, line: $line, pos: $position - $offset),
-				};
-			} else {
-				return match($offset) {
-					0 => $token,
-					default => new Token(id: $id, text: $text, line: $line, pos: $position - $offset),
-				};
 			}
+
+			return $token;
 		}, $tokens);
+	}
+
+	public static function offsetTokenize(string $source, int $offset, int $flags = 0): array {
+		$tokens = self::tokenize($source, $flags);
+
+		foreach ($tokens as $token) {
+			$token->pos += $offset;
+		}
+
+		return $tokens;
 	}
 
 	public function jsonSerialize(): string {

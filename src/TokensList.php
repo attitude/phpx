@@ -115,6 +115,14 @@ final class TokensList implements \JsonSerializable, \Iterator {
 		return isset($this->tokens[$this->cursor + $offset]);
 	}
 
+	public function replaceTokenAtCursor(array|Token $value): void {
+		if (is_array($value)) {
+			array_splice($this->tokens, $this->cursor, 1, array_map(fn(Token $it) => $it, $value));
+		} else {
+			$this->tokens[$this->cursor] = $value;
+		}
+	}
+
 	public function __toString(): string {
 		return implode('', array_map(fn ($token) => $token->text, $this->tokens));
 	}

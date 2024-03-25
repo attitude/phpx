@@ -62,6 +62,8 @@ final class Compiler {
 			NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($child).', ',
 			NodeType::PHPX_TEXT => $this->compilePHPXText($child),
 			NodeType::PHPX_EXPRESSION_CONTAINER => $this->compilePHPXExpressionContainer($child).', ',
+			NodeType::PHPX_COMMENT => $this->compilePHPXComment($child),
+			default => throw new \RuntimeException("Unknown child type: {$child['$$type']->value}"),
 		}, $children))).']';
 	}
 
@@ -258,6 +260,14 @@ final class Compiler {
 		}, $children);
 
 		return implode('.', $children);
+	}
+
+	protected function compilePHPXComment(array $node): string {
+		$this->logger?->debug('compilePHPXComment', $node);
+
+		['comment' => $comment] = $node;
+
+		return $comment->text;
 	}
 
 	protected function compilePHPXText(array $node): string {

@@ -11,5 +11,6 @@ enum NodeType: string {
 	case PHPX_FRAGMENT = 'PHPXFragment';
 	case PHPX_ATTRIBUTE = 'PHPXAttribute';
 	case PHPX_EXPRESSION_CONTAINER = 'PHPXExpressionContainer';
+	case PHPX_COMMENT = 'PHPXComment';
 	case PHPX_TEXT = 'PHPXText';
 }

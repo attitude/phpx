@@ -2,6 +2,7 @@
 
 namespace PHPX\PHPX;
 
+use PhpToken;
 use Psr\Log\LoggerInterface;
 
 final class Parser {
@@ -129,10 +130,19 @@ final class Parser {
 		$this->debugCurrentToken(__FUNCTION__);
 		assert($this->tokens->tokenAtCursorMatching(TX_CURLY_BRACKET_OPEN));
 
-		return [
-			'$$type' => NodeType::PHPX_EXPRESSION_CONTAINER,
-			'expression' => $this->parseParentheses(),
-		];
+		$expression = $this->parseParentheses();
+
+		if (count($expression['children']) === 1 && $expression['children'][0]->id === T_COMMENT) {
+			return [
+				'$$type' => NodeType::PHPX_COMMENT,
+				'comment' => $expression['children'][0],
+			];
+		} else {
+			return [
+				'$$type' => NodeType::PHPX_EXPRESSION_CONTAINER,
+				'expression' => $expression,
+			];
+		}
 	}
 
   protected function parseTextNode(): array {
@@ -153,10 +163,41 @@ final class Parser {
 		) {
 			$this->debugCurrentToken(__FUNCTION__);
 
+			if ($this->tokens->tokenAtCursorMatching(T_COMMENT)) {
+				$this->logger?->debug('Found comment', ['token' => $this->tokens->tokenAtCursor()]);
+				$commentToken = $this->tokens->tokenAtCursor();
+				$tokenText = $commentToken->text;
+
+				if (str_starts_with($tokenText, '//')) {
+					$this->logger?->debug('Token starts with //', ['token' => $this->tokens->tokenAtCursor()]);
+
+					$tokensToInsert = [
+						new Token(T_STRING, '//', $commentToken->line, $commentToken->pos),
+						...Token::offsetTokenize(substr($tokenText, 2), $commentToken->pos + 2),
+					];
+					$this->logger?->debug('Tokens to insert', ['tokens' => $tokensToInsert]);
+
+					$this->tokens->replaceTokenAtCursor($tokensToInsert);
+				} else if (str_starts_with($tokenText, '#')) {
+					$this->logger?->debug('Token starts with #', ['token' => $this->tokens->tokenAtCursor()]);
+
+					$tokensToInsert = [
+						new Token(T_STRING, '#', $commentToken->line, $commentToken->pos),
+						...Token::offsetTokenize(substr($tokenText, 1), $commentToken->pos + 1),
+					];
+					$this->logger?->debug('Tokens to insert', ['tokens' => $tokensToInsert]);
+
+					$this->tokens->replaceTokenAtCursor($tokensToInsert);
+				} else {
+					print_r($this->tokens->tokenAtCursor());
+					throw new \ParseError("Unescaped PHP comment found at line {$this->tokens->tokenAtCursor()->line}");
+				}
+			}
+
 			$value[] = $this->tokens->tokenAtCursorAndForward();
 		};
 
-		if ($this->tokens->tokenAtCursor(-1)->id === T_WHITESPACE && strstr($value[count($value) - 1]->text, "\n")) {
+		if ($this->tokens->tokenAtCursor(-1)?->id === T_WHITESPACE && strstr($value[count($value) - 1]->text, "\n")) {
 			array_pop($value);
 			$this->tokens->move(-1);
 		}

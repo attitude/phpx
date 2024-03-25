@@ -27,14 +27,14 @@ function newCompiler(Parser $parser = null, bool $withLogger = false): Compiler 
 
 describe('compile', function () {
   it('compiles valid PHP code', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<?php echo "Hello, World!";');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe('<?php echo "Hello, World!";');
   });
 
   it('compiles a simple string template', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<>Hello, {$name ?? \'unnamed\'}!</>');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
@@ -45,7 +45,7 @@ PHP
   });;
 
   it('compiles a literal template', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile(
       '`Hello, my name is {$name ?? \'yet to be defined\'}, and I come from {$country ?? \'Earth\'}!`'
     );
@@ -56,7 +56,7 @@ PHP
   });;
 
   it('compiles a template with a function call', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<>Hello, {$name ?? ucfirst($type)}!</>');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
@@ -65,7 +65,7 @@ PHP
   });
 
   it('compiles a template with a function call and spread operator', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<>Hello, {$name ?? ucfirst(...$type)}!</>');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
@@ -74,7 +74,7 @@ PHP
   });
 
   it('compiles a template with arrow function', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<>Hello, {$name ?? fn($it) => ucfirst($it))($type)}!</>');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
@@ -83,7 +83,7 @@ PHP
   });
 
   it('compiles a template with void element', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<img src={$src} alt="An image of PHPX" />');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
@@ -92,7 +92,7 @@ PHP
   });
 
   it('compiles a template with short boolean attribute', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<input type="checkbox" checked={$checked} disabled />');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
@@ -101,7 +101,7 @@ PHP
   });
 
   it('compiles a template with void element and spread operator', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<img {$loading} src="about:blank" {...$props} alt=\'Never overridden alt\' />');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
@@ -110,7 +110,7 @@ PHP
   });
 
   it('compiles a template with element', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile(
 <<<'PHPX'
   <h1 className="title">Hello, {$name ?? ucfirst($type)}!</h1>
@@ -125,7 +125,7 @@ PHP
   });
 
   it('compiles a template with nested elements', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile(
 <<<'PHPX'
 <>
@@ -153,25 +153,82 @@ PHP
   });
 
   it('compiles a html page template', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile(file_get_contents(__DIR__.'/fixtures/html-page-template.phpx'));
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toMatchSnapshot();
   });
 
   it('compiles a PHPX script to render Page layout', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile(file_get_contents(__DIR__.'/fixtures/page.phpx'));
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toMatchSnapshot();
   });
 
   it('should ignore null children and null atribudes', function () {
-    $compiler = newCompiler(parser: newParser(withLogger: false), withLogger: false);
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<div></div>');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
       "['$', 'div']"
+    );
+  });
+
+  it('compiles `#` in the PHPXText', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile('<>Your # is {$number ?? \'not available\'}!</>');
+    expect($compiler->getAST())->toMatchSnapshot();
+    expect($compiler->getCompiled())->toBe(
+      "['Your # is ', (\$number ?? 'not available'), '!']"
+    );
+  });
+
+  it('compiles with `//` in the PHPXText', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile(
+<<<'PHPX'
+<?php
+// A normal comment
+$message = (
+  <p>
+    URL address should start with https:// prefix
+  </p>
+);
+PHPX
+    );
+    expect($compiler->getAST())->toMatchSnapshot();
+    expect($compiler->getCompiled())->toBe(
+<<<'PHP'
+<?php
+// A normal comment
+$message = (
+  ['$', 'p', null, [
+    'URL address should start with https:// prefix',
+  ]]
+);
+PHP
+    );
+  });
+
+  it('compiles with `/* */` comment in the PHPXText', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile(
+<<<'PHPX'
+<>
+  {/* regular PHPX comment */}
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+</>
+PHPX
+    );
+    expect($compiler->getAST())->toMatchSnapshot();
+    expect($compiler->getCompiled())->toBe(
+<<<'PHP'
+[
+  /* regular PHPX comment */
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+]
+PHP
     );
   });
 });
