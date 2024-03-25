@@ -231,4 +231,31 @@ PHPX
 PHP
     );
   });
+
+  it('compiles escaped \\\' (apostrophe) in the PHPXText', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile(
+<<<'PHPX'
+$a = 'These\'are quotes in a string and that\'s okay.';
+$b = (
+  <>
+    Hello, {$name ?? 'unnamed'}!
+    These\'re quotes in a string and that\'s okay too!
+  </>
+);
+PHPX
+    );
+    expect($compiler->getAST())->toMatchSnapshot();
+    expect($compiler->getCompiled())->toBe(
+<<<'PHP'
+$a = 'These\'are quotes in a string and that\'s okay.';
+$b = (
+  [
+    'Hello, ', ($name ?? 'unnamed'), '!
+    These\'re quotes in a string and that\'s okay too!',
+  ]
+);
+PHP
+    );
+  });
 });

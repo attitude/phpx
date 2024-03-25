@@ -38,42 +38,57 @@ final class Token extends \PhpToken implements \JsonSerializable {
 		}
 
 		$tokens = parent::tokenize($source, $flags);
+
+		if ($offset) {
+			$source = mb_substr($source, $offset);
+		}
+
 		if (!$startsWithOpenTag) {
 			array_shift($tokens);
 		}
 
-		return array_map(function (Token $token) use ($offset, $source) {
-			$token->pos = $token->pos - $offset;
 
-			$text = $token->text;
-			$id = $token->id;
-			$line = $token->line;
-			$position = $token->pos;
+		foreach ($tokens as $i => $token) {
+			$token->pos -= $offset;
 
-			if ($id === T_ENCAPSED_AND_WHITESPACE && str_starts_with($text, '\'')) {
-				$buffer = substr($source, 0, $position);
-				$lastPositionOfNewLine = strrpos($buffer, "\n");
-				$nextPositionOfNewLine = strpos($text, "\n");
-
-				echo json_encode(trim($text, "\n"));
-				$before = substr($buffer, $lastPositionOfNewLine + 1);
-
-				throw new \ParseError(
-					"Unescaped single quote found at line {$line}:\n".
-					$before.substr($text, 0, $nextPositionOfNewLine)."\n".
-					str_repeat('-', strlen($before))."^\n".
-					"Use &apos; for HTML5 or &#39; for HTML4 also to escape quotes in markup.\n"
+			if ($token->id === T_BAD_CHARACTER) {
+				$token->id = T_STRING;
+				$token->text = str_replace(
+					$source,
+					chr(0x1A), // (substitute)
+					'\\\''
 				);
 			}
 
-			if ($id === T_IS_NOT_EQUAL && $text === '<>') {
+			if ($token->id === T_IS_NOT_EQUAL && $token->text === '<>') {
 				$token->id = TX_FRAGMENT_ELEMENT_OPEN;
-			} else if ($text === '`') {
-				assert($id === TX_TEMPLATE_LITERAL);
-			}
+			} else if ($token->text === '`') {
+				assert($token->id === TX_TEMPLATE_LITERAL);
+			} else if (
+				$token->id === T_ENCAPSED_AND_WHITESPACE
+				&& str_starts_with($token->text, '\'')
+			) {
+				if ($tokens[$i - 1]->id === T_NS_SEPARATOR) {
+					$previousToken = $tokens[$i - 1];
+					$currentToken = $token;
 
-			return $token;
-		}, $tokens);
+					$newSource =
+						mb_substr($source, 0, $previousToken->pos)
+						.chr(0x1A) // (substitute)
+						.mb_substr($source, $token->pos + 1);
+
+					return self::tokenize($newSource, $flags);
+				} else {
+					echo json_encode($tokens)."\n";
+					throw new \ParseError(
+						"Unexpected T_ENCAPSED_AND_WHITESPACE after '{$tokens[$i - 1]->text}'\n".
+						"Use &apos; for HTML5 or &#39; for HTML4 also to escape quotes in markup.\n"
+					);
+				}
+			}
+		}
+
+		return $tokens;
 	}
 
 	public static function offsetTokenize(string $source, int $offset, int $flags = 0): array {
