@@ -102,6 +102,15 @@ PHP
     );
   });
 
+  it('compiles a template with data-non-printable', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: true));
+    $compiler->compile('<div data-non-printable={$data} />');
+    expect($compiler->getAST())->toMatchSnapshot();
+    expect($compiler->getCompiled())->toBe(
+      "['div', ['data-non-printable'=>(\$data)]]"
+    );
+  });
+
   it('compiles a template with void element and spread operator', function () {
     $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<img {$loading} src="about:blank" {...$props} alt=\'Never overridden alt\' />');

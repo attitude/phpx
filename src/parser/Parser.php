@@ -285,6 +285,16 @@ final class Parser {
 		$name = $this->tokens->tokenAtCursorAndForward();
 		assert($name->id === T_STRING);
 
+		if ($this->tokens->tokenAtCursorMatching('-')) {
+			$name = [$name];
+
+			while($this->tokens->tokenAtCursorMatching('-') && $this->tokens->tokenAtCursor(1)->id === T_STRING) {
+				$name[] = $this->tokens->tokenAtCursorAndForward();
+				$name[] = $this->tokens->tokenAtCursorAndForward();
+			}
+		}
+
+
 		$assignment = null;
 		$value = true;
 

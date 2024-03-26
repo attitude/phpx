@@ -95,16 +95,21 @@ final class Compiler {
 			'value' => $value,
 		] = $node;
 
+		$nameText = match(is_array($name)) {
+			true => implode('', array_map(fn (Token $token) => $token->text, $name)),
+			false => $name->text,
+		};
+
 		if (!$assignment) {
 			assert($value === true);
-			return $this->formatter->formatAttributeExpression($name->text, 'true');
+			return $this->formatter->formatAttributeExpression($nameText, 'true');
 		} else if ($assignment->text === '=') {
 			if ($value instanceof Token) {
-				return $this->formatter->formatAttributeExpression($name->text, $value->text);
+				return $this->formatter->formatAttributeExpression($nameText, $value->text);
 			} else {
 				$expression = $this->compileBlock($value, '(', ')');
 
-				return $this->formatter->formatAttributeExpression($name->text, $expression);
+				return $this->formatter->formatAttributeExpression($nameText, $expression);
 			}
 		} else {
 			throw new \RuntimeException("Unknown assignment type: {$assignment->text}");
