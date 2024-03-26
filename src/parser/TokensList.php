@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace PHPX\PHPX;
+namespace Attitude\PHPX\Parser;
 
 /** Token for {, value of ord('{'); */
 const TX_CURLY_BRACKET_OPEN = 123;

@@ -1,7 +1,12 @@
 <?php declare(strict_types = 1);
 
-namespace PHPX\PHPX;
+namespace Attitude\PHPX\Compiler;
 
+use Attitude\PHPX\Compiler\Formatter;
+use Attitude\PHPX\Parser\NodeType;
+use Attitude\PHPX\Parser\Parser;
+use Attitude\PHPX\Parser\Token;
+use Attitude\PHPX\Parser\TokensList;
 use Psr\Log\LoggerInterface;
 
 final class Compiler {

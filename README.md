@@ -76,7 +76,7 @@ $ composer install
 
 require_once 'path/to/phpx/src/Compiler.php';
 
-$phpx = new \PHPX\PHPX\Compiler();
+$phpx = new \Attitude\PHPX\Compiler();
 
 $phpx->compile(<<<'PHPX'
 <>

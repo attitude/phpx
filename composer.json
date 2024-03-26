@@ -1,5 +1,5 @@
 {
-    "name": "phpx/phpx",
+    "name": "attitude/phpx",
     "description": "PHPX is to PHP what JSX is to JS",
     "type": "package",
     "license": "MIT",
@@ -17,8 +17,10 @@
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "PHPX\\PHPX\\": "src/",
-            "PHPX\\React\\": "src/examples/"
+            "Attitude\\PHPX\\Compiler\\": "src/compiler/",
+            "Attitude\\PHPX\\Parser\\": "src/parser/",
+            "Attitude\\PHPX\\Renderer\\": "src/renderer/",
+            "Attitude\\PHPX\\React\\": "src/examples/react"
         }
     },
     "require": {

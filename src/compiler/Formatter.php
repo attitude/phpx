@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPX\PHPX;
+namespace Attitude\PHPX\Compiler;
 
 // TODO: Incomplete
 class Formatter {

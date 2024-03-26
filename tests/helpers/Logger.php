@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace PHPX\PHPX;
+namespace Attitude\PHPX;
 
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;

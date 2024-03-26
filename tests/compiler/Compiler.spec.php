@@ -1,6 +1,8 @@
 <?php declare(strict_types = 1);
 
-namespace PHPX\PHPX;
+namespace Attitude\PHPX;
+use Attitude\PHPX\Compiler\Compiler;
+use Attitude\PHPX\Parser\Parser;
 
 require_once __DIR__.'/../../src/index.php';
 

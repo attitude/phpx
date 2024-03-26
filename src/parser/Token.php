@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-namespace PHPX\PHPX;
+namespace Attitude\PHPX\Parser;
 
 final class Token extends \PhpToken implements \JsonSerializable {
 	public function __toString(): string {
