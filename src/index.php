@@ -2,3 +2,4 @@
 
 require_once 'compiler/index.php';
 require_once 'parser/index.php';
+require_once 'renderer/index.php';

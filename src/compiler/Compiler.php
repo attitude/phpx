@@ -2,6 +2,8 @@
 
 namespace Attitude\PHPX\Compiler;
 
+include_once __DIR__.'/../concatenateStringMembers.php';
+
 use Attitude\PHPX\Compiler\Formatter;
 use Attitude\PHPX\Parser\NodeType;
 use Attitude\PHPX\Parser\Parser;
@@ -167,29 +169,6 @@ final class Compiler {
 		);
 	}
 
-	protected static function combineStringArrayMembers(array $array): array {
-		$combinedArray = [];
-		$currentString = '';
-
-		foreach ($array as $item) {
-			if (is_string($item)) {
-				$currentString .= $item;
-			} else {
-				if ($currentString !== '') {
-					$combinedArray[] = $currentString;
-					$currentString = '';
-				}
-				$combinedArray[] = $item;
-			}
-		}
-
-		if ($currentString !== '') {
-			$combinedArray[] = $currentString;
-		}
-
-		return $combinedArray;
-	}
-
 	protected function compilePHPXExpressionContainer(array $node): string {
 		$this->logger?->debug('compilePHPXExpressionContainer', $node);
 
@@ -199,7 +178,7 @@ final class Compiler {
 
 		$code = '';
 
-		$children = self::combineStringArrayMembers(array_map(fn (mixed $child) => match($child instanceof Token) {
+		$children = concatenateStringMembers(array_map(fn (mixed $child) => match($child instanceof Token) {
 			true => $child->text,
 			false => $child,
 		}, $children));
