@@ -231,7 +231,7 @@ describe('Attitude\ArrayRenderer\HTML', function () {
       ]],
     ];
 
-    $expected = '<div data-attribute="value" data-active=""></div>';
+    $expected = '<div data-attribute="value" data-active></div>';
 
     expect((new Renderer)($html))->toBe($expected);
   });
@@ -389,4 +389,24 @@ HTML;
       },
     ]))->toBe($expected);
   });
+
+  it('renders data attribute', function () {
+    $html = ['div', ['data-foo' => true], [
+      ['input', ['type'=>'checkbox', 'checked'=>true, 'disabled'=>true]],
+    ]];
+
+    $expected = '<div data-foo><input type="checkbox" checked disabled /></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('renders array of data attributes', function () {
+    $html = ['div', ['data' => ['foo' => true, 'bar' => 2, 'baz' => null]], [
+      ['input', ['type'=>'checkbox', 'checked'=>true, 'disabled'=>true]],
+    ]];
+
+    $expected = '<div data-foo data-bar="2"><input type="checkbox" checked disabled /></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  })->only();
 });

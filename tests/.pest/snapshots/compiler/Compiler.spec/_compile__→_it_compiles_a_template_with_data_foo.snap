@@ -13,25 +13,23 @@
                 "name": [
                     "L1:P5-9:data:262:<T_STRING",
                     "L1:P9-10:-:45",
-                    "L1:P10-13:non:262:<T_STRING",
-                    "L1:P13-14:-:45",
-                    "L1:P14-23:printable:262:<T_STRING"
+                    "L1:P10-13:foo:262:<T_STRING"
                 ],
-                "assignment": "L1:P23-24:=:61",
+                "assignment": "L1:P13-14:=:61",
                 "value": {
                     "$$type": "Block",
-                    "opening": "L1:P24-25:{:123",
+                    "opening": "L1:P14-15:{:123",
                     "children": [
-                        "L1:P25-30:$data:266:<T_VARIABLE"
+                        "L1:P15-20:$data:266:<T_VARIABLE"
                     ],
-                    "closing": "L1:P30-31:}:125"
+                    "closing": "L1:P20-21:}:125"
                 }
             },
-            "L1:P31-32: :392:<T_WHITESPACE"
+            "L1:P21-22: :392:<T_WHITESPACE"
         ],
         "closingElement": [
-            "L1:P32-33:\/:47",
-            "L1:P33-34:>:62"
+            "L1:P22-23:\/:47",
+            "L1:P23-24:>:62"
         ]
     }
 ]

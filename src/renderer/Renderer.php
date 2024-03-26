@@ -120,14 +120,13 @@ final class Renderer {
           // Inline handleSpecialAttributes
           $key = ($key === "htmlFor") ? "for" : (($key === "className") ? "class" : $key);
 
-          // Inline handlePropValue with XSS protection
           if (is_bool($value)) {
-            if ($key === true) {
+            if ($value === true) {
               $attributeString[] = $key;
-            } else {
-              continue;
             }
-          } elseif (is_array($value)) {
+
+            continue;
+          } elseif ($key !== 'data' && is_array($value)) {
             $_flattened = [];
 
             // Flatten array
@@ -149,8 +148,8 @@ final class Renderer {
           } elseif ($key === "data" && (is_object($value) || is_array($value))) {
             foreach ((array) $value as $dataKey => $dataValue) {
               if (is_bool($dataValue)) {
-                if ($dataValue) {
-                  $attributeString[] = "data-$dataKey=\"\"";
+                if ($dataValue === true) {
+                  $attributeString[] = "data-$dataKey";
                 }
 
                 continue;

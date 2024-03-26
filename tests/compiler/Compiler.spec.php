@@ -102,12 +102,21 @@ PHP
     );
   });
 
-  it('compiles a template with data-non-printable', function () {
+  it('compiles a template with data-foo', function () {
     $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: true));
-    $compiler->compile('<div data-non-printable={$data} />');
+    $compiler->compile('<div data-foo={$data} />');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
-      "['div', ['data-non-printable'=>(\$data)]]"
+      "['div', ['data-foo'=>(\$data)]]"
+    );
+  });
+
+  it('compiles true dataAttribute', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile('<div data-foo></div>');
+    expect($compiler->getAST())->toMatchSnapshot();
+    expect($compiler->getCompiled())->toBe(
+      "['div', ['data-foo'=>true]]"
     );
   });
 

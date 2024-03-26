@@ -309,6 +309,7 @@ final class Parser {
 		} else if (!(
 			$this->tokens->tokenAtCursorMatching(T_WHITESPACE)
 			|| $this->tokens->tokenAtCursorMatching('/')
+			|| $this->tokens->tokenAtCursorMatching('>')
 		)) {
 			throw new \ParseError($this->unexpectedTokenMessage('"=" (attribute assignment)'));
 		}
