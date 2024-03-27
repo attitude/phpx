@@ -282,18 +282,21 @@ final class Parser {
   protected function parseElementAttribute(): array {
 		$this->debugCurrentToken(__FUNCTION__);
 
-		$name = $this->tokens->tokenAtCursorAndForward();
-		assert($name->id === T_STRING);
+		$name = [$this->tokens->tokenAtCursorAndForward()];
+		assert($name[0]->id === T_STRING);
+
+		if ($this->tokens->tokenAtCursorMatching(':')) {
+			$name[] = $this->tokens->tokenAtCursorAndForward();
+			assert($this->tokens->tokenAtCursor()->id === T_STRING);
+			$name[] = $this->tokens->tokenAtCursorAndForward();
+		}
 
 		if ($this->tokens->tokenAtCursorMatching('-')) {
-			$name = [$name];
-
 			while($this->tokens->tokenAtCursorMatching('-') && $this->tokens->tokenAtCursor(1)->id === T_STRING) {
 				$name[] = $this->tokens->tokenAtCursorAndForward();
 				$name[] = $this->tokens->tokenAtCursorAndForward();
 			}
 		}
-
 
 		$assignment = null;
 		$value = true;

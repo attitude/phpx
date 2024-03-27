@@ -10,14 +10,18 @@
             "L1:P6-7: :392:<T_WHITESPACE",
             {
                 "$$type": "PHPXAttribute",
-                "name": "L1:P7-11:type:262:<T_STRING",
+                "name": [
+                    "L1:P7-11:type:262:<T_STRING"
+                ],
                 "assignment": "L1:P11-12:=:61",
                 "value": "L1:P12-22:\"checkbox\":269:<T_CONSTANT_ENCAPSED_STRING"
             },
             "L1:P22-23: :392:<T_WHITESPACE",
             {
                 "$$type": "PHPXAttribute",
-                "name": "L1:P23-30:checked:262:<T_STRING",
+                "name": [
+                    "L1:P23-30:checked:262:<T_STRING"
+                ],
                 "assignment": "L1:P30-31:=:61",
                 "value": {
                     "$$type": "Block",
@@ -31,7 +35,9 @@
             "L1:P41-42: :392:<T_WHITESPACE",
             {
                 "$$type": "PHPXAttribute",
-                "name": "L1:P42-50:disabled:262:<T_STRING",
+                "name": [
+                    "L1:P42-50:disabled:262:<T_STRING"
+                ],
                 "assignment": null,
                 "value": true
             },

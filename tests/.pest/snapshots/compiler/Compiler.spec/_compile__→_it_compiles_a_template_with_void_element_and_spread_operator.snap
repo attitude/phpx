@@ -19,7 +19,9 @@
             "L1:P15-16: :392:<T_WHITESPACE",
             {
                 "$$type": "PHPXAttribute",
-                "name": "L1:P16-19:src:262:<T_STRING",
+                "name": [
+                    "L1:P16-19:src:262:<T_STRING"
+                ],
                 "assignment": "L1:P19-20:=:61",
                 "value": "L1:P20-33:\"about:blank\":269:<T_CONSTANT_ENCAPSED_STRING"
             },
@@ -36,7 +38,9 @@
             "L1:P45-46: :392:<T_WHITESPACE",
             {
                 "$$type": "PHPXAttribute",
-                "name": "L1:P46-49:alt:262:<T_STRING",
+                "name": [
+                    "L1:P46-49:alt:262:<T_STRING"
+                ],
                 "assignment": "L1:P49-50:=:61",
                 "value": "L1:P50-72:'Never overridden alt':269:<T_CONSTANT_ENCAPSED_STRING"
             },

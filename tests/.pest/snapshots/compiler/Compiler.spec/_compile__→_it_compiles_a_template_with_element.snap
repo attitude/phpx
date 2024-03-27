@@ -15,7 +15,9 @@
             "L1:P5-6: :392:<T_WHITESPACE",
             {
                 "$$type": "PHPXAttribute",
-                "name": "L1:P6-15:className:262:<T_STRING",
+                "name": [
+                    "L1:P6-15:className:262:<T_STRING"
+                ],
                 "assignment": "L1:P15-16:=:61",
                 "value": "L1:P16-23:\"title\":269:<T_CONSTANT_ENCAPSED_STRING"
             }

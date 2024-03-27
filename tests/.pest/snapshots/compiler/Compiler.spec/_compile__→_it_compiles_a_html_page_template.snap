@@ -11,7 +11,9 @@
             "L1:P5-6: :392:<T_WHITESPACE",
             {
                 "$$type": "PHPXAttribute",
-                "name": "L1:P6-10:lang:262:<T_STRING",
+                "name": [
+                    "L1:P6-10:lang:262:<T_STRING"
+                ],
                 "assignment": "L1:P10-11:=:61",
                 "value": "L1:P11-15:\"en\":269:<T_CONSTANT_ENCAPSED_STRING"
             }
@@ -50,7 +52,9 @@
                             "L3:P32-33: :392:<T_WHITESPACE",
                             {
                                 "$$type": "PHPXAttribute",
-                                "name": "L3:P33-40:charset:262:<T_STRING",
+                                "name": [
+                                    "L3:P33-40:charset:262:<T_STRING"
+                                ],
                                 "assignment": "L3:P40-41:=:61",
                                 "value": "L3:P41-48:\"UTF-8\":269:<T_CONSTANT_ENCAPSED_STRING"
                             },
@@ -78,14 +82,18 @@
                             "L4:P59-60: :392:<T_WHITESPACE",
                             {
                                 "$$type": "PHPXAttribute",
-                                "name": "L4:P60-64:name:262:<T_STRING",
+                                "name": [
+                                    "L4:P60-64:name:262:<T_STRING"
+                                ],
                                 "assignment": "L4:P64-65:=:61",
                                 "value": "L4:P65-75:\"viewport\":269:<T_CONSTANT_ENCAPSED_STRING"
                             },
                             "L4:P75-76: :392:<T_WHITESPACE",
                             {
                                 "$$type": "PHPXAttribute",
-                                "name": "L4:P76-83:content:262:<T_STRING",
+                                "name": [
+                                    "L4:P76-83:content:262:<T_STRING"
+                                ],
                                 "assignment": "L4:P83-84:=:61",
                                 "value": "L4:P84-123:\"width=device-width, initial-scale=1.0\":269:<T_CONSTANT_ENCAPSED_STRING"
                             },
@@ -161,14 +169,18 @@
                             "L6:P182-183: :392:<T_WHITESPACE",
                             {
                                 "$$type": "PHPXAttribute",
-                                "name": "L6:P183-187:name:262:<T_STRING",
+                                "name": [
+                                    "L6:P183-187:name:262:<T_STRING"
+                                ],
                                 "assignment": "L6:P187-188:=:61",
                                 "value": "L6:P188-201:\"description\":269:<T_CONSTANT_ENCAPSED_STRING"
                             },
                             "L6:P201-202: :392:<T_WHITESPACE",
                             {
                                 "$$type": "PHPXAttribute",
-                                "name": "L6:P202-209:content:262:<T_STRING",
+                                "name": [
+                                    "L6:P202-209:content:262:<T_STRING"
+                                ],
                                 "assignment": "L6:P209-210:=:61",
                                 "value": {
                                     "$$type": "Block",
@@ -203,14 +215,18 @@
                             "L7:P235-236: :392:<T_WHITESPACE",
                             {
                                 "$$type": "PHPXAttribute",
-                                "name": "L7:P236-239:rel:262:<T_STRING",
+                                "name": [
+                                    "L7:P236-239:rel:262:<T_STRING"
+                                ],
                                 "assignment": "L7:P239-240:=:61",
                                 "value": "L7:P240-252:\"stylesheet\":269:<T_CONSTANT_ENCAPSED_STRING"
                             },
                             "L7:P252-253: :392:<T_WHITESPACE",
                             {
                                 "$$type": "PHPXAttribute",
-                                "name": "L7:P253-257:href:262:<T_STRING",
+                                "name": [
+                                    "L7:P253-257:href:262:<T_STRING"
+                                ],
                                 "assignment": "L7:P257-258:=:61",
                                 "value": {
                                     "$$type": "Block",
@@ -292,7 +308,9 @@
                                     "L11:P301-302: :392:<T_WHITESPACE",
                                     {
                                         "$$type": "PHPXAttribute",
-                                        "name": "L11:P302-306:href:262:<T_STRING",
+                                        "name": [
+                                            "L11:P302-306:href:262:<T_STRING"
+                                        ],
                                         "assignment": "L11:P306-307:=:61",
                                         "value": "L11:P307-310:\"\/\":269:<T_CONSTANT_ENCAPSED_STRING"
                                     }

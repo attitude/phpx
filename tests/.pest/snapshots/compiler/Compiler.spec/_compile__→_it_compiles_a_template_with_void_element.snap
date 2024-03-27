@@ -10,7 +10,9 @@
             "L1:P4-5: :392:<T_WHITESPACE",
             {
                 "$$type": "PHPXAttribute",
-                "name": "L1:P5-8:src:262:<T_STRING",
+                "name": [
+                    "L1:P5-8:src:262:<T_STRING"
+                ],
                 "assignment": "L1:P8-9:=:61",
                 "value": {
                     "$$type": "Block",
@@ -24,7 +26,9 @@
             "L1:P15-16: :392:<T_WHITESPACE",
             {
                 "$$type": "PHPXAttribute",
-                "name": "L1:P16-19:alt:262:<T_STRING",
+                "name": [
+                    "L1:P16-19:alt:262:<T_STRING"
+                ],
                 "assignment": "L1:P19-20:=:61",
                 "value": "L1:P20-38:\"An image of PHPX\":269:<T_CONSTANT_ENCAPSED_STRING"
             },

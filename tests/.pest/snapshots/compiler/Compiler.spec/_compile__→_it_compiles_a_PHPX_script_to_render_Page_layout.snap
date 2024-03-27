@@ -556,7 +556,9 @@
                                     "L34:P624-625: :392:<T_WHITESPACE",
                                     {
                                         "$$type": "PHPXAttribute",
-                                        "name": "L34:P625-629:href:262:<T_STRING",
+                                        "name": [
+                                            "L34:P625-629:href:262:<T_STRING"
+                                        ],
                                         "assignment": "L34:P629-630:=:61",
                                         "value": "L34:P630-633:\"\/\":269:<T_CONSTANT_ENCAPSED_STRING"
                                     }
@@ -824,7 +826,9 @@
                             "L51:P926-927: :392:<T_WHITESPACE",
                             {
                                 "$$type": "PHPXAttribute",
-                                "name": "L51:P927-931:lang:262:<T_STRING",
+                                "name": [
+                                    "L51:P927-931:lang:262:<T_STRING"
+                                ],
                                 "assignment": "L51:P931-932:=:61",
                                 "value": "L51:P932-936:\"en\":269:<T_CONSTANT_ENCAPSED_STRING"
                             }
@@ -863,7 +867,9 @@
                                             "L53:P964-965: :392:<T_WHITESPACE",
                                             {
                                                 "$$type": "PHPXAttribute",
-                                                "name": "L53:P965-972:charset:262:<T_STRING",
+                                                "name": [
+                                                    "L53:P965-972:charset:262:<T_STRING"
+                                                ],
                                                 "assignment": "L53:P972-973:=:61",
                                                 "value": "L53:P973-980:\"UTF-8\":269:<T_CONSTANT_ENCAPSED_STRING"
                                             },
@@ -891,14 +897,18 @@
                                             "L54:P997-998: :392:<T_WHITESPACE",
                                             {
                                                 "$$type": "PHPXAttribute",
-                                                "name": "L54:P998-1002:name:262:<T_STRING",
+                                                "name": [
+                                                    "L54:P998-1002:name:262:<T_STRING"
+                                                ],
                                                 "assignment": "L54:P1002-1003:=:61",
                                                 "value": "L54:P1003-1013:\"viewport\":269:<T_CONSTANT_ENCAPSED_STRING"
                                             },
                                             "L54:P1013-1014: :392:<T_WHITESPACE",
                                             {
                                                 "$$type": "PHPXAttribute",
-                                                "name": "L54:P1014-1021:content:262:<T_STRING",
+                                                "name": [
+                                                    "L54:P1014-1021:content:262:<T_STRING"
+                                                ],
                                                 "assignment": "L54:P1021-1022:=:61",
                                                 "value": "L54:P1022-1061:\"width=device-width, initial-scale=1.0\":269:<T_CONSTANT_ENCAPSED_STRING"
                                             },
@@ -974,14 +984,18 @@
                                             "L56:P1132-1133: :392:<T_WHITESPACE",
                                             {
                                                 "$$type": "PHPXAttribute",
-                                                "name": "L56:P1133-1137:name:262:<T_STRING",
+                                                "name": [
+                                                    "L56:P1133-1137:name:262:<T_STRING"
+                                                ],
                                                 "assignment": "L56:P1137-1138:=:61",
                                                 "value": "L56:P1138-1151:\"description\":269:<T_CONSTANT_ENCAPSED_STRING"
                                             },
                                             "L56:P1151-1152: :392:<T_WHITESPACE",
                                             {
                                                 "$$type": "PHPXAttribute",
-                                                "name": "L56:P1152-1159:content:262:<T_STRING",
+                                                "name": [
+                                                    "L56:P1152-1159:content:262:<T_STRING"
+                                                ],
                                                 "assignment": "L56:P1159-1160:=:61",
                                                 "value": {
                                                     "$$type": "Block",
@@ -1016,14 +1030,18 @@
                                             "L57:P1191-1192: :392:<T_WHITESPACE",
                                             {
                                                 "$$type": "PHPXAttribute",
-                                                "name": "L57:P1192-1195:rel:262:<T_STRING",
+                                                "name": [
+                                                    "L57:P1192-1195:rel:262:<T_STRING"
+                                                ],
                                                 "assignment": "L57:P1195-1196:=:61",
                                                 "value": "L57:P1196-1208:\"stylesheet\":269:<T_CONSTANT_ENCAPSED_STRING"
                                             },
                                             "L57:P1208-1209: :392:<T_WHITESPACE",
                                             {
                                                 "$$type": "PHPXAttribute",
-                                                "name": "L57:P1209-1213:href:262:<T_STRING",
+                                                "name": [
+                                                    "L57:P1209-1213:href:262:<T_STRING"
+                                                ],
                                                 "assignment": "L57:P1213-1214:=:61",
                                                 "value": {
                                                     "$$type": "Block",

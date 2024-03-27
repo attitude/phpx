@@ -21,7 +21,9 @@
                     "L2:P8-9: :392:<T_WHITESPACE",
                     {
                         "$$type": "PHPXAttribute",
-                        "name": "L2:P9-18:className:262:<T_STRING",
+                        "name": [
+                            "L2:P9-18:className:262:<T_STRING"
+                        ],
                         "assignment": "L2:P18-19:=:61",
                         "value": "L2:P19-26:\"title\":269:<T_CONSTANT_ENCAPSED_STRING"
                     }
@@ -151,14 +153,18 @@
                             "L5:P165-166: :392:<T_WHITESPACE",
                             {
                                 "$$type": "PHPXAttribute",
-                                "name": "L5:P166-169:src:262:<T_STRING",
+                                "name": [
+                                    "L5:P166-169:src:262:<T_STRING"
+                                ],
                                 "assignment": "L5:P169-170:=:61",
                                 "value": "L5:P170-183:\"about:blank\":269:<T_CONSTANT_ENCAPSED_STRING"
                             },
                             "L5:P183-184: :392:<T_WHITESPACE",
                             {
                                 "$$type": "PHPXAttribute",
-                                "name": "L5:P184-187:alt:262:<T_STRING",
+                                "name": [
+                                    "L5:P184-187:alt:262:<T_STRING"
+                                ],
                                 "assignment": "L5:P187-188:=:61",
                                 "value": "L5:P188-203:\"Happy coding!\":269:<T_CONSTANT_ENCAPSED_STRING"
                             },

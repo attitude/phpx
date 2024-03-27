@@ -408,5 +408,5 @@ HTML;
     $expected = '<div data-foo data-bar="2"><input type="checkbox" checked disabled /></div>';
 
     expect((new Renderer)($html))->toBe($expected);
-  })->only();
+  });
 });
