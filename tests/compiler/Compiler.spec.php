@@ -46,7 +46,7 @@ PHP
     );
   });
 
-  it('compiles a literal template', function () {
+  it('compiles a template literal', function () {
     $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile(
       '`Hello, my name is {$name ?? \'yet to be defined\'}, and I come from {$country ?? \'Earth\'}!`'
@@ -57,7 +57,7 @@ PHP
     );
   });
 
-  it('compiles a literal template inside of element', function () {
+  it('compiles a template literal inside of element', function () {
     $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<p>{`Hello, my name is {$name ?? \'yet to be defined\'}, and I come from {$country ?? \'Earth\'}!`}</p>');
     expect($compiler->getAST())->toMatchSnapshot();
