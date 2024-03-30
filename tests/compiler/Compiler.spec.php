@@ -57,6 +57,15 @@ PHP
     );
   });
 
+  it('compiles a literal template inside of element', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile('<p>{`Hello, my name is {$name ?? \'yet to be defined\'}, and I come from {$country ?? \'Earth\'}!`}</p>');
+    expect($compiler->getAST())->toMatchSnapshot();
+    expect($compiler->getCompiled())->toBe(
+      "['p', null, ['Hello, my name is '.(\$name ?? 'yet to be defined').', and I come from '.(\$country ?? 'Earth').'!']]"
+    );
+  });
+
   it('compiles a template with a function call', function () {
     $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<>Hello, {$name ?? ucfirst($type)}!</>');

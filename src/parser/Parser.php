@@ -132,17 +132,23 @@ final class Parser {
 
 		$expression = $this->parseParentheses();
 
-		if (count($expression['children']) === 1 && $expression['children'][0]->id === T_COMMENT) {
-			return [
-				'$$type' => NodeType::PHPX_COMMENT,
-				'comment' => $expression['children'][0],
-			];
-		} else {
-			return [
-				'$$type' => NodeType::PHPX_EXPRESSION_CONTAINER,
-				'expression' => $expression,
-			];
+		if (count($expression['children']) === 1) {
+			if (is_array($expression['children'][0]) && $expression['children'][0]['$$type'] === NodeType::TEMPLATE_LITERAL) {
+				return $expression['children'][0];
+			}
+
+			if ($expression['children'][0]->id === T_COMMENT) {
+				return [
+					'$$type' => NodeType::PHPX_COMMENT,
+					'comment' => $expression['children'][0],
+				];
+			}
 		}
+
+		return [
+			'$$type' => NodeType::PHPX_EXPRESSION_CONTAINER,
+			'expression' => $expression,
+		];
 	}
 
   protected function parseTextNode(): array {
@@ -351,6 +357,7 @@ final class Parser {
 				TX_SQUARE_BRACKET_OPEN => $this->parseParentheses(),
 				TX_FRAGMENT_ELEMENT_OPEN => $this->parseFragmentElement(),
 				TX_ELEMENT_OPENING_OPEN => $this->parseElement(),
+				TX_TEMPLATE_LITERAL => $this->parseTemplateLiteral(),
 				default => $this->tokens->tokenAtCursorAndForward(),
 			};
 		}

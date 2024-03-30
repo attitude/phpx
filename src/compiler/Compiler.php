@@ -68,6 +68,7 @@ final class Compiler {
 
 		return '['.self::trimChildren(implode('', array_map(fn(array|Token $child) => match($child['$$type']) {
 			NodeType::BLOCK => $this->compileBlock($child).', ',
+			NodeType::TEMPLATE_LITERAL => $this->compileTemplateLiteral($child).', ',
 			NodeType::PHPX_ELEMENT => $this->compilePHPXElement($child).', ',
 			NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($child).', ',
 			NodeType::PHPX_TEXT => $this->compilePHPXText($child),
