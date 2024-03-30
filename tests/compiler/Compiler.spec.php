@@ -49,7 +49,7 @@ PHP
   it('compiles a template literal', function () {
     $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile(
-      '`Hello, my name is {$name ?? \'yet to be defined\'}, and I come from {$country ?? \'Earth\'}!`'
+      '`Hello, my name is ${$name ?? \'yet to be defined\'}, and I come from ${$country ?? \'Earth\'}!`'
     );
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
@@ -57,9 +57,18 @@ PHP
     );
   });
 
+  it('compiles a template literal with a function call', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile('`Hello, ${ucfirst($name ?? \'unnamed\')}!`');
+    expect($compiler->getAST())->toMatchSnapshot();
+    expect($compiler->getCompiled())->toBe(
+      "'Hello, '.(ucfirst(\$name ?? 'unnamed')).'!'"
+    );
+  });
+
   it('compiles a template literal inside of element', function () {
     $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
-    $compiler->compile('<p>{`Hello, my name is {$name ?? \'yet to be defined\'}, and I come from {$country ?? \'Earth\'}!`}</p>');
+    $compiler->compile('<p>{`Hello, my name is ${$name ?? \'yet to be defined\'}, and I come from ${$country ?? \'Earth\'}!`}</p>');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
       "['p', null, ['Hello, my name is '.(\$name ?? 'yet to be defined').', and I come from '.(\$country ?? 'Earth').'!']]"

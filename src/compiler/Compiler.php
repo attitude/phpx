@@ -223,6 +223,7 @@ final class Compiler {
 					NodeType::PHPX_ELEMENT => $this->compilePHPXElement($value),
 					NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($value),
 					NodeType::PHPX_EXPRESSION_CONTAINER => $this->compilePHPXExpressionContainer($value),
+					NodeType::TEMPLATE_LITERAL => $this->compileTemplateLiteral($value),
 					default => throw new \RuntimeException("Unknown child type: {$value['$$type']}"),
 				},
 			}, $children))

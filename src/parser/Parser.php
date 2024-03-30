@@ -222,8 +222,7 @@ final class Parser {
 			$this->debugCurrentToken(__FUNCTION__);
 
 			$children[] = match($this->tokens->tokenAtCursor()->id) {
-				T_CURLY_OPEN,
-				TX_CURLY_BRACKET_OPEN => $this->parseParentheses(),
+				T_DOLLAR_OPEN_CURLY_BRACES => $this->parseParentheses(),
 				default => $this->tokens->tokenAtCursorAndForward(),
 			};
 		}
