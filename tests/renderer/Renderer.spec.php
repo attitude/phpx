@@ -30,13 +30,9 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('generates a div', function () {
-    $html = [
-      'div',
-      ['class' => 'container'],
-      [
-        ['h1', null, 'Hello World!'],
-      ],
-    ];
+    $html = ['$', 'div', ['class' => 'container'], [
+      ['$', 'h1', null, 'Hello World!'],
+    ]];
 
     $expected = '<div class="container"><h1>Hello World!</h1></div>';
 
@@ -44,16 +40,12 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('generates a div with non-element children', function () {
-    $html = [
-      'div',
-      ['class' => 'container'],
-      [
-        null,
-        ['h1', null, ['Hello World!', null, false, true]],
-        false,
-        true,
-      ],
-    ];
+    $html = ['$', 'div', ['class' => 'container'], [
+      null,
+      ['$', 'h1', null, ['Hello World!', null, false, true]],
+      false,
+      true,
+    ]];
 
     $expected = '<div class="container"><h1>Hello World!</h1></div>';
 
@@ -61,14 +53,10 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('generates a div with multiple children', function () {
-    $html = [
-      'div',
-      ['class' => 'container'],
-      [
-        ['h1', null, 'Hello World!'],
-        ['p', null, 'This is a paragraph.'],
-      ],
-    ];
+    $html = ['$', 'div', ['class' => 'container'], [
+      ['$', 'h1', null, 'Hello World!'],
+      ['$', 'p', null, 'This is a paragraph.'],
+    ]];
 
     $expected = '<div class="container"><h1>Hello World!</h1><p>This is a paragraph.</p></div>';
 
@@ -76,14 +64,11 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('generates a div with multiple children and attributes', function () {
-    $html = [
-      'div',
-      ['class' => 'container', 'id' => 'main-container'],
-      [
-        ['h1', null, 'Hello World!'],
-        ['p', null, 'This is a paragraph.'],
-      ],
-    ];
+    $html = ['$', 'div', ['class' => 'container',
+    'id' => 'main-container'], [
+      ['$', 'h1', null, 'Hello World!'],
+      ['$', 'p', null, 'This is a paragraph.'],
+    ]];
 
     $expected = '<div class="container" id="main-container"><h1>Hello World!</h1><p>This is a paragraph.</p></div>';
 
@@ -91,14 +76,12 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('generates a div with multiple children and attributes and styles', function () {
-    $html = [
-      'div',
-      ['class' => 'container', 'id' => 'main-container', 'style' => (object)['color' => 'red', 'font-size' => '16px']],
-      [
-        ['h1', null, 'Hello World!'],
-        ['p', null, 'This is a paragraph.'],
-      ],
-    ];
+    $html = ['$', 'div', ['class' => 'container',
+    'id' => 'main-container',
+    'style' => (object)['color' => 'red', 'font-size' => '16px']], [
+      ['$', 'h1', null, 'Hello World!'],
+      ['$', 'p', null, 'This is a paragraph.'],
+    ]];
 
     $expected = '<div class="container" id="main-container" style="color:red;font-size:16px"><h1>Hello World!</h1><p>This is a paragraph.</p></div>';
 
@@ -106,14 +89,14 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('generates a div with multiple children and attributes and styles and classes', function () {
-    $html = [
-      'div',
-      ['class' => ['container', 'main-container'], 'id' => 'main-container', 'style' => (object)['color' => 'red', 'font-size' => '16px']],
-      [
-        ['h1', null, 'Hello World!'],
-        ['p', null, 'This is a paragraph.'],
-      ],
-    ];
+    $html = ['$', 'div', [
+      'class' => ['container', 'main-container'],
+      'id' => 'main-container',
+      'style' => (object)['color' => 'red', 'font-size' => '16px'],
+    ], [
+      ['$', 'h1', null, 'Hello World!'],
+      ['$', 'p', null, 'This is a paragraph.'],
+    ]];
 
     $expected = '<div class="container main-container" id="main-container" style="color:red;font-size:16px"><h1>Hello World!</h1><p>This is a paragraph.</p></div>';
 
@@ -121,14 +104,16 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('generates a div with multiple children and attributes and styles and classes and data attributes', function () {
-    $html = [
-      'div',
-      ['class' => ['container', 'main-container'], 'id' => 'main-container', 'style' => (object)['color' => 'red', 'font-size' => '16px'], 'data-attribute' => null, 'data-another' => 'value'],
-      [
-        ['h1', null, 'Hello World!'],
-        ['p', null, 'This is a paragraph.'],
-      ],
-    ];
+    $html = ['$', 'div', [
+      'class' => ['container', 'main-container'],
+      'id' => 'main-container',
+      'style' => (object)['color' => 'red', 'font-size' => '16px'],
+      'data-attribute' => null,
+      'data-another' => 'value',
+    ], [
+      ['$', 'h1', null, 'Hello World!'],
+      ['$', 'p', null, 'This is a paragraph.'],
+    ]];
 
     $expected = '<div class="container main-container" id="main-container" style="color:red;font-size:16px" data-another="value"><h1>Hello World!</h1><p>This is a paragraph.</p></div>';
 
@@ -136,14 +121,16 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('handles camelCase attributes', function () {
-    $html = [
-      'div',
-      ['class' => ['container', 'main-container'], 'id' => 'main-container', 'style' => (object)['color' => 'red', 'fontSize' => '16px'], 'data-attribute' => null, 'data-another' => 'value'],
-      [
-        ['h1', null, 'Hello World!'],
-        ['p', null, 'This is a paragraph.'],
-      ],
-    ];
+    $html = ['$',  'div', [
+      'class' => ['container', 'main-container'],
+      'id' => 'main-container',
+      'style' => (object)['color' => 'red', 'fontSize' => '16px'],
+      'data-attribute' => null,
+      'data-another' => 'value',
+    ], [
+      ['$', 'h1', null, 'Hello World!'],
+      ['$', 'p', null, 'This is a paragraph.'],
+    ]];
 
     $expected = '<div class="container main-container" id="main-container" style="color:red;font-size:16px" data-another="value"><h1>Hello World!</h1><p>This is a paragraph.</p></div>';
 
@@ -151,14 +138,17 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('handles empty string attributes', function () {
-    $html = [
-      'div',
-      ['class' => ['container', 'main-container'], 'id' => 'main-container', 'style' => (object)['color' => 'red', 'fontSize' => '16px'], 'data-attribute' => null, 'data-another' => 'value', 'empty-string' => ''],
-      [
-        ['h1', null, 'Hello World!'],
-        ['p', null, 'This is a paragraph.'],
-      ],
-    ];
+    $html = ['$',  'div', [
+      'class' => ['container', 'main-container'],
+      'id' => 'main-container',
+      'style' => (object)['color' => 'red', 'fontSize' => '16px'],
+      'data-attribute' => null,
+      'data-another' => 'value',
+      'empty-string' => '',
+    ], [
+      ['$', 'h1', null, 'Hello World!'],
+      ['$', 'p', null, 'This is a paragraph.'],
+    ]];
 
     $expected = '<div class="container main-container" id="main-container" style="color:red;font-size:16px" data-another="value" empty-string=""><h1>Hello World!</h1><p>This is a paragraph.</p></div>';
 
@@ -166,10 +156,7 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('handles void elements', function () {
-    $html = [
-      'input',
-      ['type' => 'text', 'name' => 'username'],
-    ];
+    $html = ['$', 'input', ['type' => 'text', 'name' => 'username']];
 
     $expected = '<input type="text" name="username" />';
 
@@ -177,10 +164,7 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('auto-closes void elements', function () {
-    $html = [
-      'input',
-      ['type' => 'text', 'name' => 'username'],
-    ];
+    $html = ['$', 'input', ['type' => 'text', 'name' => 'username']];
 
     $expected = '<input type="text" name="username">';
     $renderer = new Renderer;
@@ -190,10 +174,7 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('handles dangerouslySetInnerHTML', function () {
-    $html = [
-      'div',
-      ['dangerouslySetInnerHTML' => '<h1>Hello World!</h1>'],
-    ];
+    $html = ['$', 'div', ['dangerouslySetInnerHTML' => '<h1>Hello World!</h1>']];
 
     $expected = '<div><h1>Hello World!</h1></div>';
 
@@ -201,19 +182,15 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('handles nested fragments', function () {
-    $html = [
-      'div',
-      ['class' => 'container'],
+    $html = ['$', 'div', ['class' => 'container'], [
       [
-        [
-          ['h1', null, 'Hello World!'],
-          ['p', null, 'This is a paragraph.'],
-        ],
-        [
-          ['p', null, 'This is another paragraph.'],
-        ],
+        ['$','h1', null, 'Hello World!'],
+        ['$','p', null, 'This is a paragraph.'],
       ],
-    ];
+      [
+        ['$','p', null, 'This is another paragraph.'],
+      ],
+    ]];
 
     $expected = '<div class="container"><h1>Hello World!</h1><p>This is a paragraph.</p><p>This is another paragraph.</p></div>';
 
@@ -221,15 +198,14 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('renders data attributes passed as an object', function () {
-    $html = [
-      'div',
-      ['data' => (object)[
+    $html = ['$', 'div', [
+      'data' => (object)[
         'attribute' => 'value',
         'bar' => null,
         'baz' => false,
         'active' => true,
-      ]],
-    ];
+      ],
+    ]];
 
     $expected = '<div data-attribute="value" data-active></div>';
 
@@ -237,29 +213,25 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('renders nested elements with fragments pretty-printed', function () {
-    $html = [
-      'div',
-      ['class' => 'container'],
+    $html = ['$', 'div', ['class' => 'container'], [
       [
-        [
-          ['h1', null, 'Hello World!'],
-          ['p', null, 'This is a paragraph.'],
-        ],
-        [
-          ['p', null, 'This is another paragraph.'],
-        ],
-        [
-          ['p', null, [
-            'This is a nested paragraph.',
-            ['a', ['href' => 'https://github.com/attitude/phpx'], [
-              'This is a nested link with ',
-              ['span', null, 'This is a nested span.'],
-            ]],
-            'End of nested paragraph.',
-          ]],
-          ],
+        ['$', 'h1', null, 'Hello World!'],
+        ['$', 'p', null, 'This is a paragraph.'],
       ],
-    ];
+      [
+        ['$', 'p', null, 'This is another paragraph.'],
+      ],
+      [
+        ['$', 'p', null, [
+          'This is a nested paragraph.',
+          ['$', 'a', ['href' => 'https://github.com/attitude/phpx'], [
+            'This is a nested link with ',
+            ['$', 'span', null, 'This is a nested span.'],
+          ]],
+          'End of nested paragraph.',
+        ]],
+        ],
+    ]];
 
     $expected = <<<'HTML'
 <div class="container">
@@ -285,43 +257,43 @@ HTML;
   });
 
   it('renders full HTML document', function () {
-    $html = ['html', ['lang' => 'en'], [
-      ['head', null, [
-        ['meta', [ 'charset' => 'UTF-8']],
-        ['meta', [
+    $html = ['$', 'html', ['lang' => 'en'], [
+      ['$', 'head', null, [
+        ['$', 'meta', [ 'charset' => 'UTF-8']],
+        ['$', 'meta', [
           'name' => 'viewport',
           'content' => 'width=device-width, initial-scale=1.0',
         ]],
-        ['title', null, [
+        ['$', 'title', null, [
           'Blog',
           ' by @martin_adamko',
         ]],
-        ['meta', [ 'name' => 'description', 'content' => null]],
-        ['link', [ 'rel' => 'stylesheet', 'href' => '/_assets/css/styles.css']],
+        ['$', 'meta', [ 'name' => 'description', 'content' => null]],
+        ['$', 'link', [ 'rel' => 'stylesheet', 'href' => '/_assets/css/styles.css']],
       ]],
-      ['body', null, [
-        ['header',null, [
-          ['Navigation', ['url' => '/', 'title' => 'Anet Lynx'], [
-            ['a', ['href' => '/'], ['Home']],
+      ['$', 'body', null, [
+        ['$', 'header',null, [
+          ['$', 'Navigation', ['url' => '/', 'title' => 'Anet Lynx'], [
+            ['$', 'a', ['href' => '/'], ['Home']],
           ]],
-          ['h1', null, ['Blog']],
+          ['$', 'h1', null, [['Blog']]],
           null,
         ]],
-        ['main', ['dangerouslySetInnerHTML' => '<h2>Recent Articles</h2>']],
-        ['aside', null, [
-          ['ul', null, [[
-            ['li', null, [['a', ['href' => '/blog/2024-03-12/index.html'],
+        ['$', 'main', ['dangerouslySetInnerHTML' => '<h2>Recent Articles</h2>']],
+        ['$', 'aside', null, [
+          ['$', 'ul', null, [[
+            ['$', 'li', null, [['$', 'a', ['href' => '/blog/2024-03-12/index.html'],
                 ['2024-03-12'],
               ]],
             ],
-            ['li', null, [['a', ['href' => '/blog/2024-03-14/index.html'],
+            ['$', 'li', null, [['$', 'a', ['href' => '/blog/2024-03-14/index.html'],
                 ['2024-03-14'],
               ]],
             ],
           ]]],
         ]],
-        ['footer',null, [
-          ['p', null, ['©', 2024, ' ', ['a', ['href' => 'https://threads.com/@martin_adamko'], '@martin_adamko']]],
+        ['$', 'footer',null, [
+          ['$', 'p', null, ['©', 2024, ' ', ['$', 'a', ['href' => 'https://threads.com/@martin_adamko'], '@martin_adamko']]],
         ]],
       ]],
     ]];
@@ -379,9 +351,9 @@ HTML;
         ] = $props;
 
         return (
-          ['nav', ['class' => 'navigation'], [
-            ['a', ['href' => $url, 'class' => 'navigation-link'], [
-              ['strong', ['class' => 'navigation-title'], $title],
+          ['$', 'nav', ['class' => 'navigation'], [
+            ['$', 'a', ['href' => $url, 'class' => 'navigation-link'], [
+              ['$', 'strong', ['class' => 'navigation-title'], $title],
             ]],
             $children,
           ]]
@@ -391,8 +363,8 @@ HTML;
   });
 
   it('renders data attribute', function () {
-    $html = ['div', ['data-foo' => true], [
-      ['input', ['type'=>'checkbox', 'checked'=>true, 'disabled'=>true]],
+    $html = ['$', 'div', ['data-foo' => true], [
+      ['$', 'input', ['type'=>'checkbox', 'checked'=>true, 'disabled'=>true]],
     ]];
 
     $expected = '<div data-foo><input type="checkbox" checked disabled /></div>';
@@ -401,8 +373,8 @@ HTML;
   });
 
   it('renders array of data attributes', function () {
-    $html = ['div', ['data' => ['foo' => true, 'bar' => 2, 'baz' => null]], [
-      ['input', ['type'=>'checkbox', 'checked'=>true, 'disabled'=>true]],
+    $html = ['$', 'div', ['data' => ['foo' => true, 'bar' => 2, 'baz' => null]], [
+      ['$', 'input', ['type'=>'checkbox', 'checked'=>true, 'disabled'=>true]],
     ]];
 
     $expected = '<div data-foo data-bar="2"><input type="checkbox" checked disabled /></div>';

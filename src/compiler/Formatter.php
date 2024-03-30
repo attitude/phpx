@@ -6,19 +6,20 @@ namespace Attitude\PHPX\Compiler;
 class Formatter {
   public function formatElement(string $type, string|null $config, string|null $children): string {
     $compiled = [
+			"'$'",
 			"'{$type}'",
 			$config,
 			$children,
 		];
 
-    if (empty($compiled[2])) {
+    if (empty($compiled[3])) {
       array_pop($compiled);
 
-      if (empty($compiled[1])) {
+      if (empty($compiled[2])) {
         array_pop($compiled);
       }
-    } else if (empty($compiled[1])) {
-      $compiled[1] = 'null';
+    } else if (empty($compiled[2])) {
+      $compiled[2] = 'null';
     }
 
     return '['.implode(', ', $compiled).']';

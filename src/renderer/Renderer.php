@@ -18,15 +18,16 @@ final class Renderer {
   }
 
   public function getNodeType(array $node): string {
-    return $node[0];
+    assert($node[0] === '$', "Serialized node requires first element to be '$', got `{$node[0]}` instead.");
+    return $node[1];
   }
 
   public function getNodeProps(array $node): array {
-    return $node[1] ?? [];
+    return $node[2] ?? [];
   }
 
   public function getNodeChildren(array $node): bool|int|float|string|array|null {
-    return $node[2] ?? $this->getNodeProps($node)['children'] ?? [];
+    return $node[3] ?? $this->getNodeProps($node)['children'] ?? [];
   }
 
   public function render(bool|int|float|string|array|null $node, array $components = []): string {
@@ -77,17 +78,35 @@ final class Renderer {
         } else {
           return implode('', $html);
         }
+      } else if ($node[0] !== '$') {
+        if ($this->pretty && count($node) > 1) {
+          return "\n".$this->format(trim($this->renderNode($node, $nesting + 1)), $nesting + 1);
+        } else {
+          return $this->renderNode($node, $nesting + 1);
+        }
       }
 
-      $type = $this->getNodeType($node);
+      try {
+        $type = $this->getNodeType($node);
+      } catch (\Throwable $e) {
+        debug_print_backtrace();
+        throw $e;
+      }
       assert(is_string($type), "Type must be a string");
-
-      if (array_key_exists($type, $this->components)) {
-        return $this->renderNode(call_user_func($this->components[$type], array_merge($node[1] ?? [], ($node[2] ?? null) ? ['children' => $node[2]] : [])), $nesting);
-      }
 
       $props = $this->getNodeProps($node);
       $children = $this->getNodeChildren($node);
+
+      if (array_key_exists($type, $this->components)) {
+        return $this->renderNode(
+          call_user_func(
+            $this->components[$type],
+            array_merge(
+              $props ?? [],
+              ($children ?? null) ? ['children' => $children] : []
+            )
+          ), $nesting);
+      }
 
       $shouldEscapeHtml = true;
 
