@@ -197,6 +197,20 @@ PHP
     expect($compiler->getCompiled())->toMatchSnapshot();
   });
 
+  it('compiles a mixed text, expression and tag', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile(<<<'HTML'
+<p> ©{$year} <a href="https://threads.com/@martin_adamko">@martin_adamko</a> </p>
+HTML
+    );
+    expect($compiler->getAST())->toMatchSnapshot();
+    expect($compiler->getCompiled())->toBe(
+<<<'PHP'
+['$', 'p', null, ['©', ($year), ' ', ['$', 'a', ['href'=>"https://threads.com/@martin_adamko"], ['@martin_adamko']]]]
+PHP
+    );
+  });
+
   it('compiles a PHPX script to render Page layout', function () {
     $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile(file_get_contents(__DIR__.'/fixtures/page.phpx'));

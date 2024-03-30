@@ -2,7 +2,7 @@
 
 namespace Attitude\PHPX\Compiler;
 
-include_once __DIR__.'/../concatenateStringMembers.php';
+include_once __DIR__.'/../arrayMap.php';
 
 use Attitude\PHPX\Compiler\Formatter;
 use Attitude\PHPX\Parser\NodeType;
@@ -10,6 +10,7 @@ use Attitude\PHPX\Parser\Parser;
 use Attitude\PHPX\Parser\Token;
 use Attitude\PHPX\Parser\TokensList;
 use Psr\Log\LoggerInterface;
+use function Attitude\PHPX\arrayMap;
 
 final class Compiler {
 	public ?LoggerInterface $logger = null;
@@ -66,16 +67,18 @@ final class Compiler {
 	protected function compilePHPXChildrenArray(array $children): string {
 		$this->logger?->debug('compilePHPXChildrenArray', $children);
 
-		return '['.self::trimChildren(implode('', array_map(fn(array|Token $child) => match($child['$$type']) {
+		$childrenCount = count($children);
+
+		return '['.self::trimChildren(implode('', arrayMap($children, fn(array $child, int $index) => match($child['$$type']) {
 			NodeType::BLOCK => $this->compileBlock($child).', ',
 			NodeType::TEMPLATE_LITERAL => $this->compileTemplateLiteral($child).', ',
 			NodeType::PHPX_ELEMENT => $this->compilePHPXElement($child).', ',
 			NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($child).', ',
-			NodeType::PHPX_TEXT => $this->compilePHPXText($child),
+			NodeType::PHPX_TEXT => $this->compilePHPXText($child, $index, $childrenCount),
 			NodeType::PHPX_EXPRESSION_CONTAINER => $this->compilePHPXExpressionContainer($child).', ',
 			NodeType::PHPX_COMMENT => $this->compilePHPXComment($child),
 			default => throw new \RuntimeException("Unknown child type: {$child['$$type']->value}"),
-		}, $children))).']';
+		}))).']';
 	}
 
 	protected function compilePHPXFragmentElement(array $node): string {
@@ -175,6 +178,29 @@ final class Compiler {
 		);
 	}
 
+	protected static function concatenateStringMembers(array $array): array {
+		$combinedArray = [];
+		$currentString = '';
+
+		foreach ($array as $item) {
+			if (is_string($item)) {
+				$currentString .= $item;
+			} else {
+				if ($currentString !== '') {
+					$combinedArray[] = $currentString;
+					$currentString = '';
+				}
+				$combinedArray[] = $item;
+			}
+		}
+
+		if ($currentString !== '') {
+			$combinedArray[] = $currentString;
+		}
+
+		return $combinedArray;
+	}
+
 	protected function compilePHPXExpressionContainer(array $node): string {
 		$this->logger?->debug('compilePHPXExpressionContainer', $node);
 
@@ -184,7 +210,7 @@ final class Compiler {
 
 		$code = '';
 
-		$children = concatenateStringMembers(array_map(fn (mixed $child) => match($child instanceof Token) {
+		$children = self::concatenateStringMembers(array_map(fn (mixed $child) => match($child instanceof Token) {
 			true => $child->text,
 			false => $child,
 		}, $children));
@@ -254,21 +280,36 @@ final class Compiler {
 		return $comment->text;
 	}
 
-	protected function compilePHPXText(array $node): string {
+	protected function compilePHPXText(array $node, int $index, int $count): string {
 		$this->logger?->debug('compilePHPXText', [$node]);
 
 		['tokens' => $tokens] = $node;
 
+		$isFirst = $index === 0;
+		$isLast = $index === $count - 1;
+
 		if (count($tokens) === 1) {
 			$token = $tokens[0];
 
-			if ($token->id === T_WHITESPACE) {
+			if ($token->id === T_WHITESPACE && ($isFirst || $isLast || strstr($token->text, "\n"))) {
 				return $token->text;
 			} else {
-				return '\''.$token->text.'\', ';
+				if ($isFirst) {
+					return '\''.ltrim($token->text, ' ').'\', ';
+				} else if ($isLast) {
+					return '\''.rtrim($token->text, ' ').'\', ';
+				} else {
+					return '\''.$token->text.'\', ';
+				}
 			}
 		} else {
-			return '\''.implode('', array_map(fn($token) => $token->text, $tokens)).'\', ';
+			if ($isFirst) {
+				return '\''.ltrim(implode('', array_map(fn($token) => $token->text, $tokens)), ' ').'\', ';
+			} else if ($isLast) {
+				return '\''.rtrim(implode('', array_map(fn($token) => $token->text, $tokens)), ' ').'\', ';
+			} else {
+				return '\''.implode('', array_map(fn($token) => $token->text, $tokens)).'\', ';
+			}
 		}
 	}
 

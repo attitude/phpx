@@ -21,7 +21,7 @@
 			($content),
 		]],
 		['$', 'footer', null, [
-			['$', 'p', null, ['©', ($year), ' @martin_adamko']],
+			['$', 'p', null, ['©', ($year), ' ', ['$', 'a', ['href'=>"https://threads.com/@martin_adamko"], ['@martin_adamko']]]],
 		]],
 	]],
 ]]

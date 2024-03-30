@@ -2,8 +2,6 @@
 
 namespace Attitude\PHPX\Renderer;
 
-include_once __DIR__.'/../concatenateStringMembers.php';
-
 final class Renderer {
   public bool $void = false;
   public bool $pretty = false;
@@ -39,213 +37,216 @@ final class Renderer {
   }
 
   protected function format(string $rendered, int $nesting): string {
-    static $iteration = 0;
-
-    $iteration++;
-
-    if ($this->pretty) {
-      return str_repeat($this->indentation, $nesting).$rendered;
-    } else {
-      return $rendered;
-    }
+    return str_repeat($this->indentation, $nesting).$rendered;
   }
 
   protected function renderNode(bool|int|float|string|array|null $node, int $nesting): string {
-    if (is_string($node)) {
-      return $node;
-    } elseif (is_numeric($node)) {
+    if (is_string($node) || is_numeric($node)) {
       return (string) $node;
-    } elseif (is_bool($node)) {
-      return '';
-    } elseif (is_null($node)) {
+    } elseif (is_bool($node) || is_null($node)) {
       return '';
     } elseif (is_array($node)) {
       if (empty($node)) {
         return '';
-      } else if (is_array($node[0])) {
-        $html = [];
-
-        foreach ($node as $child) {
-          $html[] = $this->renderNode($child, $nesting);
-        }
-
-        if ($this->pretty) {
-          if (count($html) === 1) {
-            return $html[0];
-          } else {
-            return implode("\n", $html);
-          }
-        } else {
-          return implode('', $html);
-        }
-      } else if ($node[0] !== '$') {
-        if ($this->pretty && count($node) > 1) {
-          return "\n".$this->format(trim($this->renderNode($node, $nesting + 1)), $nesting + 1);
-        } else {
-          return $this->renderNode($node, $nesting + 1);
-        }
-      }
-
-      try {
+      } else if ($node[0] === '$') {
         $type = $this->getNodeType($node);
-      } catch (\Throwable $e) {
-        debug_print_backtrace();
-        throw $e;
-      }
-      assert(is_string($type), "Type must be a string");
+        assert(is_string($type), "Type must be a string");
 
-      $props = $this->getNodeProps($node);
-      $children = $this->getNodeChildren($node);
+        $props = $this->getNodeProps($node);
+        $children = $this->getNodeChildren($node);
 
-      if (array_key_exists($type, $this->components)) {
-        return $this->renderNode(
-          call_user_func(
-            $this->components[$type],
-            array_merge(
-              $props ?? [],
-              ($children ?? null) ? ['children' => $children] : []
-            )
-          ), $nesting);
-      }
-
-      $shouldEscapeHtml = true;
-
-      if (array_key_exists('dangerouslySetInnerHTML', $props)) {
-        $children = $props['dangerouslySetInnerHTML'];
-        unset($props['dangerouslySetInnerHTML']);
-        $shouldEscapeHtml = false;
-
-        if (array_key_exists('children', $props)) {
-          // Throw error in development mode
-          throw new \Exception("Can't use children and dangerouslySetInnerHTML at the same time");
-        }
-      }
-
-      unset($props['children']);
-
-      $attributeString = [];
-
-      foreach ($props as $key => $value) {
-        if ($key === 'className') {
-          $key = 'class';
-        } else if ($key === 'htmlFor') {
-          $key = 'for';
+        if (array_key_exists($type, $this->components)) {
+          return $this->renderNode(
+            call_user_func(
+              $this->components[$type],
+              array_merge(
+                $props ?? [],
+                ($children ?? null) ? ['children' => $children] : []
+              )
+            ), $nesting);
         }
 
-        // Transform key from camelCase to kebab-case
-        $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $key));
+        $shouldEscapeHtml = true;
 
-        if ($value !== null) {
-          // Inline handleSpecialAttributes
-          $key = ($key === "htmlFor") ? "for" : (($key === "className") ? "class" : $key);
+        if (array_key_exists('dangerouslySetInnerHTML', $props)) {
+          $children = $props['dangerouslySetInnerHTML'];
+          unset($props['dangerouslySetInnerHTML']);
+          $shouldEscapeHtml = false;
 
-          if (is_bool($value)) {
-            if ($value === true) {
-              $attributeString[] = $key;
-            }
+          if (array_key_exists('children', $props)) {
+            // Throw error in development mode
+            throw new \Exception("Can't use children and dangerouslySetInnerHTML at the same time");
+          }
+        }
 
-            continue;
-          } elseif ($key !== 'data' && is_array($value)) {
-            $_flattened = [];
+        unset($props['children']);
 
-            // Flatten array
-            array_walk_recursive($value, function ($a) use (&$_flattened) {
-              $_flattened[] = $a;
-            });
+        $attributeString = [];
 
-            $value = implode(" ", $value);
-          } elseif ($key === "style" && (is_object($value) || is_array($value))) {
-            $styleString = "";
-            foreach ((array) $value as $styleKey => $styleValue) {
-              // Transform key from camelCase to kebab-case
-              $styleKey = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $styleKey));
-              $styleString .= "$styleKey:$styleValue;";
-            }
-            $value = rtrim($styleString, ';');
-          } elseif (is_string($value) || is_numeric($value)) {
-            $value = (string) $value;
-          } elseif ($key === "data" && (is_object($value) || is_array($value))) {
-            foreach ((array) $value as $dataKey => $dataValue) {
-              if (is_bool($dataValue)) {
-                if ($dataValue === true) {
-                  $attributeString[] = "data-$dataKey";
-                }
+        foreach ($props as $key => $value) {
+          if ($key === 'className') {
+            $key = 'class';
+          } else if ($key === 'htmlFor') {
+            $key = 'for';
+          }
 
-                continue;
-              } elseif (is_string($dataValue) || is_numeric($dataValue)) {
-                $dataValue = (string) $dataValue;
-              } else if (is_null($dataValue)) {
-                continue;
-              } else {
-                throw new \Exception("Invalid prop value type: `" . gettype($dataValue) . "``");
+          // Transform key from camelCase to kebab-case
+          $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $key));
+
+          if ($value !== null) {
+            // Inline handleSpecialAttributes
+            $key = ($key === "htmlFor") ? "for" : (($key === "className") ? "class" : $key);
+
+            if (is_bool($value)) {
+              if ($value === true) {
+                $attributeString[] = $key;
               }
 
-              $attributeString[] = "data-$dataKey=\"$dataValue\"";
+              continue;
+            } elseif ($key !== 'data' && is_array($value)) {
+              $_flattened = [];
+
+              // Flatten array
+              array_walk_recursive($value, function ($a) use (&$_flattened) {
+                $_flattened[] = $a;
+              });
+
+              $value = implode(" ", $value);
+            } elseif ($key === "style" && (is_object($value) || is_array($value))) {
+              $styleString = "";
+              foreach ((array) $value as $styleKey => $styleValue) {
+                // Transform key from camelCase to kebab-case
+                $styleKey = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $styleKey));
+                $styleString .= "$styleKey:$styleValue;";
+              }
+              $value = rtrim($styleString, ';');
+            } elseif (is_string($value) || is_numeric($value)) {
+              $value = (string) $value;
+            } elseif ($key === "data" && (is_object($value) || is_array($value))) {
+              foreach ((array) $value as $dataKey => $dataValue) {
+                if (is_bool($dataValue)) {
+                  if ($dataValue === true) {
+                    $attributeString[] = "data-$dataKey";
+                  }
+
+                  continue;
+                } elseif (is_string($dataValue) || is_numeric($dataValue)) {
+                  $dataValue = (string) $dataValue;
+                } else if (is_null($dataValue)) {
+                  continue;
+                } else {
+                  throw new \Exception("Invalid prop value type: `" . gettype($dataValue) . "``");
+                }
+
+                $attributeString[] = "data-$dataKey=\"$dataValue\"";
+              }
+
+              continue;
+            } else {
+              throw new \Exception("Invalid prop value type: `" . gettype($value) . "``");
             }
 
-            continue;
-          } else {
-            throw new \Exception("Invalid prop value type: `" . gettype($value) . "``");
+            $attributeString[] = "$key=\"$value\"";
           }
-
-          $attributeString[] = "$key=\"$value\"";
         }
-      }
 
-      $attributeString = implode(" ", $attributeString);
+        $attributeString = implode(" ", $attributeString);
 
-      $childrenRendered = '';
+        $childrenRendered = '';
 
-      if (is_array($children)) {
-        $children = concatenateStringMembers($children, allowNumeric: true);
-        $childrenCount = count($children);
+        if (is_string($children)) {
+          $childrenRendered = $shouldEscapeHtml ? htmlspecialchars($children, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) : $children;
+        } else {
+          $childrenRendered = $this->renderNode($children, $nesting + 1);
+        }
+
+        // Handle void elements:
+        if (in_array($type, ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'])) {
+          return "<$type".(empty($attributeString) ? '' : ' ' . $attributeString).($this->void ? ">" : " />");
+        } else {
+          return "<$type".(empty($attributeString) ? '' : ' ' . $attributeString).">{$childrenRendered}</$type>";
+        }
+      } else {
+        $children = self::concatenateStringMembers($node);
 
         $elements = 0;
         $childrenRendered = [];
 
+        $previousChildWasElement = false;
+
         foreach ($children as $i => $child) {
           if (is_array($child)) {
-            $elements++;
+            if ($child[0] === '$') {
+              $elements++;
+              $_child = $this->renderNode($child, $nesting);
 
-            if ($this->pretty) {
-              $childrenRendered[] = "\n".$this->renderNode($child, $nesting + 1);
+              if ($this->pretty) {
+                if ($previousChildWasElement) {
+                  $_child = "\n".$this->format($_child, $nesting);
+                }
+              }
+
+              $childrenRendered[] = $_child;
+              $previousChildWasElement = true;
             } else {
-              $childrenRendered[] = $this->renderNode($child, $nesting + 1);
+              throw new \Exception("Unexpected unflattened array in children");
             }
           } else if (is_string($child) || is_numeric($child)) {
-            if ($this->pretty && $childrenCount > 1) {
-              $childrenRendered[] = "\n".$this->format(trim($this->renderNode($child, $nesting + 1)), $nesting + 1);
-            } else {
-              $childrenRendered[] = $this->renderNode($child, $nesting + 1);
-            }
+            $childrenRendered[] = $this->renderNode($child, $nesting + 1);
+            $previousChildWasElement = false;
           } else {
             continue;
           }
         }
 
         if ($this->pretty) {
-          if ($elements === 0) {
-            $childrenRendered = implode('', $childrenRendered);
+          $imploded = implode('', $childrenRendered);
+
+          if ($elements >= 1) {
+            return "\n".$this->format($imploded, $nesting)."\n".$this->format('', $nesting - 1);
           } else {
-            $childrenRendered = implode('', $childrenRendered)."\n".str_repeat($this->indentation, $nesting);
+            return $imploded;
           }
         } else {
-          $childrenRendered = implode('', $childrenRendered);
+          return implode('', $childrenRendered);
         }
-      } else {
-        if (is_string($children)) {
-          $childrenRendered = $shouldEscapeHtml ? htmlspecialchars($children, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) : $children;
-        }
-      }
-
-      // Handle void elements:
-      if (in_array($type, ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'])) {
-        return $this->format("<$type".(empty($attributeString) ? '' : ' ' . $attributeString).($this->void ? ">" : " />"), $nesting);
-      } else {
-        return $this->format("<$type".(empty($attributeString) ? '' : ' ' . $attributeString).">$childrenRendered</$type>", $nesting);
       }
     } else {
       throw new \Exception("Invalid node type: `" . gettype($node) . "``");
     }
+  }
+
+  protected static function concatenateStringMembers(array $array): array {
+    $combinedArray = [];
+    $currentString = '';
+
+    foreach ($array as $item) {
+      if (
+        is_string($item) || is_numeric($item)
+      ) {
+        $currentString .= $item;
+      } else {
+        if ($currentString !== '') {
+          $combinedArray[] = $currentString;
+          $currentString = '';
+        }
+
+        if (is_array($item)) {
+          if ($item[0] === '$') {
+            $combinedArray[] = $item;
+          } else {
+            $combinedArray = [...$combinedArray, ...self::concatenateStringMembers($item)];
+          }
+        } else {
+          $combinedArray[] = $item;
+        }
+      }
+    }
+
+    if ($currentString !== '') {
+      $combinedArray[] = $currentString;
+    }
+
+    return $combinedArray;
   }
 }

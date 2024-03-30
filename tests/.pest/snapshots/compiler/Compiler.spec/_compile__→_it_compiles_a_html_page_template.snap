@@ -619,63 +619,96 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L24:P515-516: :392:<T_WHITESPACE",
-                                            "L24:P516-517:@:64",
-                                            "L24:P517-530:martin_adamko:262:<T_STRING"
+                                            "L24:P515-516: :392:<T_WHITESPACE"
+                                        ]
+                                    },
+                                    {
+                                        "$$type": "PHPXElement",
+                                        "openingElement": [
+                                            "L24:P516-517:<:60",
+                                            "L24:P517-518:a:262:<T_STRING",
+                                            "L24:P560-561:>:62"
+                                        ],
+                                        "selfClosing": false,
+                                        "attributes": [
+                                            "L24:P518-519: :392:<T_WHITESPACE",
+                                            {
+                                                "$$type": "PHPXAttribute",
+                                                "name": [
+                                                    "L24:P519-523:href:262:<T_STRING"
+                                                ],
+                                                "assignment": "L24:P523-524:=:61",
+                                                "value": "L24:P524-560:\"https:\/\/threads.com\/@martin_adamko\":269:<T_CONSTANT_ENCAPSED_STRING"
+                                            }
+                                        ],
+                                        "children": [
+                                            {
+                                                "$$type": "PHPXText",
+                                                "tokens": [
+                                                    "L24:P561-562:@:64",
+                                                    "L24:P562-575:martin_adamko:262:<T_STRING"
+                                                ]
+                                            }
+                                        ],
+                                        "closingElement": [
+                                            "L24:P575-576:<:60",
+                                            "L24:P576-577:\/:47",
+                                            "L24:P577-578:a:262:<T_STRING",
+                                            "L24:P578-579:>:62"
                                         ]
                                     }
                                 ],
                                 "closingElement": [
-                                    "L24:P530-531:<:60",
-                                    "L24:P531-532:\/:47",
-                                    "L24:P532-533:p:262:<T_STRING",
-                                    "L24:P533-534:>:62"
+                                    "L24:P579-580:<:60",
+                                    "L24:P580-581:\/:47",
+                                    "L24:P581-582:p:262:<T_STRING",
+                                    "L24:P582-583:>:62"
                                 ]
                             },
                             {
                                 "$$type": "PHPXText",
                                 "tokens": [
-                                    "L24:P534-537:\n\t\t:392:<T_WHITESPACE"
+                                    "L24:P583-586:\n\t\t:392:<T_WHITESPACE"
                                 ]
                             }
                         ],
                         "closingElement": [
-                            "L25:P537-538:<:60",
-                            "L25:P538-539:\/:47",
-                            "L25:P539-545:footer:262:<T_STRING",
-                            "L25:P545-546:>:62"
+                            "L25:P586-587:<:60",
+                            "L25:P587-588:\/:47",
+                            "L25:P588-594:footer:262:<T_STRING",
+                            "L25:P594-595:>:62"
                         ]
                     },
                     {
                         "$$type": "PHPXText",
                         "tokens": [
-                            "L25:P546-548:\n\t:392:<T_WHITESPACE"
+                            "L25:P595-597:\n\t:392:<T_WHITESPACE"
                         ]
                     }
                 ],
                 "closingElement": [
-                    "L26:P548-549:<:60",
-                    "L26:P549-550:\/:47",
-                    "L26:P550-554:body:262:<T_STRING",
-                    "L26:P554-555:>:62"
+                    "L26:P597-598:<:60",
+                    "L26:P598-599:\/:47",
+                    "L26:P599-603:body:262:<T_STRING",
+                    "L26:P603-604:>:62"
                 ]
             },
             {
                 "$$type": "PHPXText",
                 "tokens": [
-                    "L26:P555-556:\n:392:<T_WHITESPACE"
+                    "L26:P604-605:\n:392:<T_WHITESPACE"
                 ]
             }
         ],
         "closingElement": [
-            "L27:P556-557:<:60",
-            "L27:P557-558:\/:47",
-            "L27:P558-562:html:262:<T_STRING",
-            "L27:P562-563:>:62"
+            "L27:P605-606:<:60",
+            "L27:P606-607:\/:47",
+            "L27:P607-611:html:262:<T_STRING",
+            "L27:P611-612:>:62"
         ]
     },
     {
         "$$type": "Expression",
-        "value": "L27:P563-564:\n:392:<T_WHITESPACE"
+        "value": "L27:P612-613:\n:392:<T_WHITESPACE"
     }
 ]

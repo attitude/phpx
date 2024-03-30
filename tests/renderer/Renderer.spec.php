@@ -223,12 +223,12 @@ describe('Attitude\ArrayRenderer\HTML', function () {
       ],
       [
         ['$', 'p', null, [
-          'This is a nested paragraph.',
+          'This is a nested paragraph with ',
           ['$', 'a', ['href' => 'https://github.com/attitude/phpx'], [
-            'This is a nested link with ',
-            ['$', 'span', null, 'This is a nested span.'],
+            'a nested link with ',
+            ['$', 'span', null, 'a nested span.'],
           ]],
-          'End of nested paragraph.',
+          ' and end of a nested paragraph.',
         ]],
         ],
     ]];
@@ -239,12 +239,9 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   <p>This is a paragraph.</p>
   <p>This is another paragraph.</p>
   <p>
-    This is a nested paragraph.
-    <a href="https://github.com/attitude/phpx">
-      This is a nested link with
-      <span>This is a nested span.</span>
-    </a>
-    End of nested paragraph.
+    This is a nested paragraph with <a href="https://github.com/attitude/phpx">
+      a nested link with <span>a nested span.</span>
+    </a> and end of a nested paragraph.
   </p>
 </div>
 HTML;
@@ -330,8 +327,7 @@ HTML;
     </aside>
     <footer>
       <p>
-        ©2024
-        <a href="https://threads.com/@martin_adamko">@martin_adamko</a>
+        ©2024 <a href="https://threads.com/@martin_adamko">@martin_adamko</a>
       </p>
     </footer>
   </body>
