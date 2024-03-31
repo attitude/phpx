@@ -37,7 +37,7 @@ final class Renderer {
   }
 
   protected function format(string $rendered, int $nesting): string {
-    return str_repeat($this->indentation, $nesting).$rendered;
+    return str_repeat($this->indentation, max(0, $nesting)).$rendered;
   }
 
   protected function renderNode(bool|int|float|string|array|null $node, int $nesting): string {
