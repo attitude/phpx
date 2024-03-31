@@ -12,13 +12,13 @@ class Formatter {
 			$children,
 		];
 
-    if (empty($compiled[3])) {
+    if (empty($compiled[3]) || $compiled[3] === 'null' || $compiled[3] === '[]') {
       array_pop($compiled);
 
-      if (empty($compiled[2])) {
+      if (empty($compiled[2]) || $compiled[2] === 'null' || $compiled[2] === '[]') {
         array_pop($compiled);
       }
-    } else if (empty($compiled[2])) {
+    } else if (empty($compiled[2]) || $compiled[2] === 'null' || $compiled[2] === '[]') {
       $compiled[2] = 'null';
     }
 

@@ -1,0 +1,17 @@
+[
+    {
+        "$$type": "PHPXElement",
+        "openingElement": [
+            "L1:P0-1:<:60",
+            "L1:P1-3:br:262:<T_STRING"
+        ],
+        "selfClosing": true,
+        "attributes": [
+            "L1:P3-4: :392:<T_WHITESPACE"
+        ],
+        "closingElement": [
+            "L1:P4-5:\/:47",
+            "L1:P5-6:>:62"
+        ]
+    }
+]

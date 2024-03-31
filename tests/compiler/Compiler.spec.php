@@ -111,6 +111,15 @@ PHP
     );
   });
 
+  it('compiles a tempalte with empty element and no attributes', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile('<br />');
+    expect($compiler->getAST())->toMatchSnapshot();
+    expect($compiler->getCompiled())->toBe(
+      "['$', 'br']"
+    );
+  });
+
   it('compiles a template with short boolean attribute', function () {
     $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<input type="checkbox" checked={$checked} disabled />');
