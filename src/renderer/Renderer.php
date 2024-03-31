@@ -142,8 +142,22 @@ final class Renderer {
               }
 
               continue;
+            } else if ($value instanceof \JsonSerializable) {
+              $value = htmlspecialchars(json_encode($value), ENT_QUOTES);
+            } else if ($value instanceof \DateTime) {
+              $value = $value->format('c');
+            } else if ($value instanceof \stdClass) {
+              $value = json_encode($value);
             } else {
-              throw new \Exception("Invalid prop value type: `" . gettype($value) . "``");
+              if (gettype($value) === 'object') {
+                if (method_exists($value, '__toString')) {
+                  $value = (string) $value;
+                } else {
+                  throw new \Exception("Invalid prop value type: `" . gettype($value) . "``");
+                }
+              } else {
+                throw new \Exception("Invalid prop value type: `" . gettype($value) . "``");
+              }
             }
 
             $attributeString[] = "$key=\"$value\"";
