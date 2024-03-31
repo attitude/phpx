@@ -330,4 +330,35 @@ PHPX
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toMatchSnapshot();
   });
+
+  it('compiles element with attributes on multiple lines', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile(
+<<<'PHPX'
+<div>
+  <p
+    className="text-center"
+    style="color: red;"
+    data-foo="bar"
+  >
+    Hello, {$name ?? 'unnamed'}!
+  </p>
+</div>
+PHPX
+    );
+    expect($compiler->getAST())->toMatchSnapshot();
+    expect($compiler->getCompiled())->toBe(
+<<<'PHP'
+['$', 'div', null, [
+  ['$', 'p', [
+    'className'=>"text-center",
+    'style'=>"color: red;",
+    'data-foo'=>"bar",
+  ], [
+    'Hello, ', ($name ?? 'unnamed'), '!',
+  ]],
+]]
+PHP
+    );
+  });
 });

@@ -149,14 +149,20 @@ final class Compiler {
 	protected function compilePHPXAttributes(array $attributes): string {
 		$this->logger?->debug('compilePHPXAttributes', $attributes);
 
-		return '['.trim(implode('', array_map(fn (array|Token $value) => match($value instanceof Token) {
+		$attributes = implode('', array_map(fn (array|Token $value) => match($value instanceof Token) {
 			true => $value->text,
 			false => match($value['$$type']) {
 				NodeType::PHPX_ATTRIBUTE => $this->compilePHPXAttribute($value).',',
 				NodeType::BLOCK => $this->compilePHPXAttributesPropsExpression($value).',',
 				default => throw new \RuntimeException("Unknown attribute type: {$value['$$type']->value}"),
 			}
-		}, $attributes)), ' ,').']';
+		}, $attributes));
+
+		if (strstr($attributes, "\n")) {
+			return '['.trim($attributes, ',').']';
+		} else {
+			return '['.trim($attributes, ' ,').']';
+		}
 	}
 
 	protected function compilePHPXElement(array $node): string {
