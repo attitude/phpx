@@ -111,7 +111,7 @@ PHP
     );
   });
 
-  it('compiles a tempalte with empty element and no attributes', function () {
+  it('compiles a template with empty element and no attributes', function () {
     $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<br />');
     expect($compiler->getAST())->toMatchSnapshot();
@@ -129,12 +129,12 @@ PHP
     );
   });
 
-  it('compiles a template with data-foo', function () {
+  it('compiles a template with kebab attribute name', function () {
     $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
-    $compiler->compile('<div data-foo={$data} />');
+    $compiler->compile('<div data-foo-bar={$data instanceof \DateTime} />');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
-      "['$', 'div', ['data-foo'=>(\$data)]]"
+      "['$', 'div', ['data-foo-bar'=>(\$data instanceof \DateTime)]]"
     );
   });
 
