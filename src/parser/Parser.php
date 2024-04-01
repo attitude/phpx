@@ -357,7 +357,9 @@ final class Parser {
 				TX_PARENTHESIS_OPEN,
 				TX_SQUARE_BRACKET_OPEN => $this->parseParentheses(),
 				TX_FRAGMENT_ELEMENT_OPEN => $this->parseFragmentElement(),
-				TX_ELEMENT_OPENING_OPEN => $this->parseElement(),
+				TX_ELEMENT_OPENING_OPEN => $this->tokens->tokenAtCursorIsWord(1)
+					? $this->parseElement()
+					: $this->tokens->tokenAtCursorAndForward(),
 				TX_TEMPLATE_LITERAL => $this->parseTemplateLiteral(),
 				default => $this->tokens->tokenAtCursorAndForward(),
 			};

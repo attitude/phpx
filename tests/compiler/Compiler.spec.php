@@ -75,6 +75,15 @@ PHP
     );
   });
 
+  it('compile an element with a less than condition', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile('<>{$count < 0 ? <p>Hello, {$name}!</p> : null}</>');
+    expect($compiler->getAST())->toMatchSnapshot();
+    expect($compiler->getCompiled())->toBe(
+      "[(\$count < 0 ? ['$', 'p', null, ['Hello, ', (\$name), '!']] : null)]"
+    );
+  });
+
   it('compiles a template with a function call', function () {
     $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<>Hello, {$name ?? ucfirst($type)}!</>');
