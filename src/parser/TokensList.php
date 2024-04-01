@@ -64,6 +64,18 @@ final class TokensList implements \JsonSerializable, \Iterator {
 		return $this->tokenAtCursor();
 	}
 
+	public function tokenAtCursorIsWord(int $offset = 0): Token|null {
+		$token = $this->tokenAtCursor($offset);
+
+		if ($token?->id === T_STRING) {
+			return $token;
+		} else if (preg_match('/^\w+$/', $token?->text)) {
+			return $token;
+		} else {
+			return null;
+		}
+	}
+
 	public function tokenAtCursorMatches(int|string|array $value): Token|null {
 		$token = $this->tokenAtCursor();
 

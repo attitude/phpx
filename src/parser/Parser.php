@@ -277,7 +277,9 @@ final class Parser {
 				T_CURLY_OPEN,
 				TX_CURLY_BRACKET_OPEN => $this->parseParentheses(),
 				T_CLASS => throw new \ParseError("Use `className` instead of `class`"),
-				default => throw new \ParseError($this->unexpectedTokenMessage()),
+				default => $this->tokens->tokenAtCursorIsWord()
+					? $this->parseElementAttribute()
+					: throw new \ParseError($this->unexpectedTokenMessage()),
 			};
 		}
 
@@ -292,12 +294,12 @@ final class Parser {
 
 		if ($this->tokens->tokenAtCursorMatches(':')) {
 			$name[] = $this->tokens->tokenAtCursorAndForward();
-			assert($this->tokens->tokenAtCursor()->id === T_STRING);
+			assert($this->tokens->tokenAtCursorIsWord());
 			$name[] = $this->tokens->tokenAtCursorAndForward();
 		}
 
 		if ($this->tokens->tokenAtCursorMatches('-')) {
-			while($this->tokens->tokenAtCursorMatches('-') && $this->tokens->tokenAtCursor(1)->id === T_STRING) {
+			while($this->tokens->tokenAtCursorMatches('-') && $this->tokens->tokenAtCursorIsWord(1)) {
 				$name[] = $this->tokens->tokenAtCursorAndForward();
 				$name[] = $this->tokens->tokenAtCursorAndForward();
 			}
