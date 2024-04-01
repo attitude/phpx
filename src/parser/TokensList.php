@@ -40,7 +40,7 @@ final class TokensList implements \JsonSerializable, \Iterator {
 		}
 	}
 
-	protected function tokenAtCursorMatchingSequence(array $sequence): Token|null {
+	protected function tokenAtCursorMatchesSequence(array $sequence): Token|null {
 		foreach ($sequence as $i => $text) {
 			assert(is_string($text) || is_int($text));
 
@@ -64,31 +64,29 @@ final class TokensList implements \JsonSerializable, \Iterator {
 		return $this->tokenAtCursor();
 	}
 
-	public function tokenAtCursorMatching(int|string|array $value): Token|null {
+	public function tokenAtCursorMatches(int|string|array $value): Token|null {
 		$token = $this->tokenAtCursor();
 
 		if (is_array($value)) {
-			if ($this->tokenAtCursorMatchingSequence($value)) {
+			if ($this->tokenAtCursorMatchesSequence($value)) {
+				return $token;
+			} else {
+				return null;
+			}
+		} else if (is_string($value)) {
+			if ($token?->text === $value) {
+				return $token;
+			} else {
+				return null;
+			}
+		} else if (is_int($value)) {
+			if ($token?->id === $value) {
 				return $token;
 			} else {
 				return null;
 			}
 		} else {
-			if (is_string($value)) {
-				if ($token?->text === $value) {
-					return $token;
-				} else {
-					return null;
-				}
-			} else if (is_int($value)) {
-				if ($token?->id === $value) {
-					return $token;
-				} else {
-					return null;
-				}
-			} else {
-				throw new \InvalidArgumentException("Invalid value type ".gettype($value));
-			}
+			throw new \InvalidArgumentException("Invalid value type ".gettype($value));
 		}
 	}
 
