@@ -268,7 +268,7 @@ final class Compiler {
 		['children' => $children] = $node;
 
 		$children = array_map(fn (mixed $child) => match($child instanceof Token) {
-			true => "'{$child->text}'",
+			true => '\''.addcslashes($child->text, '\'').'\'',
 			false => match($child['$$type']) {
 				NodeType::BLOCK => $this->compileBlock($child, '(', ')'),
 				default => throw new \RuntimeException("Unknown child type: {$child['$$type']}"),
