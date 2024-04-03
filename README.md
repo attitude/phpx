@@ -22,10 +22,10 @@
 
 ```php
 [
-  ['h1', ['className'=>"title"], ['Hello, ', ($name ?? ucfirst($type)), '!']],
-  ['p', null, [
+  ['$', 'h1', ['className'=>"title"], ['Hello, ', ($name ?? ucfirst($type)), '!']],
+  ['$', 'p', null, [
     'Welcome to the world of PHPX, where you can write PHP code in a JSX-like syntax.',
-    ['img', ['src'=>"about:blank", 'alt'=>"Happy coding!"]], ' forever!',
+    ['$', 'img', ['src'=>"about:blank", 'alt'=>"Happy coding!"]], ' forever!',
   ]],
 ]
 ```
