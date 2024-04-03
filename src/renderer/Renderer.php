@@ -172,6 +172,10 @@ final class Renderer {
           $childrenRendered = $shouldEscapeHtml ? htmlspecialchars($children, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) : $children;
         } else {
           $childrenRendered = $this->renderNode($children, $nesting + 1);
+
+          if ($this->pretty && (strstr($childrenRendered, "\n") || strstr($childrenRendered, "<"))) {
+            $childrenRendered = "\n".$this->format($childrenRendered, $nesting + 1)."\n".$this->format('', $nesting);
+          }
         }
 
         // Handle void elements:
@@ -213,17 +217,7 @@ final class Renderer {
           }
         }
 
-        if ($this->pretty) {
-          $imploded = implode('', $childrenRendered);
-
-          if ($elements >= 1) {
-            return "\n".$this->format($imploded, $nesting)."\n".$this->format('', $nesting - 1);
-          } else {
-            return $imploded;
-          }
-        } else {
-          return implode('', $childrenRendered);
-        }
+        return implode('', $childrenRendered);
       }
     } else {
       throw new \Exception("Invalid node type: `" . gettype($node) . "``");

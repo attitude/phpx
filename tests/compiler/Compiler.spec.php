@@ -120,6 +120,15 @@ PHP
     );
   });
 
+  it('compiles a template with fragment and children', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile('<><p>{$name} is a {$type}!</p><p>{$phone} is not a {$type}</p></>');
+    expect($compiler->getAST())->toMatchSnapshot();
+    expect($compiler->getCompiled())->toBe(
+      "[['$', 'p', null, [(\$name), ' is a ', (\$type), '!']], ['$', 'p', null, [(\$phone), ' is not a ', (\$type)]]]"
+    );
+  });
+
   it('compiles a template with empty element and no attributes', function () {
     $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<br />');

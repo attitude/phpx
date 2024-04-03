@@ -270,7 +270,7 @@ HTML;
       ]],
       ['$', 'body', null, [
         ['$', 'header',null, [
-          ['$', 'Navigation', ['url' => '/', 'title' => 'Anet Lynx'], [
+          ['$', 'Navigation', ['url' => '/', 'title' => 'Martin Adamko'], [
             ['$', 'a', ['href' => '/'], ['Home']],
           ]],
           ['$', 'h1', null, [['Blog']]],
@@ -308,7 +308,7 @@ HTML;
     <header>
       <nav class="navigation">
         <a href="/" class="navigation-link">
-          <strong class="navigation-title">Anet Lynx</strong>
+          <strong class="navigation-title">Martin Adamko</strong>
         </a>
         <a href="/">Home</a>
       </nav>
@@ -351,8 +351,117 @@ HTML;
             ['$', 'a', ['href' => $url, 'class' => 'navigation-link'], [
               ['$', 'strong', ['class' => 'navigation-title'], $title],
             ]],
-            $children,
+            [[$children]],
           ]]
+        );
+      },
+    ]))->toBe($expected);
+  });
+
+  it('renders full HTML document with fragment', function() {
+    $html = ['$', 'html', ['lang' => 'en'], [
+      ['$', 'head', null, [
+        ['$', 'meta', [ 'charset' => 'UTF-8']],
+        ['$', 'meta', [
+          'name' => 'viewport',
+          'content' => 'width=device-width, initial-scale=1.0',
+        ]],
+        ['$', 'title', null, 'Blog'],
+        ['$', 'meta', [ 'name' => 'description', 'content' => null]],
+        ['$', 'link', [ 'rel' => 'stylesheet', 'href' => '/_assets/css/styles.css']],
+      ]],
+      ['$', 'body', null, [['$', 'Page']]],
+    ]];
+
+    $expected = <<<'HTML'
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog</title>
+    <meta name="description" />
+    <link rel="stylesheet" href="/_assets/css/styles.css" />
+  </head>
+  <body>
+    <header>
+      <nav class="navigation">
+        <a href="/" class="navigation-link">
+          <strong class="navigation-title">Martin Adamko</strong>
+        </a>
+        <a href="/">Home</a>
+      </nav>
+      <h1>Blog</h1>
+    </header>
+    <main><h2>Recent Articles</h2></main>
+    <aside>
+      <ul>
+        <li>
+          <a href="/blog/2024-03-12/index.html">2024-03-12</a>
+        </li>
+        <li>
+          <a href="/blog/2024-03-14/index.html">2024-03-14</a>
+        </li>
+      </ul>
+    </aside>
+    <footer>
+      <p>
+        ©2024 <a href="https://threads.com/@martin_adamko">@martin_adamko</a>
+      </p>
+    </footer>
+  </body>
+</html>
+HTML;
+
+    $renderer = new Renderer();
+    $renderer->pretty = true;
+    $renderer->indentation = '  ';
+
+    expect($renderer($html, [
+      'Navigation' => function (array $props): array {
+        [
+          'url' => $url,
+          'title' => $title,
+          'children' => $children,
+        ] = $props;
+
+        return (
+          ['$', 'nav', ['class' => 'navigation'], [
+            ['$', 'a', ['href' => $url, 'class' => 'navigation-link'], [
+              ['$', 'strong', ['class' => 'navigation-title'], $title],
+            ]],
+            [[[$children]]],
+          ]]
+        );
+      },
+      'Page' => function() {
+        return (
+          [
+            [
+              ['$', 'header',null, [
+                ['$', 'Navigation', ['url' => '/', 'title' => 'Martin Adamko'], [
+                  ['$', 'a', ['href' => '/'], ['Home']],
+                ]],
+                ['$', 'h1', null, [['Blog']]],
+                null,
+              ]],
+              [[['$', 'main', ['dangerouslySetInnerHTML' => '<h2>Recent Articles</h2>']]]],
+              ['$', 'aside', null, [
+                ['$', 'ul', null, [[
+                  ['$', 'li', null, [['$', 'a', ['href' => '/blog/2024-03-12/index.html'],
+                      ['2024-03-12'],
+                    ]],
+                  ],
+                  ['$', 'li', null, [['$', 'a', ['href' => '/blog/2024-03-14/index.html'],
+                      ['2024-03-14'],
+                    ]],
+                  ],
+                ]]],
+              ]],
+              ['$', 'footer',null, [
+                ['$', 'p', null, ['©', 2024, ' ', ['$', 'a', ['href' => 'https://threads.com/@martin_adamko'], '@martin_adamko']]],
+              ]],
+            ],
+          ]
         );
       },
     ]))->toBe($expected);
