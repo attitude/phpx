@@ -22,6 +22,8 @@ const TX_FRAGMENT_ELEMENT_CLOSING_SEQUENCE = ['<', '/', '>'];
 const TX_ELEMENT_OPENING_OPEN = 60;
 /** Token for <T_STRING sequence, value of ['<',T_STRING]; */
 const TX_ELEMENT_OPENING_OPEN_SEQUENCE = ['<', T_STRING];
+/** Token for <?, value of ['<', '?']; */
+const TX_PHP_OPEN_SEQUENCE = ['<', '?'];
 /** Token sequence for />, value of ['/', '>']; */
 const TX_ELEMENT_SELF_CLOSING_SEQUENCE = ['/', '>'];
 /** Token for >, value of ord('>'); */

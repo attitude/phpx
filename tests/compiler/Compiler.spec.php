@@ -388,4 +388,9 @@ PHPX
 PHP
     );
   });
+
+  it('throws an error when a using PHP opening tags', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    expect(fn() => $compiler->compile('<title>[<?=$todayFormatted?>]</title>'))->toThrow(\ParseError::class, 'Unexpected PHP opening tag on line 1');
+  });
 });

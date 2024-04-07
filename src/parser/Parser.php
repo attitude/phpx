@@ -169,6 +169,10 @@ final class Parser {
 		) {
 			$this->debugCurrentToken(__FUNCTION__);
 
+			if ($this->tokens->tokenAtCursorMatches(TX_PHP_OPEN_SEQUENCE)) {
+				throw new \ParseError("Unexpected PHP opening tag on line {$this->tokens->tokenAtCursor()->line}");
+			}
+
 			if ($this->tokens->tokenAtCursorMatches(T_COMMENT)) {
 				$this->logger?->debug('Found comment', ['token' => $this->tokens->tokenAtCursor()]);
 				$commentToken = $this->tokens->tokenAtCursor();
