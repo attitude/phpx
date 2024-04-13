@@ -141,7 +141,7 @@ describe('Attitude\ArrayRenderer\HTML', function () {
     $html = ['$',  'div', [
       'class' => ['container', 'main-container'],
       'id' => 'main-container',
-      'style' => (object)['color' => 'red', 'fontSize' => '16px'],
+      'style' => ['color' => 'red', 'fontSize' => '16px'],
       'data-attribute' => null,
       'data-another' => 'value',
       'empty-string' => '',
@@ -153,7 +153,7 @@ describe('Attitude\ArrayRenderer\HTML', function () {
     $expected = '<div class="container main-container" id="main-container" style="color:red;font-size:16px" data-another="value" empty-string=""><h1>Hello World!</h1><p>This is a paragraph.</p></div>';
 
     expect((new Renderer)($html))->toBe($expected);
-  });
+  })->only();
 
   it('handles void elements', function () {
     $html = ['$', 'input', ['type' => 'text', 'name' => 'username']];

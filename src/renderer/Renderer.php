@@ -43,9 +43,9 @@ final class Renderer {
   protected function renderNode(bool|int|float|string|array|null $node, int $nesting): string {
     if (is_string($node) || is_numeric($node)) {
       return (string) $node;
-    } elseif (is_bool($node) || is_null($node)) {
+    } else if (is_bool($node) || is_null($node)) {
       return '';
-    } elseif (is_array($node)) {
+    } else if (is_array($node)) {
       if (empty($node)) {
         return '';
       } else if ($node[0] === '$') {
@@ -103,16 +103,7 @@ final class Renderer {
               }
 
               continue;
-            } elseif ($key !== 'data' && is_array($value)) {
-              $_flattened = [];
-
-              // Flatten array
-              array_walk_recursive($value, function ($a) use (&$_flattened) {
-                $_flattened[] = $a;
-              });
-
-              $value = implode(" ", $value);
-            } elseif ($key === "style" && (is_object($value) || is_array($value))) {
+            } else if ($key === "style" && (is_object($value) || is_array($value))) {
               $styleString = "";
               foreach ((array) $value as $styleKey => $styleValue) {
                 // Transform key from camelCase to kebab-case
@@ -120,9 +111,9 @@ final class Renderer {
                 $styleString .= "$styleKey:$styleValue;";
               }
               $value = rtrim($styleString, ';');
-            } elseif (is_string($value) || is_numeric($value)) {
+            } else if (is_string($value) || is_numeric($value)) {
               $value = (string) $value;
-            } elseif ($key === "data" && (is_object($value) || is_array($value))) {
+            } else if ($key === "data" && (is_object($value) || is_array($value))) {
               foreach ((array) $value as $dataKey => $dataValue) {
                 if (is_bool($dataValue)) {
                   if ($dataValue === true) {
@@ -130,7 +121,7 @@ final class Renderer {
                   }
 
                   continue;
-                } elseif (is_string($dataValue) || is_numeric($dataValue)) {
+                } else if (is_string($dataValue) || is_numeric($dataValue)) {
                   $dataValue = (string) $dataValue;
                 } else if (is_null($dataValue)) {
                   continue;
@@ -142,6 +133,15 @@ final class Renderer {
               }
 
               continue;
+            } else if ($key !== 'data' && is_array($value)) {
+              $_flattened = [];
+
+              // Flatten array
+              array_walk_recursive($value, function ($a) use (&$_flattened) {
+                $_flattened[] = $a;
+              });
+
+              $value = implode(" ", $value);
             } else if ($value instanceof \JsonSerializable) {
               $value = htmlspecialchars(json_encode($value), ENT_QUOTES);
             } else if ($value instanceof \DateTime) {
