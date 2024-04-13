@@ -157,7 +157,7 @@ PHP
   });
 
   it('compiles complicated kebab attribute name', function () {
-    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: true));
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $compiler->compile('<li className="meals-item" data-as-table={$meal->priceFormatted instanceof StringList} />');
     expect($compiler->getAST())->toMatchSnapshot();
     expect($compiler->getCompiled())->toBe(
