@@ -143,20 +143,20 @@ final class Renderer {
 
               $value = implode(" ", $value);
             } else if ($value instanceof \JsonSerializable) {
-              $value = htmlspecialchars(json_encode($value), ENT_QUOTES);
-            } else if ($value instanceof \DateTime) {
+              $value = htmlspecialchars(json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES);
+            } else if ($value instanceof \DateTime || $value instanceof \DateTimeImmutable) {
               $value = $value->format('c');
             } else if ($value instanceof \stdClass) {
-              $value = json_encode($value);
+              $value = htmlspecialchars(json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES);
             } else {
               if (gettype($value) === 'object') {
                 if (method_exists($value, '__toString')) {
                   $value = (string) $value;
                 } else {
-                  throw new \Exception("Invalid prop value type: `" . gettype($value) . "``");
+                  throw new \Exception("Invalid prop `{$key}` value type: `" . gettype($value) . "``");
                 }
               } else {
-                throw new \Exception("Invalid prop value type: `" . gettype($value) . "``");
+                throw new \Exception("Invalid prop `{$key}` value type: `" . gettype($value) . "``");
               }
             }
 
