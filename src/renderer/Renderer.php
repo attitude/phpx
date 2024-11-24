@@ -94,9 +94,6 @@ final class Renderer {
           $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $key));
 
           if ($value !== null) {
-            // Inline handleSpecialAttributes
-            $key = ($key === "htmlFor") ? "for" : (($key === "className") ? "class" : $key);
-
             if (is_bool($value)) {
               if ($value === true) {
                 $attributeString[] = $key;
