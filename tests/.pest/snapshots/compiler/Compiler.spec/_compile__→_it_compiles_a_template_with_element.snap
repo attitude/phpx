@@ -1,34 +1,34 @@
 [
     {
         "$$type": "Expression",
-        "value": "L1:P0-2:  :392:<T_WHITESPACE"
+        "value": "L1:P0-2:  :397:<T_WHITESPACE"
     },
     {
         "$$type": "PHPXElement",
         "openingElement": [
             "L1:P2-3:<:60",
-            "L1:P3-5:h1:262:<T_STRING",
+            "L1:P3-5:h1:313:<T_STRING",
             "L1:P23-24:>:62"
         ],
         "selfClosing": false,
         "attributes": [
-            "L1:P5-6: :392:<T_WHITESPACE",
+            "L1:P5-6: :397:<T_WHITESPACE",
             {
                 "$$type": "PHPXAttribute",
                 "name": [
-                    "L1:P6-15:className:262:<T_STRING"
+                    "L1:P6-15:className:313:<T_STRING"
                 ],
                 "assignment": "L1:P15-16:=:61",
-                "value": "L1:P16-23:\"title\":269:<T_CONSTANT_ENCAPSED_STRING"
+                "value": "L1:P16-23:\"title\":320:<T_CONSTANT_ENCAPSED_STRING"
             }
         ],
         "children": [
             {
                 "$$type": "PHPXText",
                 "tokens": [
-                    "L1:P24-29:Hello:262:<T_STRING",
+                    "L1:P24-29:Hello:313:<T_STRING",
                     "L1:P29-30:,:44",
-                    "L1:P30-31: :392:<T_WHITESPACE"
+                    "L1:P30-31: :397:<T_WHITESPACE"
                 ]
             },
             {
@@ -37,16 +37,16 @@
                     "$$type": "Block",
                     "opening": "L1:P31-32:{:123",
                     "children": [
-                        "L1:P32-37:$name:266:<T_VARIABLE",
-                        "L1:P37-38: :392:<T_WHITESPACE",
-                        "L1:P38-40:??:400:<T_COALESCE",
-                        "L1:P40-41: :392:<T_WHITESPACE",
-                        "L1:P41-48:ucfirst:262:<T_STRING",
+                        "L1:P32-37:$name:317:<T_VARIABLE",
+                        "L1:P37-38: :397:<T_WHITESPACE",
+                        "L1:P38-40:??:284:<T_COALESCE",
+                        "L1:P40-41: :397:<T_WHITESPACE",
+                        "L1:P41-48:ucfirst:313:<T_STRING",
                         {
                             "$$type": "Block",
                             "opening": "L1:P48-49:(:40",
                             "children": [
-                                "L1:P49-54:$type:266:<T_VARIABLE"
+                                "L1:P49-54:$type:317:<T_VARIABLE"
                             ],
                             "closing": "L1:P54-55:):41"
                         }
@@ -64,7 +64,7 @@
         "closingElement": [
             "L1:P57-58:<:60",
             "L1:P58-59:\/:47",
-            "L1:P59-61:h1:262:<T_STRING",
+            "L1:P59-61:h1:313:<T_STRING",
             "L1:P61-62:>:62"
         ]
     }

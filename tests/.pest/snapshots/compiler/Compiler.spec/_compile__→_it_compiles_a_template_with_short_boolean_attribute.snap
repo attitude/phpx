@@ -3,45 +3,45 @@
         "$$type": "PHPXElement",
         "openingElement": [
             "L1:P0-1:<:60",
-            "L1:P1-6:input:262:<T_STRING"
+            "L1:P1-6:input:313:<T_STRING"
         ],
         "selfClosing": true,
         "attributes": [
-            "L1:P6-7: :392:<T_WHITESPACE",
+            "L1:P6-7: :397:<T_WHITESPACE",
             {
                 "$$type": "PHPXAttribute",
                 "name": [
-                    "L1:P7-11:type:262:<T_STRING"
+                    "L1:P7-11:type:313:<T_STRING"
                 ],
                 "assignment": "L1:P11-12:=:61",
-                "value": "L1:P12-22:\"checkbox\":269:<T_CONSTANT_ENCAPSED_STRING"
+                "value": "L1:P12-22:\"checkbox\":320:<T_CONSTANT_ENCAPSED_STRING"
             },
-            "L1:P22-23: :392:<T_WHITESPACE",
+            "L1:P22-23: :397:<T_WHITESPACE",
             {
                 "$$type": "PHPXAttribute",
                 "name": [
-                    "L1:P23-30:checked:262:<T_STRING"
+                    "L1:P23-30:checked:313:<T_STRING"
                 ],
                 "assignment": "L1:P30-31:=:61",
                 "value": {
                     "$$type": "Block",
                     "opening": "L1:P31-32:{:123",
                     "children": [
-                        "L1:P32-40:$checked:266:<T_VARIABLE"
+                        "L1:P32-40:$checked:317:<T_VARIABLE"
                     ],
                     "closing": "L1:P40-41:}:125"
                 }
             },
-            "L1:P41-42: :392:<T_WHITESPACE",
+            "L1:P41-42: :397:<T_WHITESPACE",
             {
                 "$$type": "PHPXAttribute",
                 "name": [
-                    "L1:P42-50:disabled:262:<T_STRING"
+                    "L1:P42-50:disabled:313:<T_STRING"
                 ],
                 "assignment": null,
                 "value": true
             },
-            "L1:P50-51: :392:<T_WHITESPACE"
+            "L1:P50-51: :397:<T_WHITESPACE"
         ],
         "closingElement": [
             "L1:P51-52:\/:47",

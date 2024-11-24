@@ -3,7 +3,7 @@
         "$$type": "PHPXElement",
         "openingElement": [
             "L1:P0-1:<:60",
-            "L1:P1-4:div:262:<T_STRING",
+            "L1:P1-4:div:313:<T_STRING",
             "L1:P4-5:>:62"
         ],
         "selfClosing": false,
@@ -12,62 +12,62 @@
             {
                 "$$type": "PHPXText",
                 "tokens": [
-                    "L1:P5-8:\n  :392:<T_WHITESPACE"
+                    "L1:P5-8:\n  :397:<T_WHITESPACE"
                 ]
             },
             {
                 "$$type": "PHPXElement",
                 "openingElement": [
                     "L2:P8-9:<:60",
-                    "L2:P9-10:p:262:<T_STRING",
+                    "L2:P9-10:p:313:<T_STRING",
                     "L6:P84-85:>:62"
                 ],
                 "selfClosing": false,
                 "attributes": [
-                    "L2:P10-15:\n    :392:<T_WHITESPACE",
+                    "L2:P10-15:\n    :397:<T_WHITESPACE",
                     {
                         "$$type": "PHPXAttribute",
                         "name": [
-                            "L3:P15-24:className:262:<T_STRING"
+                            "L3:P15-24:className:313:<T_STRING"
                         ],
                         "assignment": "L3:P24-25:=:61",
-                        "value": "L3:P25-38:\"text-center\":269:<T_CONSTANT_ENCAPSED_STRING"
+                        "value": "L3:P25-38:\"text-center\":320:<T_CONSTANT_ENCAPSED_STRING"
                     },
-                    "L3:P38-43:\n    :392:<T_WHITESPACE",
+                    "L3:P38-43:\n    :397:<T_WHITESPACE",
                     {
                         "$$type": "PHPXAttribute",
                         "name": [
-                            "L4:P43-48:style:262:<T_STRING"
+                            "L4:P43-48:style:313:<T_STRING"
                         ],
                         "assignment": "L4:P48-49:=:61",
-                        "value": "L4:P49-62:\"color: red;\":269:<T_CONSTANT_ENCAPSED_STRING"
+                        "value": "L4:P49-62:\"color: red;\":320:<T_CONSTANT_ENCAPSED_STRING"
                     },
-                    "L4:P62-67:\n    :392:<T_WHITESPACE",
+                    "L4:P62-67:\n    :397:<T_WHITESPACE",
                     {
                         "$$type": "PHPXAttribute",
                         "name": [
-                            "L5:P67-71:data:262:<T_STRING",
+                            "L5:P67-71:data:313:<T_STRING",
                             "L5:P71-72:-:45",
-                            "L5:P72-75:foo:262:<T_STRING"
+                            "L5:P72-75:foo:313:<T_STRING"
                         ],
                         "assignment": "L5:P75-76:=:61",
-                        "value": "L5:P76-81:\"bar\":269:<T_CONSTANT_ENCAPSED_STRING"
+                        "value": "L5:P76-81:\"bar\":320:<T_CONSTANT_ENCAPSED_STRING"
                     },
-                    "L5:P81-84:\n  :392:<T_WHITESPACE"
+                    "L5:P81-84:\n  :397:<T_WHITESPACE"
                 ],
                 "children": [
                     {
                         "$$type": "PHPXText",
                         "tokens": [
-                            "L6:P85-90:\n    :392:<T_WHITESPACE"
+                            "L6:P85-90:\n    :397:<T_WHITESPACE"
                         ]
                     },
                     {
                         "$$type": "PHPXText",
                         "tokens": [
-                            "L7:P90-95:Hello:262:<T_STRING",
+                            "L7:P90-95:Hello:313:<T_STRING",
                             "L7:P95-96:,:44",
-                            "L7:P96-97: :392:<T_WHITESPACE"
+                            "L7:P96-97: :397:<T_WHITESPACE"
                         ]
                     },
                     {
@@ -76,11 +76,11 @@
                             "$$type": "Block",
                             "opening": "L7:P97-98:{:123",
                             "children": [
-                                "L7:P98-103:$name:266:<T_VARIABLE",
-                                "L7:P103-104: :392:<T_WHITESPACE",
-                                "L7:P104-106:??:400:<T_COALESCE",
-                                "L7:P106-107: :392:<T_WHITESPACE",
-                                "L7:P107-116:'unnamed':269:<T_CONSTANT_ENCAPSED_STRING"
+                                "L7:P98-103:$name:317:<T_VARIABLE",
+                                "L7:P103-104: :397:<T_WHITESPACE",
+                                "L7:P104-106:??:284:<T_COALESCE",
+                                "L7:P106-107: :397:<T_WHITESPACE",
+                                "L7:P107-116:'unnamed':320:<T_CONSTANT_ENCAPSED_STRING"
                             ],
                             "closing": "L7:P116-117:}:125"
                         }
@@ -94,28 +94,28 @@
                     {
                         "$$type": "PHPXText",
                         "tokens": [
-                            "L7:P118-121:\n  :392:<T_WHITESPACE"
+                            "L7:P118-121:\n  :397:<T_WHITESPACE"
                         ]
                     }
                 ],
                 "closingElement": [
                     "L8:P121-122:<:60",
                     "L8:P122-123:\/:47",
-                    "L8:P123-124:p:262:<T_STRING",
+                    "L8:P123-124:p:313:<T_STRING",
                     "L8:P124-125:>:62"
                 ]
             },
             {
                 "$$type": "PHPXText",
                 "tokens": [
-                    "L8:P125-126:\n:392:<T_WHITESPACE"
+                    "L8:P125-126:\n:397:<T_WHITESPACE"
                 ]
             }
         ],
         "closingElement": [
             "L9:P126-127:<:60",
             "L9:P127-128:\/:47",
-            "L9:P128-131:div:262:<T_STRING",
+            "L9:P128-131:div:313:<T_STRING",
             "L9:P131-132:>:62"
         ]
     }

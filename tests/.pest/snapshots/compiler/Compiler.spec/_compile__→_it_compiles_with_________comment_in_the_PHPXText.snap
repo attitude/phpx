@@ -6,45 +6,45 @@
             {
                 "$$type": "PHPXText",
                 "tokens": [
-                    "L1:P2-5:\n  :392:<T_WHITESPACE"
+                    "L1:P2-5:\n  :397:<T_WHITESPACE"
                 ]
             },
             {
                 "$$type": "PHPXComment",
-                "comment": "L2:P6-32:\/* regular PHPX comment *\/:387:<T_COMMENT"
+                "comment": "L2:P6-32:\/* regular PHPX comment *\/:392:<T_COMMENT"
             },
             {
                 "$$type": "PHPXText",
                 "tokens": [
-                    "L2:P33-36:\n  :392:<T_WHITESPACE"
+                    "L2:P33-36:\n  :397:<T_WHITESPACE"
                 ]
             },
             {
                 "$$type": "PHPXText",
                 "tokens": [
-                    "L3:P36-41:Lorem:262:<T_STRING",
-                    "L3:P41-42: :392:<T_WHITESPACE",
-                    "L3:P42-47:ipsum:262:<T_STRING",
-                    "L3:P47-48: :392:<T_WHITESPACE",
-                    "L3:P48-53:dolor:262:<T_STRING",
-                    "L3:P53-54: :392:<T_WHITESPACE",
-                    "L3:P54-57:sit:262:<T_STRING",
-                    "L3:P57-58: :392:<T_WHITESPACE",
-                    "L3:P58-62:amet:262:<T_STRING",
+                    "L3:P36-41:Lorem:313:<T_STRING",
+                    "L3:P41-42: :397:<T_WHITESPACE",
+                    "L3:P42-47:ipsum:313:<T_STRING",
+                    "L3:P47-48: :397:<T_WHITESPACE",
+                    "L3:P48-53:dolor:313:<T_STRING",
+                    "L3:P53-54: :397:<T_WHITESPACE",
+                    "L3:P54-57:sit:313:<T_STRING",
+                    "L3:P57-58: :397:<T_WHITESPACE",
+                    "L3:P58-62:amet:313:<T_STRING",
                     "L3:P62-63:,:44",
-                    "L3:P63-64: :392:<T_WHITESPACE",
-                    "L3:P64-75:consectetur:262:<T_STRING",
-                    "L3:P75-76: :392:<T_WHITESPACE",
-                    "L3:P76-86:adipiscing:262:<T_STRING",
-                    "L3:P86-87: :392:<T_WHITESPACE",
-                    "L3:P87-91:elit:262:<T_STRING",
+                    "L3:P63-64: :397:<T_WHITESPACE",
+                    "L3:P64-75:consectetur:313:<T_STRING",
+                    "L3:P75-76: :397:<T_WHITESPACE",
+                    "L3:P76-86:adipiscing:313:<T_STRING",
+                    "L3:P86-87: :397:<T_WHITESPACE",
+                    "L3:P87-91:elit:313:<T_STRING",
                     "L3:P91-92:.:46"
                 ]
             },
             {
                 "$$type": "PHPXText",
                 "tokens": [
-                    "L3:P92-93:\n:392:<T_WHITESPACE"
+                    "L3:P92-93:\n:397:<T_WHITESPACE"
                 ]
             }
         ],

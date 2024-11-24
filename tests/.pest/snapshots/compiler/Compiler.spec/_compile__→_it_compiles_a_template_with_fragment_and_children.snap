@@ -7,7 +7,7 @@
                 "$$type": "PHPXElement",
                 "openingElement": [
                     "L1:P2-3:<:60",
-                    "L1:P3-4:p:262:<T_STRING",
+                    "L1:P3-4:p:313:<T_STRING",
                     "L1:P4-5:>:62"
                 ],
                 "selfClosing": false,
@@ -19,7 +19,7 @@
                             "$$type": "Block",
                             "opening": "L1:P5-6:{:123",
                             "children": [
-                                "L1:P6-11:$name:266:<T_VARIABLE"
+                                "L1:P6-11:$name:317:<T_VARIABLE"
                             ],
                             "closing": "L1:P11-12:}:125"
                         }
@@ -27,11 +27,11 @@
                     {
                         "$$type": "PHPXText",
                         "tokens": [
-                            "L1:P12-13: :392:<T_WHITESPACE",
-                            "L1:P13-15:is:262:<T_STRING",
-                            "L1:P15-16: :392:<T_WHITESPACE",
-                            "L1:P16-17:a:262:<T_STRING",
-                            "L1:P17-18: :392:<T_WHITESPACE"
+                            "L1:P12-13: :397:<T_WHITESPACE",
+                            "L1:P13-15:is:313:<T_STRING",
+                            "L1:P15-16: :397:<T_WHITESPACE",
+                            "L1:P16-17:a:313:<T_STRING",
+                            "L1:P17-18: :397:<T_WHITESPACE"
                         ]
                     },
                     {
@@ -40,7 +40,7 @@
                             "$$type": "Block",
                             "opening": "L1:P18-19:{:123",
                             "children": [
-                                "L1:P19-24:$type:266:<T_VARIABLE"
+                                "L1:P19-24:$type:317:<T_VARIABLE"
                             ],
                             "closing": "L1:P24-25:}:125"
                         }
@@ -55,7 +55,7 @@
                 "closingElement": [
                     "L1:P26-27:<:60",
                     "L1:P27-28:\/:47",
-                    "L1:P28-29:p:262:<T_STRING",
+                    "L1:P28-29:p:313:<T_STRING",
                     "L1:P29-30:>:62"
                 ]
             },
@@ -63,7 +63,7 @@
                 "$$type": "PHPXElement",
                 "openingElement": [
                     "L1:P30-31:<:60",
-                    "L1:P31-32:p:262:<T_STRING",
+                    "L1:P31-32:p:313:<T_STRING",
                     "L1:P32-33:>:62"
                 ],
                 "selfClosing": false,
@@ -75,7 +75,7 @@
                             "$$type": "Block",
                             "opening": "L1:P33-34:{:123",
                             "children": [
-                                "L1:P34-40:$phone:266:<T_VARIABLE"
+                                "L1:P34-40:$phone:317:<T_VARIABLE"
                             ],
                             "closing": "L1:P40-41:}:125"
                         }
@@ -83,13 +83,13 @@
                     {
                         "$$type": "PHPXText",
                         "tokens": [
-                            "L1:P41-42: :392:<T_WHITESPACE",
-                            "L1:P42-44:is:262:<T_STRING",
-                            "L1:P44-45: :392:<T_WHITESPACE",
-                            "L1:P45-48:not:262:<T_STRING",
-                            "L1:P48-49: :392:<T_WHITESPACE",
-                            "L1:P49-50:a:262:<T_STRING",
-                            "L1:P50-51: :392:<T_WHITESPACE"
+                            "L1:P41-42: :397:<T_WHITESPACE",
+                            "L1:P42-44:is:313:<T_STRING",
+                            "L1:P44-45: :397:<T_WHITESPACE",
+                            "L1:P45-48:not:313:<T_STRING",
+                            "L1:P48-49: :397:<T_WHITESPACE",
+                            "L1:P49-50:a:313:<T_STRING",
+                            "L1:P50-51: :397:<T_WHITESPACE"
                         ]
                     },
                     {
@@ -98,7 +98,7 @@
                             "$$type": "Block",
                             "opening": "L1:P51-52:{:123",
                             "children": [
-                                "L1:P52-57:$type:266:<T_VARIABLE"
+                                "L1:P52-57:$type:317:<T_VARIABLE"
                             ],
                             "closing": "L1:P57-58:}:125"
                         }
@@ -107,7 +107,7 @@
                 "closingElement": [
                     "L1:P58-59:<:60",
                     "L1:P59-60:\/:47",
-                    "L1:P60-61:p:262:<T_STRING",
+                    "L1:P60-61:p:313:<T_STRING",
                     "L1:P61-62:>:62"
                 ]
             }
