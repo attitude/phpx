@@ -3,6 +3,6 @@
     "PHPX"
   ],
   "files.associations": {
-    "*.phpx": "razor"
-  },
+		"*.phpx": "hack"
+	},
 }
