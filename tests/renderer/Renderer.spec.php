@@ -1,5 +1,5 @@
-<?php
-use Attitude\PHPX\Compiler\Compiler;
+<?php declare(strict_types=1);
+
 use Attitude\PHPX\Renderer\Renderer;
 
 require_once __DIR__.'/../../src/index.php';
@@ -485,5 +485,17 @@ HTML;
     $expected = '<div data-foo data-bar="2"><input type="checkbox" checked disabled /></div>';
 
     expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('renders React compatible output', function () {
+    $Component = include __DIR__ . '/react-18/components/Title.php';
+    $expected = file_get_contents(__DIR__ . '/react-18/components/Title.tsx.html');
+    $data = json_decode(file_get_contents(__DIR__ . '/react-18/components/Title.tsx.json'), true);
+
+    $html = $Component($data);
+    $renderer = new Renderer;
+    $renderer->react = true;
+
+    expect($renderer($html))->toBe($expected);
   });
 });

@@ -5,6 +5,7 @@ namespace Attitude\PHPX\Renderer;
 final class Renderer {
   public bool $void = false;
   public bool $pretty = false;
+  public bool $react = false;
   public string $indentation = "\t";
   protected array $components = [];
 
@@ -182,7 +183,7 @@ final class Renderer {
           return "<$type".(empty($attributeString) ? '' : ' ' . $attributeString).">{$childrenRendered}</$type>";
         }
       } else {
-        $children = self::concatenateStringMembers($node);
+        $children = self::concatenateStringMembers($node, $this->react);
 
         $elements = 0;
         $childrenRendered = [];
@@ -221,15 +222,36 @@ final class Renderer {
     }
   }
 
-  protected static function concatenateStringMembers(array $array): array {
+  protected static function concatenateStringMembers(array $array, bool $react): array {
     $combinedArray = [];
     $currentString = '';
 
-    foreach ($array as $item) {
+    $length = count($array);
+
+    foreach ($array as $index => $item) {
       if (
         is_string($item) || is_numeric($item)
       ) {
-        $currentString .= $item;
+        if ($react) {
+          $isFirst = $index === 0;
+          $isLast = $index === $length - 1;
+          $stringifiedValue = (string) $item;
+
+          $canBeTrimmedFromStart = !$isFirst && ltrim($stringifiedValue) !== $stringifiedValue;
+          $canBeTrimmedFromEnd = !$isLast && rtrim($stringifiedValue) !== $stringifiedValue;
+
+          if ($canBeTrimmedFromStart && $canBeTrimmedFromEnd) {
+            $currentString .= '<!-- -->' . $stringifiedValue . '<!-- -->';
+          } else if ($canBeTrimmedFromEnd) {
+            $currentString .= $stringifiedValue . '<!-- -->';
+          } else if ($canBeTrimmedFromStart) {
+            $currentString .= '<!-- -->' . $stringifiedValue;
+          } else {
+            $currentString .= $stringifiedValue;
+          }
+        } else {
+          $currentString .= (string) $item;
+        }
       } else {
         if ($currentString !== '') {
           $combinedArray[] = $currentString;
@@ -240,7 +262,7 @@ final class Renderer {
           if ($item[0] === '$') {
             $combinedArray[] = $item;
           } else {
-            $combinedArray = [...$combinedArray, ...self::concatenateStringMembers($item)];
+            $combinedArray = [...$combinedArray, ...self::concatenateStringMembers($item, $react)];
           }
         } else {
           $combinedArray[] = $item;
