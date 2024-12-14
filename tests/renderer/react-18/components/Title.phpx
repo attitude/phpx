@@ -1,0 +1,17 @@
+<?php declare(strict_types = 1);
+
+return function(array $props): array {
+  $count = 0;
+
+  return (
+		<>
+			<h1>
+				{$props['children']} {$props['name']}
+			</h1>
+			<span>
+				Count: {$count}
+				<button>Increase</button>
+			</span>
+		</>
+	);
+};
