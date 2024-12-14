@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 function PageFooter(array $props): array {
   $year = $props['year'] ?? date('Y');
