@@ -22,8 +22,8 @@ final class Compiler {
 	protected string $compiled;
 
 	public function __construct(
-		Parser $parser = null,
-		Formatter $formatter = null,
+		?Parser $parser = null,
+		?Formatter $formatter = null,
 	) {
 		$this->parser = $parser ?? new Parser();
 		$this->formatter = $formatter ?? new Formatter();

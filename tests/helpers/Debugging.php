@@ -27,7 +27,7 @@ trait Debugging {
 		static::$debugging = abs(static::$debugging);
 	}
 
-  protected function __log(string|callable $message = null): void {
+  protected function __log(string|callable|null $message = null): void {
 		static $stackSize;
 
     if (is_callable($message)) {

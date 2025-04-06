@@ -379,7 +379,7 @@ final class Parser {
 		];
 	}
 
-  protected function unexpectedTokenMessage(string $expected = null): string {
+  protected function unexpectedTokenMessage(?string $expected = null): string {
 		return "Unexpected token #{$this->tokens->index()} => {$this->tokens->tokenAtCursor()} at line {$this->tokens->tokenAtCursor()->line}".(
 			$expected ? ", expected {$expected} instead" : ''
 		);

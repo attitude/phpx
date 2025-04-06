@@ -16,7 +16,7 @@ function newParser(bool $withLogger = false): Parser {
   return $parser;
 }
 
-function newCompiler(Parser $parser = null, bool $withLogger = false): Compiler {
+function newCompiler(?Parser $parser = null, bool $withLogger = false): Compiler {
   $compiler = new Compiler(parser: $parser);
 
   if ($withLogger) {
