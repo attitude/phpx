@@ -2,15 +2,16 @@
 
 namespace Attitude\PHPX\Compiler;
 
-// TODO: Incomplete
-class Formatter {
+require_once 'FormatterInterface.php';
+
+final class Formatter implements FormatterInterface {
   public function formatElement(string $type, string|null $config, string|null $children): string {
     $compiled = [
-			"'$'",
-			"'{$type}'",
-			$config,
-			$children,
-		];
+        "'$'",
+        "'{$type}'",
+        $config,
+        $children,
+    ];
 
     if (empty($compiled[3]) || $compiled[3] === 'null' || $compiled[3] === '[]') {
       array_pop($compiled);

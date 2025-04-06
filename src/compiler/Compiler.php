@@ -16,14 +16,14 @@ final class Compiler {
 	public ?LoggerInterface $logger = null;
 	protected TokensList $tokens;
 	protected Parser $parser;
-	protected Formatter $formatter;
+	protected FormatterInterface $formatter;
 	protected string $source;
 	protected array $ast;
 	protected string $compiled;
 
 	public function __construct(
 		?Parser $parser = null,
-		?Formatter $formatter = null,
+		?FormatterInterface $formatter = null,
 	) {
 		$this->parser = $parser ?? new Parser();
 		$this->formatter = $formatter ?? new Formatter();
