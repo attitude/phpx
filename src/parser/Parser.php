@@ -2,7 +2,6 @@
 
 namespace Attitude\PHPX\Parser;
 
-use PhpToken;
 use Psr\Log\LoggerInterface;
 
 final class Parser {
