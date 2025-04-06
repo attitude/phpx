@@ -1,23 +1,23 @@
 [
     {
         "$$type": "Expression",
-        "value": "L1:P0-6:<?php\n:394:<T_OPEN_TAG"
+        "value": "L1:P0-6:<?php\n:393:<T_OPEN_TAG"
     },
     {
         "$$type": "Expression",
-        "value": "L2:P6-25:\/\/ A normal comment:392:<T_COMMENT"
+        "value": "L2:P6-25:\/\/ A normal comment:391:<T_COMMENT"
     },
     {
         "$$type": "Expression",
-        "value": "L2:P25-26:\n:397:<T_WHITESPACE"
+        "value": "L2:P25-26:\n:396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L3:P26-34:$message:317:<T_VARIABLE"
+        "value": "L3:P26-34:$message:266:<T_VARIABLE"
     },
     {
         "$$type": "Expression",
-        "value": "L3:P34-35: :397:<T_WHITESPACE"
+        "value": "L3:P34-35: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
@@ -25,18 +25,18 @@
     },
     {
         "$$type": "Expression",
-        "value": "L3:P36-37: :397:<T_WHITESPACE"
+        "value": "L3:P36-37: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Block",
         "opening": "L3:P37-38:(:40",
         "children": [
-            "L3:P38-41:\n  :397:<T_WHITESPACE",
+            "L3:P38-41:\n  :396:<T_WHITESPACE",
             {
                 "$$type": "PHPXElement",
                 "openingElement": [
                     "L4:P41-42:<:60",
-                    "L4:P42-43:p:313:<T_STRING",
+                    "L4:P42-43:p:262:<T_STRING",
                     "L4:P43-44:>:62"
                 ],
                 "selfClosing": false,
@@ -45,44 +45,44 @@
                     {
                         "$$type": "PHPXText",
                         "tokens": [
-                            "L4:P44-49:\n    :397:<T_WHITESPACE"
+                            "L4:P44-49:\n    :396:<T_WHITESPACE"
                         ]
                     },
                     {
                         "$$type": "PHPXText",
                         "tokens": [
-                            "L5:P49-52:URL:313:<T_STRING",
-                            "L5:P52-53: :397:<T_WHITESPACE",
-                            "L5:P53-60:address:313:<T_STRING",
-                            "L5:P60-61: :397:<T_WHITESPACE",
-                            "L5:P61-67:should:313:<T_STRING",
-                            "L5:P67-68: :397:<T_WHITESPACE",
-                            "L5:P68-73:start:313:<T_STRING",
-                            "L5:P73-74: :397:<T_WHITESPACE",
-                            "L5:P74-78:with:313:<T_STRING",
-                            "L5:P78-79: :397:<T_WHITESPACE",
-                            "L5:P79-84:https:313:<T_STRING",
+                            "L5:P49-52:URL:262:<T_STRING",
+                            "L5:P52-53: :396:<T_WHITESPACE",
+                            "L5:P53-60:address:262:<T_STRING",
+                            "L5:P60-61: :396:<T_WHITESPACE",
+                            "L5:P61-67:should:262:<T_STRING",
+                            "L5:P67-68: :396:<T_WHITESPACE",
+                            "L5:P68-73:start:262:<T_STRING",
+                            "L5:P73-74: :396:<T_WHITESPACE",
+                            "L5:P74-78:with:262:<T_STRING",
+                            "L5:P78-79: :396:<T_WHITESPACE",
+                            "L5:P79-84:https:262:<T_STRING",
                             "L5:P84-85:::58",
-                            "L5:P85-87:\/\/:313:<T_STRING",
-                            "L1:P87-88: :397:<T_WHITESPACE",
-                            "L1:P88-94:prefix:313:<T_STRING"
+                            "L5:P85-87:\/\/:262:<T_STRING",
+                            "L1:P87-88: :396:<T_WHITESPACE",
+                            "L1:P88-94:prefix:262:<T_STRING"
                         ]
                     },
                     {
                         "$$type": "PHPXText",
                         "tokens": [
-                            "L5:P94-97:\n  :397:<T_WHITESPACE"
+                            "L5:P94-97:\n  :396:<T_WHITESPACE"
                         ]
                     }
                 ],
                 "closingElement": [
                     "L6:P97-98:<:60",
                     "L6:P98-99:\/:47",
-                    "L6:P99-100:p:313:<T_STRING",
+                    "L6:P99-100:p:262:<T_STRING",
                     "L6:P100-101:>:62"
                 ]
             },
-            "L6:P101-102:\n:397:<T_WHITESPACE"
+            "L6:P101-102:\n:396:<T_WHITESPACE"
         ],
         "closing": "L7:P102-103:):41"
     },

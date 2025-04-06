@@ -6,12 +6,12 @@
             {
                 "$$type": "PHPXText",
                 "tokens": [
-                    "L1:P2-6:Your:313:<T_STRING",
-                    "L1:P6-7: :397:<T_WHITESPACE",
-                    "L1:P7-8:#:313:<T_STRING",
-                    "L1:P8-9: :397:<T_WHITESPACE",
-                    "L1:P9-11:is:313:<T_STRING",
-                    "L1:P11-12: :397:<T_WHITESPACE"
+                    "L1:P2-6:Your:262:<T_STRING",
+                    "L1:P6-7: :396:<T_WHITESPACE",
+                    "L1:P7-8:#:262:<T_STRING",
+                    "L1:P8-9: :396:<T_WHITESPACE",
+                    "L1:P9-11:is:262:<T_STRING",
+                    "L1:P11-12: :396:<T_WHITESPACE"
                 ]
             },
             {
@@ -20,11 +20,11 @@
                     "$$type": "Block",
                     "opening": "L1:P12-13:{:123",
                     "children": [
-                        "L1:P13-20:$number:317:<T_VARIABLE",
-                        "L1:P20-21: :397:<T_WHITESPACE",
-                        "L1:P21-23:??:284:<T_COALESCE",
-                        "L1:P23-24: :397:<T_WHITESPACE",
-                        "L1:P24-39:'not available':320:<T_CONSTANT_ENCAPSED_STRING"
+                        "L1:P13-20:$number:266:<T_VARIABLE",
+                        "L1:P20-21: :396:<T_WHITESPACE",
+                        "L1:P21-23:??:404:<T_COALESCE",
+                        "L1:P23-24: :396:<T_WHITESPACE",
+                        "L1:P24-39:'not available':269:<T_CONSTANT_ENCAPSED_STRING"
                     ],
                     "closing": "L1:P39-40:}:125"
                 }

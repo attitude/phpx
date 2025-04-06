@@ -1,11 +1,11 @@
 [
     {
         "$$type": "Expression",
-        "value": "L1:P0-2:$a:317:<T_VARIABLE"
+        "value": "L1:P0-2:$a:266:<T_VARIABLE"
     },
     {
         "$$type": "Expression",
-        "value": "L1:P2-3: :397:<T_WHITESPACE"
+        "value": "L1:P2-3: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
@@ -13,11 +13,11 @@
     },
     {
         "$$type": "Expression",
-        "value": "L1:P4-5: :397:<T_WHITESPACE"
+        "value": "L1:P4-5: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L1:P5-54:'These\\'are quotes in a string and that\\'s okay.':320:<T_CONSTANT_ENCAPSED_STRING"
+        "value": "L1:P5-54:'These\\'are quotes in a string and that\\'s okay.':269:<T_CONSTANT_ENCAPSED_STRING"
     },
     {
         "$$type": "Expression",
@@ -25,15 +25,15 @@
     },
     {
         "$$type": "Expression",
-        "value": "L1:P55-56:\n:397:<T_WHITESPACE"
+        "value": "L1:P55-56:\n:396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L2:P56-58:$b:317:<T_VARIABLE"
+        "value": "L2:P56-58:$b:266:<T_VARIABLE"
     },
     {
         "$$type": "Expression",
-        "value": "L2:P58-59: :397:<T_WHITESPACE"
+        "value": "L2:P58-59: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
@@ -41,13 +41,13 @@
     },
     {
         "$$type": "Expression",
-        "value": "L2:P60-61: :397:<T_WHITESPACE"
+        "value": "L2:P60-61: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Block",
         "opening": "L2:P61-62:(:40",
         "children": [
-            "L2:P62-65:\n  :397:<T_WHITESPACE",
+            "L2:P62-65:\n  :396:<T_WHITESPACE",
             {
                 "$$type": "PHPXFragment",
                 "openingElement": "L3:P65-67:<>:15932:<",
@@ -55,15 +55,15 @@
                     {
                         "$$type": "PHPXText",
                         "tokens": [
-                            "L3:P67-72:\n    :397:<T_WHITESPACE"
+                            "L3:P67-72:\n    :396:<T_WHITESPACE"
                         ]
                     },
                     {
                         "$$type": "PHPXText",
                         "tokens": [
-                            "L4:P72-77:Hello:313:<T_STRING",
+                            "L4:P72-77:Hello:262:<T_STRING",
                             "L4:P77-78:,:44",
-                            "L4:P78-79: :397:<T_WHITESPACE"
+                            "L4:P78-79: :396:<T_WHITESPACE"
                         ]
                     },
                     {
@@ -72,11 +72,11 @@
                             "$$type": "Block",
                             "opening": "L4:P79-80:{:123",
                             "children": [
-                                "L4:P80-85:$name:317:<T_VARIABLE",
-                                "L4:P85-86: :397:<T_WHITESPACE",
-                                "L4:P86-88:??:284:<T_COALESCE",
-                                "L4:P88-89: :397:<T_WHITESPACE",
-                                "L4:P89-98:'unnamed':320:<T_CONSTANT_ENCAPSED_STRING"
+                                "L4:P80-85:$name:266:<T_VARIABLE",
+                                "L4:P85-86: :396:<T_WHITESPACE",
+                                "L4:P86-88:??:404:<T_COALESCE",
+                                "L4:P88-89: :396:<T_WHITESPACE",
+                                "L4:P89-98:'unnamed':269:<T_CONSTANT_ENCAPSED_STRING"
                             ],
                             "closing": "L4:P98-99:}:125"
                         }
@@ -85,35 +85,35 @@
                         "$$type": "PHPXText",
                         "tokens": [
                             "L4:P99-100:!:33",
-                            "L4:P100-105:\n    :397:<T_WHITESPACE",
-                            "L5:P105-110:These:313:<T_STRING",
-                            "L5:P110-112:\\':313:<T_STRING",
-                            "L5:P111-113:re:313:<T_STRING",
-                            "L5:P113-114: :397:<T_WHITESPACE",
-                            "L5:P114-120:quotes:313:<T_STRING",
-                            "L5:P120-121: :397:<T_WHITESPACE",
-                            "L5:P121-123:in:313:<T_STRING",
-                            "L5:P123-124: :397:<T_WHITESPACE",
-                            "L5:P124-125:a:313:<T_STRING",
-                            "L5:P125-126: :397:<T_WHITESPACE",
-                            "L5:P126-132:string:313:<T_STRING",
-                            "L5:P132-133: :397:<T_WHITESPACE",
-                            "L5:P133-136:and:266:<T_LOGICAL_AND",
-                            "L5:P136-137: :397:<T_WHITESPACE",
-                            "L5:P137-141:that:313:<T_STRING",
-                            "L5:P141-143:\\':313:<T_STRING",
-                            "L5:P142-143:s:313:<T_STRING",
-                            "L5:P143-144: :397:<T_WHITESPACE",
-                            "L5:P144-148:okay:313:<T_STRING",
-                            "L5:P148-149: :397:<T_WHITESPACE",
-                            "L5:P149-152:too:313:<T_STRING",
+                            "L4:P100-105:\n    :396:<T_WHITESPACE",
+                            "L5:P105-110:These:262:<T_STRING",
+                            "L5:P110-112:\\':262:<T_STRING",
+                            "L5:P111-113:re:262:<T_STRING",
+                            "L5:P113-114: :396:<T_WHITESPACE",
+                            "L5:P114-120:quotes:262:<T_STRING",
+                            "L5:P120-121: :396:<T_WHITESPACE",
+                            "L5:P121-123:in:262:<T_STRING",
+                            "L5:P123-124: :396:<T_WHITESPACE",
+                            "L5:P124-125:a:262:<T_STRING",
+                            "L5:P125-126: :396:<T_WHITESPACE",
+                            "L5:P126-132:string:262:<T_STRING",
+                            "L5:P132-133: :396:<T_WHITESPACE",
+                            "L5:P133-136:and:279:<T_LOGICAL_AND",
+                            "L5:P136-137: :396:<T_WHITESPACE",
+                            "L5:P137-141:that:262:<T_STRING",
+                            "L5:P141-143:\\':262:<T_STRING",
+                            "L5:P142-143:s:262:<T_STRING",
+                            "L5:P143-144: :396:<T_WHITESPACE",
+                            "L5:P144-148:okay:262:<T_STRING",
+                            "L5:P148-149: :396:<T_WHITESPACE",
+                            "L5:P149-152:too:262:<T_STRING",
                             "L5:P152-153:!:33"
                         ]
                     },
                     {
                         "$$type": "PHPXText",
                         "tokens": [
-                            "L5:P153-156:\n  :397:<T_WHITESPACE"
+                            "L5:P153-156:\n  :396:<T_WHITESPACE"
                         ]
                     }
                 ],
@@ -123,7 +123,7 @@
                     "L6:P158-159:>:62"
                 ]
             },
-            "L6:P159-160:\n:397:<T_WHITESPACE"
+            "L6:P159-160:\n:396:<T_WHITESPACE"
         ],
         "closing": "L7:P160-161:):41"
     },

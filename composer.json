@@ -1,40 +1,41 @@
 {
-    "name": "attitude/phpx",
-    "description": "PHPX is to PHP what JSX is to JS",
-    "type": "package",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Martin Adamko",
-            "email": "attitude@users.noreply.github.com"
-        }
-    ],
-    "scripts": {
-        "test": "./vendor/bin/pest",
-        "test:coverage": "./vendor/bin/pest --coverage",
-        "test:watch": "./vendor/bin/pest --watch"
-    },
-    "minimum-stability": "dev",
-    "autoload": {
-        "psr-4": {
-            "Attitude\\PHPX\\Compiler\\": "src/compiler/",
-            "Attitude\\PHPX\\Parser\\": "src/parser/",
-            "Attitude\\PHPX\\Renderer\\": "src/renderer/",
-            "Attitude\\PHPX\\React\\": "src/examples/react"
-        }
-    },
-    "require": {
-        "php": "^8",
-        "psr/log": "^3.0"
-    },
-    "require-dev": {
-        "pestphp/pest": "^2.25",
-        "pestphp/pest-plugin-watch": "^2.0",
-        "monolog/monolog": "^3.0"
-    },
-    "config": {
-        "allow-plugins": {
-            "pestphp/pest-plugin": true
-        }
-    }
+	"name": "attitude/phpx",
+	"description": "PHPX is to PHP what JSX is to JS",
+	"type": "package",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Martin Adamko",
+			"email": "attitude@users.noreply.github.com"
+		}
+	],
+	"scripts": {
+		"test": "./vendor/bin/pest",
+		"test:update-snapshots": "./vendor/bin/pest --update-snapshots",
+		"test:coverage": "./vendor/bin/pest --coverage",
+		"test:watch": "./vendor/bin/pest --watch"
+	},
+	"minimum-stability": "dev",
+	"autoload": {
+		"psr-4": {
+			"Attitude\\PHPX\\Compiler\\": "src/compiler/",
+			"Attitude\\PHPX\\Parser\\": "src/parser/",
+			"Attitude\\PHPX\\Renderer\\": "src/renderer/",
+			"Attitude\\PHPX\\React\\": "src/examples/react"
+		}
+	},
+	"require": {
+		"php": "^8",
+		"psr/log": "^3.0"
+	},
+	"require-dev": {
+		"pestphp/pest": "^2.25",
+		"pestphp/pest-plugin-watch": "^2.0",
+		"monolog/monolog": "^3.0"
+	},
+	"config": {
+		"allow-plugins": {
+			"pestphp/pest-plugin": true
+		}
+	}
 }

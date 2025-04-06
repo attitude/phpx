@@ -3,36 +3,36 @@
         "$$type": "PHPXElement",
         "openingElement": [
             "L1:P0-1:<:60",
-            "L1:P1-4:img:313:<T_STRING"
+            "L1:P1-4:img:262:<T_STRING"
         ],
         "selfClosing": true,
         "attributes": [
-            "L1:P4-5: :397:<T_WHITESPACE",
+            "L1:P4-5: :396:<T_WHITESPACE",
             {
                 "$$type": "PHPXAttribute",
                 "name": [
-                    "L1:P5-8:src:313:<T_STRING"
+                    "L1:P5-8:src:262:<T_STRING"
                 ],
                 "assignment": "L1:P8-9:=:61",
                 "value": {
                     "$$type": "Block",
                     "opening": "L1:P9-10:{:123",
                     "children": [
-                        "L1:P10-14:$src:317:<T_VARIABLE"
+                        "L1:P10-14:$src:266:<T_VARIABLE"
                     ],
                     "closing": "L1:P14-15:}:125"
                 }
             },
-            "L1:P15-16: :397:<T_WHITESPACE",
+            "L1:P15-16: :396:<T_WHITESPACE",
             {
                 "$$type": "PHPXAttribute",
                 "name": [
-                    "L1:P16-19:alt:313:<T_STRING"
+                    "L1:P16-19:alt:262:<T_STRING"
                 ],
                 "assignment": "L1:P19-20:=:61",
-                "value": "L1:P20-38:\"An image of PHPX\":320:<T_CONSTANT_ENCAPSED_STRING"
+                "value": "L1:P20-38:\"An image of PHPX\":269:<T_CONSTANT_ENCAPSED_STRING"
             },
-            "L1:P38-39: :397:<T_WHITESPACE"
+            "L1:P38-39: :396:<T_WHITESPACE"
         ],
         "closingElement": [
             "L1:P39-40:\/:47",

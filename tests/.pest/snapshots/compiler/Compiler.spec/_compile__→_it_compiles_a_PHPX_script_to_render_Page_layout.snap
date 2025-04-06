@@ -1,21 +1,21 @@
 [
     {
         "$$type": "Expression",
-        "value": "L1:P0-6:<?php :394:<T_OPEN_TAG"
+        "value": "L1:P0-6:<?php :393:<T_OPEN_TAG"
     },
     {
         "$$type": "Expression",
-        "value": "L1:P6-13:declare:336:<T_DECLARE"
+        "value": "L1:P6-13:declare:299:<T_DECLARE"
     },
     {
         "$$type": "Block",
         "opening": "L1:P13-14:(:40",
         "children": [
-            "L1:P14-26:strict_types:313:<T_STRING",
-            "L1:P26-27: :397:<T_WHITESPACE",
+            "L1:P14-26:strict_types:262:<T_STRING",
+            "L1:P26-27: :396:<T_WHITESPACE",
             "L1:P27-28:=:61",
-            "L1:P28-29: :397:<T_WHITESPACE",
-            "L1:P29-30:1:311:<T_LNUMBER"
+            "L1:P28-29: :396:<T_WHITESPACE",
+            "L1:P29-30:1:260:<T_LNUMBER"
         ],
         "closing": "L1:P30-31:):41"
     },
@@ -25,27 +25,27 @@
     },
     {
         "$$type": "Expression",
-        "value": "L1:P32-34:\n\n:397:<T_WHITESPACE"
+        "value": "L1:P32-34:\n\n:396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L3:P34-42:function:347:<T_FUNCTION"
+        "value": "L3:P34-42:function:310:<T_FUNCTION"
     },
     {
         "$$type": "Expression",
-        "value": "L3:P42-43: :397:<T_WHITESPACE"
+        "value": "L3:P42-43: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L3:P43-53:PageFooter:313:<T_STRING"
+        "value": "L3:P43-53:PageFooter:262:<T_STRING"
     },
     {
         "$$type": "Block",
         "opening": "L3:P53-54:(:40",
         "children": [
-            "L3:P54-59:array:377:<T_ARRAY",
-            "L3:P59-60: :397:<T_WHITESPACE",
-            "L3:P60-66:$props:317:<T_VARIABLE"
+            "L3:P54-59:array:344:<T_ARRAY",
+            "L3:P59-60: :396:<T_WHITESPACE",
+            "L3:P60-66:$props:266:<T_VARIABLE"
         ],
         "closing": "L3:P66-67:):41"
     },
@@ -55,60 +55,60 @@
     },
     {
         "$$type": "Expression",
-        "value": "L3:P68-69: :397:<T_WHITESPACE"
+        "value": "L3:P68-69: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L3:P69-74:array:377:<T_ARRAY"
+        "value": "L3:P69-74:array:344:<T_ARRAY"
     },
     {
         "$$type": "Expression",
-        "value": "L3:P74-75: :397:<T_WHITESPACE"
+        "value": "L3:P74-75: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Block",
         "opening": "L3:P75-76:{:123",
         "children": [
-            "L3:P76-79:\n  :397:<T_WHITESPACE",
-            "L4:P79-84:$year:317:<T_VARIABLE",
-            "L4:P84-85: :397:<T_WHITESPACE",
+            "L3:P76-79:\n  :396:<T_WHITESPACE",
+            "L4:P79-84:$year:266:<T_VARIABLE",
+            "L4:P84-85: :396:<T_WHITESPACE",
             "L4:P85-86:=:61",
-            "L4:P86-87: :397:<T_WHITESPACE",
-            "L4:P87-93:$props:317:<T_VARIABLE",
+            "L4:P86-87: :396:<T_WHITESPACE",
+            "L4:P87-93:$props:266:<T_VARIABLE",
             {
                 "$$type": "Block",
                 "opening": "L4:P93-94:[:91",
                 "children": [
-                    "L4:P94-100:'year':320:<T_CONSTANT_ENCAPSED_STRING"
+                    "L4:P94-100:'year':269:<T_CONSTANT_ENCAPSED_STRING"
                 ],
                 "closing": "L4:P100-101:]:93"
             },
-            "L4:P101-102: :397:<T_WHITESPACE",
-            "L4:P102-104:??:284:<T_COALESCE",
-            "L4:P104-105: :397:<T_WHITESPACE",
-            "L4:P105-109:date:313:<T_STRING",
+            "L4:P101-102: :396:<T_WHITESPACE",
+            "L4:P102-104:??:404:<T_COALESCE",
+            "L4:P104-105: :396:<T_WHITESPACE",
+            "L4:P105-109:date:262:<T_STRING",
             {
                 "$$type": "Block",
                 "opening": "L4:P109-110:(:40",
                 "children": [
-                    "L4:P110-113:'Y':320:<T_CONSTANT_ENCAPSED_STRING"
+                    "L4:P110-113:'Y':269:<T_CONSTANT_ENCAPSED_STRING"
                 ],
                 "closing": "L4:P113-114:):41"
             },
             "L4:P114-115:;:59",
-            "L4:P115-119:\n\n  :397:<T_WHITESPACE",
-            "L6:P119-125:return:350:<T_RETURN",
-            "L6:P125-126: :397:<T_WHITESPACE",
+            "L4:P115-119:\n\n  :396:<T_WHITESPACE",
+            "L6:P119-125:return:313:<T_RETURN",
+            "L6:P125-126: :396:<T_WHITESPACE",
             {
                 "$$type": "Block",
                 "opening": "L6:P126-127:(:40",
                 "children": [
-                    "L6:P127-132:\n    :397:<T_WHITESPACE",
+                    "L6:P127-132:\n    :396:<T_WHITESPACE",
                     {
                         "$$type": "PHPXElement",
                         "openingElement": [
                             "L7:P132-133:<:60",
-                            "L7:P133-139:footer:313:<T_STRING",
+                            "L7:P133-139:footer:262:<T_STRING",
                             "L7:P139-140:>:62"
                         ],
                         "selfClosing": false,
@@ -117,14 +117,14 @@
                             {
                                 "$$type": "PHPXText",
                                 "tokens": [
-                                    "L7:P140-147:\n      :397:<T_WHITESPACE"
+                                    "L7:P140-147:\n      :396:<T_WHITESPACE"
                                 ]
                             },
                             {
                                 "$$type": "PHPXElement",
                                 "openingElement": [
                                     "L8:P147-148:<:60",
-                                    "L8:P148-149:p:313:<T_STRING",
+                                    "L8:P148-149:p:262:<T_STRING",
                                     "L8:P149-150:>:62"
                                 ],
                                 "selfClosing": false,
@@ -133,8 +133,8 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L8:P150-152:\u00a9:313:<T_STRING",
-                                            "L8:P152-153: :397:<T_WHITESPACE"
+                                            "L8:P150-152:\u00a9:262:<T_STRING",
+                                            "L8:P152-153: :396:<T_WHITESPACE"
                                         ]
                                     },
                                     {
@@ -143,7 +143,7 @@
                                             "$$type": "Block",
                                             "opening": "L8:P153-154:{:123",
                                             "children": [
-                                                "L8:P154-159:$year:317:<T_VARIABLE"
+                                                "L8:P154-159:$year:266:<T_VARIABLE"
                                             ],
                                             "closing": "L8:P159-160:}:125"
                                         }
@@ -151,65 +151,65 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L8:P160-161: :397:<T_WHITESPACE",
+                                            "L8:P160-161: :396:<T_WHITESPACE",
                                             "L8:P161-162:@:64",
-                                            "L8:P162-175:martin_adamko:313:<T_STRING"
+                                            "L8:P162-175:martin_adamko:262:<T_STRING"
                                         ]
                                     }
                                 ],
                                 "closingElement": [
                                     "L8:P175-176:<:60",
                                     "L8:P176-177:\/:47",
-                                    "L8:P177-178:p:313:<T_STRING",
+                                    "L8:P177-178:p:262:<T_STRING",
                                     "L8:P178-179:>:62"
                                 ]
                             },
                             {
                                 "$$type": "PHPXText",
                                 "tokens": [
-                                    "L8:P179-184:\n    :397:<T_WHITESPACE"
+                                    "L8:P179-184:\n    :396:<T_WHITESPACE"
                                 ]
                             }
                         ],
                         "closingElement": [
                             "L9:P184-185:<:60",
                             "L9:P185-186:\/:47",
-                            "L9:P186-192:footer:313:<T_STRING",
+                            "L9:P186-192:footer:262:<T_STRING",
                             "L9:P192-193:>:62"
                         ]
                     },
-                    "L9:P193-196:\n  :397:<T_WHITESPACE"
+                    "L9:P193-196:\n  :396:<T_WHITESPACE"
                 ],
                 "closing": "L10:P196-197:):41"
             },
             "L10:P197-198:;:59",
-            "L10:P198-199:\n:397:<T_WHITESPACE"
+            "L10:P198-199:\n:396:<T_WHITESPACE"
         ],
         "closing": "L11:P199-200:}:125"
     },
     {
         "$$type": "Expression",
-        "value": "L11:P200-202:\n\n:397:<T_WHITESPACE"
+        "value": "L11:P200-202:\n\n:396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L13:P202-210:function:347:<T_FUNCTION"
+        "value": "L13:P202-210:function:310:<T_FUNCTION"
     },
     {
         "$$type": "Expression",
-        "value": "L13:P210-211: :397:<T_WHITESPACE"
+        "value": "L13:P210-211: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L13:P211-219:PageMain:313:<T_STRING"
+        "value": "L13:P211-219:PageMain:262:<T_STRING"
     },
     {
         "$$type": "Block",
         "opening": "L13:P219-220:(:40",
         "children": [
-            "L13:P220-225:array:377:<T_ARRAY",
-            "L13:P225-226: :397:<T_WHITESPACE",
-            "L13:P226-232:$items:317:<T_VARIABLE"
+            "L13:P220-225:array:344:<T_ARRAY",
+            "L13:P225-226: :396:<T_WHITESPACE",
+            "L13:P226-232:$items:266:<T_VARIABLE"
         ],
         "closing": "L13:P232-233:):41"
     },
@@ -219,55 +219,55 @@
     },
     {
         "$$type": "Expression",
-        "value": "L13:P234-235: :397:<T_WHITESPACE"
+        "value": "L13:P234-235: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L13:P235-240:array:377:<T_ARRAY"
+        "value": "L13:P235-240:array:344:<T_ARRAY"
     },
     {
         "$$type": "Expression",
-        "value": "L13:P240-241: :397:<T_WHITESPACE"
+        "value": "L13:P240-241: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Block",
         "opening": "L13:P241-242:{:123",
         "children": [
-            "L13:P242-245:\n  :397:<T_WHITESPACE",
+            "L13:P242-245:\n  :396:<T_WHITESPACE",
             {
                 "$$type": "Block",
                 "opening": "L14:P245-246:[:91",
                 "children": [
-                    "L14:P246-253:'items':320:<T_CONSTANT_ENCAPSED_STRING",
-                    "L14:P253-254: :397:<T_WHITESPACE",
-                    "L14:P254-256:=>:269:<T_DOUBLE_ARROW",
-                    "L14:P256-257: :397:<T_WHITESPACE",
-                    "L14:P257-263:$items:317:<T_VARIABLE",
+                    "L14:P246-253:'items':269:<T_CONSTANT_ENCAPSED_STRING",
+                    "L14:P253-254: :396:<T_WHITESPACE",
+                    "L14:P254-256:=>:390:<T_DOUBLE_ARROW",
+                    "L14:P256-257: :396:<T_WHITESPACE",
+                    "L14:P257-263:$items:266:<T_VARIABLE",
                     "L14:P263-264:,:44",
-                    "L14:P264-265: :397:<T_WHITESPACE",
-                    "L14:P265-274:'content':320:<T_CONSTANT_ENCAPSED_STRING",
-                    "L14:P274-275: :397:<T_WHITESPACE",
-                    "L14:P275-277:=>:269:<T_DOUBLE_ARROW",
-                    "L14:P277-278: :397:<T_WHITESPACE",
-                    "L14:P278-286:$content:317:<T_VARIABLE"
+                    "L14:P264-265: :396:<T_WHITESPACE",
+                    "L14:P265-274:'content':269:<T_CONSTANT_ENCAPSED_STRING",
+                    "L14:P274-275: :396:<T_WHITESPACE",
+                    "L14:P275-277:=>:390:<T_DOUBLE_ARROW",
+                    "L14:P277-278: :396:<T_WHITESPACE",
+                    "L14:P278-286:$content:266:<T_VARIABLE"
                 ],
                 "closing": "L14:P286-287:]:93"
             },
-            "L14:P287-288: :397:<T_WHITESPACE",
+            "L14:P287-288: :396:<T_WHITESPACE",
             "L14:P288-289:=:61",
-            "L14:P289-290: :397:<T_WHITESPACE",
-            "L14:P290-296:$items:317:<T_VARIABLE",
-            "L14:P296-297: :397:<T_WHITESPACE",
-            "L14:P297-299:??:284:<T_COALESCE",
-            "L14:P299-300: :397:<T_WHITESPACE",
+            "L14:P289-290: :396:<T_WHITESPACE",
+            "L14:P290-296:$items:266:<T_VARIABLE",
+            "L14:P296-297: :396:<T_WHITESPACE",
+            "L14:P297-299:??:404:<T_COALESCE",
+            "L14:P299-300: :396:<T_WHITESPACE",
             {
                 "$$type": "Block",
                 "opening": "L14:P300-301:[:91",
                 "children": [
-                    "L14:P301-308:'items':320:<T_CONSTANT_ENCAPSED_STRING",
-                    "L14:P308-309: :397:<T_WHITESPACE",
-                    "L14:P309-311:=>:269:<T_DOUBLE_ARROW",
-                    "L14:P311-312: :397:<T_WHITESPACE",
+                    "L14:P301-308:'items':269:<T_CONSTANT_ENCAPSED_STRING",
+                    "L14:P308-309: :396:<T_WHITESPACE",
+                    "L14:P309-311:=>:390:<T_DOUBLE_ARROW",
+                    "L14:P311-312: :396:<T_WHITESPACE",
                     {
                         "$$type": "Block",
                         "opening": "L14:P312-313:[:91",
@@ -275,30 +275,30 @@
                         "closing": "L14:P313-314:]:93"
                     },
                     "L14:P314-315:,:44",
-                    "L14:P315-316: :397:<T_WHITESPACE",
-                    "L14:P316-325:'content':320:<T_CONSTANT_ENCAPSED_STRING",
-                    "L14:P325-326: :397:<T_WHITESPACE",
-                    "L14:P326-328:=>:269:<T_DOUBLE_ARROW",
-                    "L14:P328-329: :397:<T_WHITESPACE",
-                    "L14:P329-333:null:313:<T_STRING",
-                    "L14:P333-334: :397:<T_WHITESPACE"
+                    "L14:P315-316: :396:<T_WHITESPACE",
+                    "L14:P316-325:'content':269:<T_CONSTANT_ENCAPSED_STRING",
+                    "L14:P325-326: :396:<T_WHITESPACE",
+                    "L14:P326-328:=>:390:<T_DOUBLE_ARROW",
+                    "L14:P328-329: :396:<T_WHITESPACE",
+                    "L14:P329-333:null:262:<T_STRING",
+                    "L14:P333-334: :396:<T_WHITESPACE"
                 ],
                 "closing": "L14:P334-335:]:93"
             },
             "L14:P335-336:;:59",
-            "L14:P336-340:\n\n  :397:<T_WHITESPACE",
-            "L16:P340-346:return:350:<T_RETURN",
-            "L16:P346-347: :397:<T_WHITESPACE",
+            "L14:P336-340:\n\n  :396:<T_WHITESPACE",
+            "L16:P340-346:return:313:<T_RETURN",
+            "L16:P346-347: :396:<T_WHITESPACE",
             {
                 "$$type": "Block",
                 "opening": "L16:P347-348:(:40",
                 "children": [
-                    "L16:P348-353:\n    :397:<T_WHITESPACE",
+                    "L16:P348-353:\n    :396:<T_WHITESPACE",
                     {
                         "$$type": "PHPXElement",
                         "openingElement": [
                             "L17:P353-354:<:60",
-                            "L17:P354-358:main:313:<T_STRING",
+                            "L17:P354-358:main:262:<T_STRING",
                             "L17:P358-359:>:62"
                         ],
                         "selfClosing": false,
@@ -307,14 +307,14 @@
                             {
                                 "$$type": "PHPXText",
                                 "tokens": [
-                                    "L17:P359-366:\n      :397:<T_WHITESPACE"
+                                    "L17:P359-366:\n      :396:<T_WHITESPACE"
                                 ]
                             },
                             {
                                 "$$type": "PHPXElement",
                                 "openingElement": [
                                     "L18:P366-367:<:60",
-                                    "L18:P367-369:ul:313:<T_STRING",
+                                    "L18:P367-369:ul:262:<T_STRING",
                                     "L18:P369-370:>:62"
                                 ],
                                 "selfClosing": false,
@@ -323,7 +323,7 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L18:P370-379:\n        :397:<T_WHITESPACE"
+                                            "L18:P370-379:\n        :396:<T_WHITESPACE"
                                         ]
                                     },
                                     {
@@ -332,33 +332,33 @@
                                             "$$type": "Block",
                                             "opening": "L19:P379-380:{:123",
                                             "children": [
-                                                "L19:P380-389:array_map:313:<T_STRING",
+                                                "L19:P380-389:array_map:262:<T_STRING",
                                                 {
                                                     "$$type": "Block",
                                                     "opening": "L19:P389-390:(:40",
                                                     "children": [
-                                                        "L19:P390-392:fn:348:<T_FN",
+                                                        "L19:P390-392:fn:311:<T_FN",
                                                         {
                                                             "$$type": "Block",
                                                             "opening": "L19:P392-393:(:40",
                                                             "children": [
-                                                                "L19:P393-398:$item:317:<T_VARIABLE"
+                                                                "L19:P393-398:$item:266:<T_VARIABLE"
                                                             ],
                                                             "closing": "L19:P398-399:):41"
                                                         },
-                                                        "L19:P399-400: :397:<T_WHITESPACE",
-                                                        "L19:P400-402:=>:269:<T_DOUBLE_ARROW",
-                                                        "L19:P402-403: :397:<T_WHITESPACE",
+                                                        "L19:P399-400: :396:<T_WHITESPACE",
+                                                        "L19:P400-402:=>:390:<T_DOUBLE_ARROW",
+                                                        "L19:P402-403: :396:<T_WHITESPACE",
                                                         {
                                                             "$$type": "Block",
                                                             "opening": "L19:P403-404:(:40",
                                                             "children": [
-                                                                "L19:P404-415:\n          :397:<T_WHITESPACE",
+                                                                "L19:P404-415:\n          :396:<T_WHITESPACE",
                                                                 {
                                                                     "$$type": "PHPXElement",
                                                                     "openingElement": [
                                                                         "L20:P415-416:<:60",
-                                                                        "L20:P416-418:li:313:<T_STRING",
+                                                                        "L20:P416-418:li:262:<T_STRING",
                                                                         "L20:P418-419:>:62"
                                                                     ],
                                                                     "selfClosing": false,
@@ -370,7 +370,7 @@
                                                                                 "$$type": "Block",
                                                                                 "opening": "L20:P419-420:{:123",
                                                                                 "children": [
-                                                                                    "L20:P420-425:$item:317:<T_VARIABLE"
+                                                                                    "L20:P420-425:$item:266:<T_VARIABLE"
                                                                                 ],
                                                                                 "closing": "L20:P425-426:}:125"
                                                                             }
@@ -379,17 +379,17 @@
                                                                     "closingElement": [
                                                                         "L20:P426-427:<:60",
                                                                         "L20:P427-428:\/:47",
-                                                                        "L20:P428-430:li:313:<T_STRING",
+                                                                        "L20:P428-430:li:262:<T_STRING",
                                                                         "L20:P430-431:>:62"
                                                                     ]
                                                                 },
-                                                                "L20:P431-440:\n        :397:<T_WHITESPACE"
+                                                                "L20:P431-440:\n        :396:<T_WHITESPACE"
                                                             ],
                                                             "closing": "L21:P440-441:):41"
                                                         },
                                                         "L21:P441-442:,:44",
-                                                        "L21:P442-443: :397:<T_WHITESPACE",
-                                                        "L21:P443-449:$items:317:<T_VARIABLE"
+                                                        "L21:P442-443: :396:<T_WHITESPACE",
+                                                        "L21:P443-449:$items:266:<T_VARIABLE"
                                                     ],
                                                     "closing": "L21:P449-450:):41"
                                                 }
@@ -400,21 +400,21 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L21:P451-458:\n      :397:<T_WHITESPACE"
+                                            "L21:P451-458:\n      :396:<T_WHITESPACE"
                                         ]
                                     }
                                 ],
                                 "closingElement": [
                                     "L22:P458-459:<:60",
                                     "L22:P459-460:\/:47",
-                                    "L22:P460-462:ul:313:<T_STRING",
+                                    "L22:P460-462:ul:262:<T_STRING",
                                     "L22:P462-463:>:62"
                                 ]
                             },
                             {
                                 "$$type": "PHPXText",
                                 "tokens": [
-                                    "L22:P463-470:\n      :397:<T_WHITESPACE"
+                                    "L22:P463-470:\n      :396:<T_WHITESPACE"
                                 ]
                             },
                             {
@@ -423,7 +423,7 @@
                                     "$$type": "Block",
                                     "opening": "L23:P470-471:{:123",
                                     "children": [
-                                        "L23:P471-479:$content:317:<T_VARIABLE"
+                                        "L23:P471-479:$content:266:<T_VARIABLE"
                                     ],
                                     "closing": "L23:P479-480:}:125"
                                 }
@@ -431,49 +431,49 @@
                             {
                                 "$$type": "PHPXText",
                                 "tokens": [
-                                    "L23:P480-485:\n    :397:<T_WHITESPACE"
+                                    "L23:P480-485:\n    :396:<T_WHITESPACE"
                                 ]
                             }
                         ],
                         "closingElement": [
                             "L24:P485-486:<:60",
                             "L24:P486-487:\/:47",
-                            "L24:P487-491:main:313:<T_STRING",
+                            "L24:P487-491:main:262:<T_STRING",
                             "L24:P491-492:>:62"
                         ]
                     },
-                    "L24:P492-495:\n  :397:<T_WHITESPACE"
+                    "L24:P492-495:\n  :396:<T_WHITESPACE"
                 ],
                 "closing": "L25:P495-496:):41"
             },
             "L25:P496-497:;:59",
-            "L25:P497-498:\n:397:<T_WHITESPACE"
+            "L25:P497-498:\n:396:<T_WHITESPACE"
         ],
         "closing": "L26:P498-499:}:125"
     },
     {
         "$$type": "Expression",
-        "value": "L26:P499-501:\n\n:397:<T_WHITESPACE"
+        "value": "L26:P499-501:\n\n:396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L28:P501-509:function:347:<T_FUNCTION"
+        "value": "L28:P501-509:function:310:<T_FUNCTION"
     },
     {
         "$$type": "Expression",
-        "value": "L28:P509-510: :397:<T_WHITESPACE"
+        "value": "L28:P509-510: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L28:P510-520:PageHeader:313:<T_STRING"
+        "value": "L28:P510-520:PageHeader:262:<T_STRING"
     },
     {
         "$$type": "Block",
         "opening": "L28:P520-521:(:40",
         "children": [
-            "L28:P521-526:array:377:<T_ARRAY",
-            "L28:P526-527: :397:<T_WHITESPACE",
-            "L28:P527-533:$props:317:<T_VARIABLE"
+            "L28:P521-526:array:344:<T_ARRAY",
+            "L28:P526-527: :396:<T_WHITESPACE",
+            "L28:P527-533:$props:266:<T_VARIABLE"
         ],
         "closing": "L28:P533-534:):41"
     },
@@ -483,56 +483,56 @@
     },
     {
         "$$type": "Expression",
-        "value": "L28:P535-536: :397:<T_WHITESPACE"
+        "value": "L28:P535-536: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L28:P536-541:array:377:<T_ARRAY"
+        "value": "L28:P536-541:array:344:<T_ARRAY"
     },
     {
         "$$type": "Expression",
-        "value": "L28:P541-542: :397:<T_WHITESPACE"
+        "value": "L28:P541-542: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Block",
         "opening": "L28:P542-543:{:123",
         "children": [
-            "L28:P543-546:\n  :397:<T_WHITESPACE",
-            "L29:P546-552:$title:317:<T_VARIABLE",
-            "L29:P552-553: :397:<T_WHITESPACE",
+            "L28:P543-546:\n  :396:<T_WHITESPACE",
+            "L29:P546-552:$title:266:<T_VARIABLE",
+            "L29:P552-553: :396:<T_WHITESPACE",
             "L29:P553-554:=:61",
-            "L29:P554-555: :397:<T_WHITESPACE",
-            "L29:P555-561:$props:317:<T_VARIABLE",
+            "L29:P554-555: :396:<T_WHITESPACE",
+            "L29:P555-561:$props:266:<T_VARIABLE",
             {
                 "$$type": "Block",
                 "opening": "L29:P561-562:[:91",
                 "children": [
-                    "L29:P562-569:'title':320:<T_CONSTANT_ENCAPSED_STRING"
+                    "L29:P562-569:'title':269:<T_CONSTANT_ENCAPSED_STRING"
                 ],
                 "closing": "L29:P569-570:]:93"
             },
-            "L29:P570-571: :397:<T_WHITESPACE",
-            "L29:P571-573:??:284:<T_COALESCE",
-            "L29:P573-574: :397:<T_WHITESPACE",
-            "L29:P574-584:'Untitled':320:<T_CONSTANT_ENCAPSED_STRING",
+            "L29:P570-571: :396:<T_WHITESPACE",
+            "L29:P571-573:??:404:<T_COALESCE",
+            "L29:P573-574: :396:<T_WHITESPACE",
+            "L29:P574-584:'Untitled':269:<T_CONSTANT_ENCAPSED_STRING",
             "L29:P584-585:;:59",
-            "L29:P585-588:\n  :397:<T_WHITESPACE",
-            "L30:P588-593:$tags:317:<T_VARIABLE",
-            "L30:P593-594: :397:<T_WHITESPACE",
+            "L29:P585-588:\n  :396:<T_WHITESPACE",
+            "L30:P588-593:$tags:266:<T_VARIABLE",
+            "L30:P593-594: :396:<T_WHITESPACE",
             "L30:P594-595:=:61",
-            "L30:P595-596: :397:<T_WHITESPACE",
-            "L30:P596-602:$props:317:<T_VARIABLE",
+            "L30:P595-596: :396:<T_WHITESPACE",
+            "L30:P596-602:$props:266:<T_VARIABLE",
             {
                 "$$type": "Block",
                 "opening": "L30:P602-603:[:91",
                 "children": [
-                    "L30:P603-609:'tags':320:<T_CONSTANT_ENCAPSED_STRING"
+                    "L30:P603-609:'tags':269:<T_CONSTANT_ENCAPSED_STRING"
                 ],
                 "closing": "L30:P609-610:]:93"
             },
-            "L30:P610-611: :397:<T_WHITESPACE",
-            "L30:P611-613:??:284:<T_COALESCE",
-            "L30:P613-614: :397:<T_WHITESPACE",
+            "L30:P610-611: :396:<T_WHITESPACE",
+            "L30:P611-613:??:404:<T_COALESCE",
+            "L30:P613-614: :396:<T_WHITESPACE",
             {
                 "$$type": "Block",
                 "opening": "L30:P614-615:[:91",
@@ -540,19 +540,19 @@
                 "closing": "L30:P615-616:]:93"
             },
             "L30:P616-617:;:59",
-            "L30:P617-621:\n\n  :397:<T_WHITESPACE",
-            "L32:P621-627:return:350:<T_RETURN",
-            "L32:P627-628: :397:<T_WHITESPACE",
+            "L30:P617-621:\n\n  :396:<T_WHITESPACE",
+            "L32:P621-627:return:313:<T_RETURN",
+            "L32:P627-628: :396:<T_WHITESPACE",
             {
                 "$$type": "Block",
                 "opening": "L32:P628-629:(:40",
                 "children": [
-                    "L32:P629-634:\n    :397:<T_WHITESPACE",
+                    "L32:P629-634:\n    :396:<T_WHITESPACE",
                     {
                         "$$type": "PHPXElement",
                         "openingElement": [
                             "L33:P634-635:<:60",
-                            "L33:P635-641:header:313:<T_STRING",
+                            "L33:P635-641:header:262:<T_STRING",
                             "L33:P641-642:>:62"
                         ],
                         "selfClosing": false,
@@ -561,54 +561,54 @@
                             {
                                 "$$type": "PHPXText",
                                 "tokens": [
-                                    "L33:P642-649:\n      :397:<T_WHITESPACE"
+                                    "L33:P642-649:\n      :396:<T_WHITESPACE"
                                 ]
                             },
                             {
                                 "$$type": "PHPXElement",
                                 "openingElement": [
                                     "L34:P649-650:<:60",
-                                    "L34:P650-651:a:313:<T_STRING",
+                                    "L34:P650-651:a:262:<T_STRING",
                                     "L34:P660-661:>:62"
                                 ],
                                 "selfClosing": false,
                                 "attributes": [
-                                    "L34:P651-652: :397:<T_WHITESPACE",
+                                    "L34:P651-652: :396:<T_WHITESPACE",
                                     {
                                         "$$type": "PHPXAttribute",
                                         "name": [
-                                            "L34:P652-656:href:313:<T_STRING"
+                                            "L34:P652-656:href:262:<T_STRING"
                                         ],
                                         "assignment": "L34:P656-657:=:61",
-                                        "value": "L34:P657-660:\"\/\":320:<T_CONSTANT_ENCAPSED_STRING"
+                                        "value": "L34:P657-660:\"\/\":269:<T_CONSTANT_ENCAPSED_STRING"
                                     }
                                 ],
                                 "children": [
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L34:P661-665:Home:313:<T_STRING"
+                                            "L34:P661-665:Home:262:<T_STRING"
                                         ]
                                     }
                                 ],
                                 "closingElement": [
                                     "L34:P665-666:<:60",
                                     "L34:P666-667:\/:47",
-                                    "L34:P667-668:a:313:<T_STRING",
+                                    "L34:P667-668:a:262:<T_STRING",
                                     "L34:P668-669:>:62"
                                 ]
                             },
                             {
                                 "$$type": "PHPXText",
                                 "tokens": [
-                                    "L34:P669-676:\n      :397:<T_WHITESPACE"
+                                    "L34:P669-676:\n      :396:<T_WHITESPACE"
                                 ]
                             },
                             {
                                 "$$type": "PHPXElement",
                                 "openingElement": [
                                     "L35:P676-677:<:60",
-                                    "L35:P677-679:h1:313:<T_STRING",
+                                    "L35:P677-679:h1:262:<T_STRING",
                                     "L35:P679-680:>:62"
                                 ],
                                 "selfClosing": false,
@@ -620,7 +620,7 @@
                                             "$$type": "Block",
                                             "opening": "L35:P680-681:{:123",
                                             "children": [
-                                                "L35:P681-687:$title:317:<T_VARIABLE"
+                                                "L35:P681-687:$title:266:<T_VARIABLE"
                                             ],
                                             "closing": "L35:P687-688:}:125"
                                         }
@@ -629,21 +629,21 @@
                                 "closingElement": [
                                     "L35:P688-689:<:60",
                                     "L35:P689-690:\/:47",
-                                    "L35:P690-692:h1:313:<T_STRING",
+                                    "L35:P690-692:h1:262:<T_STRING",
                                     "L35:P692-693:>:62"
                                 ]
                             },
                             {
                                 "$$type": "PHPXText",
                                 "tokens": [
-                                    "L35:P693-700:\n      :397:<T_WHITESPACE"
+                                    "L35:P693-700:\n      :396:<T_WHITESPACE"
                                 ]
                             },
                             {
                                 "$$type": "PHPXElement",
                                 "openingElement": [
                                     "L36:P700-701:<:60",
-                                    "L36:P701-703:ul:313:<T_STRING",
+                                    "L36:P701-703:ul:262:<T_STRING",
                                     "L36:P703-704:>:62"
                                 ],
                                 "selfClosing": false,
@@ -652,7 +652,7 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L36:P704-713:\n        :397:<T_WHITESPACE"
+                                            "L36:P704-713:\n        :396:<T_WHITESPACE"
                                         ]
                                     },
                                     {
@@ -661,33 +661,33 @@
                                             "$$type": "Block",
                                             "opening": "L37:P713-714:{:123",
                                             "children": [
-                                                "L37:P714-723:array_map:313:<T_STRING",
+                                                "L37:P714-723:array_map:262:<T_STRING",
                                                 {
                                                     "$$type": "Block",
                                                     "opening": "L37:P723-724:(:40",
                                                     "children": [
-                                                        "L37:P724-726:fn:348:<T_FN",
+                                                        "L37:P724-726:fn:311:<T_FN",
                                                         {
                                                             "$$type": "Block",
                                                             "opening": "L37:P726-727:(:40",
                                                             "children": [
-                                                                "L37:P727-731:$tag:317:<T_VARIABLE"
+                                                                "L37:P727-731:$tag:266:<T_VARIABLE"
                                                             ],
                                                             "closing": "L37:P731-732:):41"
                                                         },
-                                                        "L37:P732-733: :397:<T_WHITESPACE",
-                                                        "L37:P733-735:=>:269:<T_DOUBLE_ARROW",
-                                                        "L37:P735-736: :397:<T_WHITESPACE",
+                                                        "L37:P732-733: :396:<T_WHITESPACE",
+                                                        "L37:P733-735:=>:390:<T_DOUBLE_ARROW",
+                                                        "L37:P735-736: :396:<T_WHITESPACE",
                                                         {
                                                             "$$type": "Block",
                                                             "opening": "L37:P736-737:(:40",
                                                             "children": [
-                                                                "L37:P737-748:\n          :397:<T_WHITESPACE",
+                                                                "L37:P737-748:\n          :396:<T_WHITESPACE",
                                                                 {
                                                                     "$$type": "PHPXElement",
                                                                     "openingElement": [
                                                                         "L38:P748-749:<:60",
-                                                                        "L38:P749-751:li:313:<T_STRING",
+                                                                        "L38:P749-751:li:262:<T_STRING",
                                                                         "L38:P751-752:>:62"
                                                                     ],
                                                                     "selfClosing": false,
@@ -699,7 +699,7 @@
                                                                                 "$$type": "Block",
                                                                                 "opening": "L38:P752-753:{:123",
                                                                                 "children": [
-                                                                                    "L38:P753-757:$tag:317:<T_VARIABLE"
+                                                                                    "L38:P753-757:$tag:266:<T_VARIABLE"
                                                                                 ],
                                                                                 "closing": "L38:P757-758:}:125"
                                                                             }
@@ -708,17 +708,17 @@
                                                                     "closingElement": [
                                                                         "L38:P758-759:<:60",
                                                                         "L38:P759-760:\/:47",
-                                                                        "L38:P760-762:li:313:<T_STRING",
+                                                                        "L38:P760-762:li:262:<T_STRING",
                                                                         "L38:P762-763:>:62"
                                                                     ]
                                                                 },
-                                                                "L38:P763-772:\n        :397:<T_WHITESPACE"
+                                                                "L38:P763-772:\n        :396:<T_WHITESPACE"
                                                             ],
                                                             "closing": "L39:P772-773:):41"
                                                         },
                                                         "L39:P773-774:,:44",
-                                                        "L39:P774-775: :397:<T_WHITESPACE",
-                                                        "L39:P775-780:$tags:317:<T_VARIABLE"
+                                                        "L39:P774-775: :396:<T_WHITESPACE",
+                                                        "L39:P775-780:$tags:266:<T_VARIABLE"
                                                     ],
                                                     "closing": "L39:P780-781:):41"
                                                 }
@@ -729,55 +729,55 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L39:P782-789:\n      :397:<T_WHITESPACE"
+                                            "L39:P782-789:\n      :396:<T_WHITESPACE"
                                         ]
                                     }
                                 ],
                                 "closingElement": [
                                     "L40:P789-790:<:60",
                                     "L40:P790-791:\/:47",
-                                    "L40:P791-793:ul:313:<T_STRING",
+                                    "L40:P791-793:ul:262:<T_STRING",
                                     "L40:P793-794:>:62"
                                 ]
                             },
                             {
                                 "$$type": "PHPXText",
                                 "tokens": [
-                                    "L40:P794-799:\n    :397:<T_WHITESPACE"
+                                    "L40:P794-799:\n    :396:<T_WHITESPACE"
                                 ]
                             }
                         ],
                         "closingElement": [
                             "L41:P799-800:<:60",
                             "L41:P800-801:\/:47",
-                            "L41:P801-807:header:313:<T_STRING",
+                            "L41:P801-807:header:262:<T_STRING",
                             "L41:P807-808:>:62"
                         ]
                     },
-                    "L41:P808-811:\n  :397:<T_WHITESPACE"
+                    "L41:P808-811:\n  :396:<T_WHITESPACE"
                 ],
                 "closing": "L42:P811-812:):41"
             },
             "L42:P812-813:;:59",
-            "L42:P813-814:\n:397:<T_WHITESPACE"
+            "L42:P813-814:\n:396:<T_WHITESPACE"
         ],
         "closing": "L43:P814-815:}:125"
     },
     {
         "$$type": "Expression",
-        "value": "L43:P815-817:\n\n:397:<T_WHITESPACE"
+        "value": "L43:P815-817:\n\n:396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L45:P817-825:function:347:<T_FUNCTION"
+        "value": "L45:P817-825:function:310:<T_FUNCTION"
     },
     {
         "$$type": "Expression",
-        "value": "L45:P825-826: :397:<T_WHITESPACE"
+        "value": "L45:P825-826: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L45:P826-830:Page:313:<T_STRING"
+        "value": "L45:P826-830:Page:262:<T_STRING"
     },
     {
         "$$type": "Block",
@@ -791,80 +791,80 @@
     },
     {
         "$$type": "Expression",
-        "value": "L45:P833-834: :397:<T_WHITESPACE"
+        "value": "L45:P833-834: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L45:P834-839:array:377:<T_ARRAY"
+        "value": "L45:P834-839:array:344:<T_ARRAY"
     },
     {
         "$$type": "Expression",
-        "value": "L45:P839-840: :397:<T_WHITESPACE"
+        "value": "L45:P839-840: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Block",
         "opening": "L45:P840-841:{:123",
         "children": [
-            "L45:P841-844:\n  :397:<T_WHITESPACE",
-            "L46:P844-850:$title:317:<T_VARIABLE",
-            "L46:P850-851: :397:<T_WHITESPACE",
+            "L45:P841-844:\n  :396:<T_WHITESPACE",
+            "L46:P844-850:$title:266:<T_VARIABLE",
+            "L46:P850-851: :396:<T_WHITESPACE",
             "L46:P851-852:=:61",
-            "L46:P852-853: :397:<T_WHITESPACE",
-            "L46:P853-866:'Hello World':320:<T_CONSTANT_ENCAPSED_STRING",
+            "L46:P852-853: :396:<T_WHITESPACE",
+            "L46:P853-866:'Hello World':269:<T_CONSTANT_ENCAPSED_STRING",
             "L46:P866-867:;:59",
-            "L46:P867-870:\n  :397:<T_WHITESPACE",
-            "L47:P870-882:$description:317:<T_VARIABLE",
-            "L47:P882-883: :397:<T_WHITESPACE",
+            "L46:P867-870:\n  :396:<T_WHITESPACE",
+            "L47:P870-882:$description:266:<T_VARIABLE",
+            "L47:P882-883: :396:<T_WHITESPACE",
             "L47:P883-884:=:61",
-            "L47:P884-885: :397:<T_WHITESPACE",
-            "L47:P885-906:'This is a test page':320:<T_CONSTANT_ENCAPSED_STRING",
+            "L47:P884-885: :396:<T_WHITESPACE",
+            "L47:P885-906:'This is a test page':269:<T_CONSTANT_ENCAPSED_STRING",
             "L47:P906-907:;:59",
-            "L47:P907-910:\n  :397:<T_WHITESPACE",
-            "L48:P910-914:$css:317:<T_VARIABLE",
-            "L48:P914-915: :397:<T_WHITESPACE",
+            "L47:P907-910:\n  :396:<T_WHITESPACE",
+            "L48:P910-914:$css:266:<T_VARIABLE",
+            "L48:P914-915: :396:<T_WHITESPACE",
             "L48:P915-916:=:61",
-            "L48:P916-917: :397:<T_WHITESPACE",
-            "L48:P917-930:'\/styles.css':320:<T_CONSTANT_ENCAPSED_STRING",
+            "L48:P916-917: :396:<T_WHITESPACE",
+            "L48:P917-930:'\/styles.css':269:<T_CONSTANT_ENCAPSED_STRING",
             "L48:P930-931:;:59",
-            "L48:P931-935:\n\n  :397:<T_WHITESPACE",
-            "L50:P935-941:return:350:<T_RETURN",
-            "L50:P941-942: :397:<T_WHITESPACE",
+            "L48:P931-935:\n\n  :396:<T_WHITESPACE",
+            "L50:P935-941:return:313:<T_RETURN",
+            "L50:P941-942: :396:<T_WHITESPACE",
             {
                 "$$type": "Block",
                 "opening": "L50:P942-943:(:40",
                 "children": [
-                    "L50:P943-948:\n    :397:<T_WHITESPACE",
+                    "L50:P943-948:\n    :396:<T_WHITESPACE",
                     {
                         "$$type": "PHPXElement",
                         "openingElement": [
                             "L51:P948-949:<:60",
-                            "L51:P949-953:html:313:<T_STRING",
+                            "L51:P949-953:html:262:<T_STRING",
                             "L51:P963-964:>:62"
                         ],
                         "selfClosing": false,
                         "attributes": [
-                            "L51:P953-954: :397:<T_WHITESPACE",
+                            "L51:P953-954: :396:<T_WHITESPACE",
                             {
                                 "$$type": "PHPXAttribute",
                                 "name": [
-                                    "L51:P954-958:lang:313:<T_STRING"
+                                    "L51:P954-958:lang:262:<T_STRING"
                                 ],
                                 "assignment": "L51:P958-959:=:61",
-                                "value": "L51:P959-963:\"en\":320:<T_CONSTANT_ENCAPSED_STRING"
+                                "value": "L51:P959-963:\"en\":269:<T_CONSTANT_ENCAPSED_STRING"
                             }
                         ],
                         "children": [
                             {
                                 "$$type": "PHPXText",
                                 "tokens": [
-                                    "L51:P964-971:\n      :397:<T_WHITESPACE"
+                                    "L51:P964-971:\n      :396:<T_WHITESPACE"
                                 ]
                             },
                             {
                                 "$$type": "PHPXElement",
                                 "openingElement": [
                                     "L52:P971-972:<:60",
-                                    "L52:P972-976:head:313:<T_STRING",
+                                    "L52:P972-976:head:262:<T_STRING",
                                     "L52:P976-977:>:62"
                                 ],
                                 "selfClosing": false,
@@ -873,27 +873,27 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L52:P977-986:\n        :397:<T_WHITESPACE"
+                                            "L52:P977-986:\n        :396:<T_WHITESPACE"
                                         ]
                                     },
                                     {
                                         "$$type": "PHPXElement",
                                         "openingElement": [
                                             "L53:P986-987:<:60",
-                                            "L53:P987-991:meta:313:<T_STRING"
+                                            "L53:P987-991:meta:262:<T_STRING"
                                         ],
                                         "selfClosing": true,
                                         "attributes": [
-                                            "L53:P991-992: :397:<T_WHITESPACE",
+                                            "L53:P991-992: :396:<T_WHITESPACE",
                                             {
                                                 "$$type": "PHPXAttribute",
                                                 "name": [
-                                                    "L53:P992-999:charset:313:<T_STRING"
+                                                    "L53:P992-999:charset:262:<T_STRING"
                                                 ],
                                                 "assignment": "L53:P999-1000:=:61",
-                                                "value": "L53:P1000-1007:\"UTF-8\":320:<T_CONSTANT_ENCAPSED_STRING"
+                                                "value": "L53:P1000-1007:\"UTF-8\":269:<T_CONSTANT_ENCAPSED_STRING"
                                             },
-                                            "L53:P1007-1008: :397:<T_WHITESPACE"
+                                            "L53:P1007-1008: :396:<T_WHITESPACE"
                                         ],
                                         "closingElement": [
                                             "L53:P1008-1009:\/:47",
@@ -903,36 +903,36 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L53:P1010-1019:\n        :397:<T_WHITESPACE"
+                                            "L53:P1010-1019:\n        :396:<T_WHITESPACE"
                                         ]
                                     },
                                     {
                                         "$$type": "PHPXElement",
                                         "openingElement": [
                                             "L54:P1019-1020:<:60",
-                                            "L54:P1020-1024:meta:313:<T_STRING"
+                                            "L54:P1020-1024:meta:262:<T_STRING"
                                         ],
                                         "selfClosing": true,
                                         "attributes": [
-                                            "L54:P1024-1025: :397:<T_WHITESPACE",
+                                            "L54:P1024-1025: :396:<T_WHITESPACE",
                                             {
                                                 "$$type": "PHPXAttribute",
                                                 "name": [
-                                                    "L54:P1025-1029:name:313:<T_STRING"
+                                                    "L54:P1025-1029:name:262:<T_STRING"
                                                 ],
                                                 "assignment": "L54:P1029-1030:=:61",
-                                                "value": "L54:P1030-1040:\"viewport\":320:<T_CONSTANT_ENCAPSED_STRING"
+                                                "value": "L54:P1030-1040:\"viewport\":269:<T_CONSTANT_ENCAPSED_STRING"
                                             },
-                                            "L54:P1040-1041: :397:<T_WHITESPACE",
+                                            "L54:P1040-1041: :396:<T_WHITESPACE",
                                             {
                                                 "$$type": "PHPXAttribute",
                                                 "name": [
-                                                    "L54:P1041-1048:content:313:<T_STRING"
+                                                    "L54:P1041-1048:content:262:<T_STRING"
                                                 ],
                                                 "assignment": "L54:P1048-1049:=:61",
-                                                "value": "L54:P1049-1088:\"width=device-width, initial-scale=1.0\":320:<T_CONSTANT_ENCAPSED_STRING"
+                                                "value": "L54:P1049-1088:\"width=device-width, initial-scale=1.0\":269:<T_CONSTANT_ENCAPSED_STRING"
                                             },
-                                            "L54:P1088-1089: :397:<T_WHITESPACE"
+                                            "L54:P1088-1089: :396:<T_WHITESPACE"
                                         ],
                                         "closingElement": [
                                             "L54:P1089-1090:\/:47",
@@ -942,14 +942,14 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L54:P1091-1100:\n        :397:<T_WHITESPACE"
+                                            "L54:P1091-1100:\n        :396:<T_WHITESPACE"
                                         ]
                                     },
                                     {
                                         "$$type": "PHPXElement",
                                         "openingElement": [
                                             "L55:P1100-1101:<:60",
-                                            "L55:P1101-1106:title:313:<T_STRING",
+                                            "L55:P1101-1106:title:262:<T_STRING",
                                             "L55:P1106-1107:>:62"
                                         ],
                                         "selfClosing": false,
@@ -961,11 +961,11 @@
                                                     "$$type": "Block",
                                                     "opening": "L55:P1107-1108:{:123",
                                                     "children": [
-                                                        "L55:P1108-1114:$title:317:<T_VARIABLE",
-                                                        "L55:P1114-1115: :397:<T_WHITESPACE",
-                                                        "L55:P1115-1117:??:284:<T_COALESCE",
-                                                        "L55:P1117-1118: :397:<T_WHITESPACE",
-                                                        "L55:P1118-1124:'None':320:<T_CONSTANT_ENCAPSED_STRING"
+                                                        "L55:P1108-1114:$title:266:<T_VARIABLE",
+                                                        "L55:P1114-1115: :396:<T_WHITESPACE",
+                                                        "L55:P1115-1117:??:404:<T_COALESCE",
+                                                        "L55:P1117-1118: :396:<T_WHITESPACE",
+                                                        "L55:P1118-1124:'None':269:<T_CONSTANT_ENCAPSED_STRING"
                                                     ],
                                                     "closing": "L55:P1124-1125:}:125"
                                                 }
@@ -973,60 +973,60 @@
                                             {
                                                 "$$type": "PHPXText",
                                                 "tokens": [
-                                                    "L55:P1125-1126: :397:<T_WHITESPACE",
-                                                    "L55:P1126-1128:by:313:<T_STRING",
-                                                    "L55:P1128-1129: :397:<T_WHITESPACE",
-                                                    "L55:P1129-1137:Attitude:313:<T_STRING"
+                                                    "L55:P1125-1126: :396:<T_WHITESPACE",
+                                                    "L55:P1126-1128:by:262:<T_STRING",
+                                                    "L55:P1128-1129: :396:<T_WHITESPACE",
+                                                    "L55:P1129-1137:Attitude:262:<T_STRING"
                                                 ]
                                             }
                                         ],
                                         "closingElement": [
                                             "L55:P1137-1138:<:60",
                                             "L55:P1138-1139:\/:47",
-                                            "L55:P1139-1144:title:313:<T_STRING",
+                                            "L55:P1139-1144:title:262:<T_STRING",
                                             "L55:P1144-1145:>:62"
                                         ]
                                     },
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L55:P1145-1154:\n        :397:<T_WHITESPACE"
+                                            "L55:P1145-1154:\n        :396:<T_WHITESPACE"
                                         ]
                                     },
                                     {
                                         "$$type": "PHPXElement",
                                         "openingElement": [
                                             "L56:P1154-1155:<:60",
-                                            "L56:P1155-1159:meta:313:<T_STRING"
+                                            "L56:P1155-1159:meta:262:<T_STRING"
                                         ],
                                         "selfClosing": true,
                                         "attributes": [
-                                            "L56:P1159-1160: :397:<T_WHITESPACE",
+                                            "L56:P1159-1160: :396:<T_WHITESPACE",
                                             {
                                                 "$$type": "PHPXAttribute",
                                                 "name": [
-                                                    "L56:P1160-1164:name:313:<T_STRING"
+                                                    "L56:P1160-1164:name:262:<T_STRING"
                                                 ],
                                                 "assignment": "L56:P1164-1165:=:61",
-                                                "value": "L56:P1165-1178:\"description\":320:<T_CONSTANT_ENCAPSED_STRING"
+                                                "value": "L56:P1165-1178:\"description\":269:<T_CONSTANT_ENCAPSED_STRING"
                                             },
-                                            "L56:P1178-1179: :397:<T_WHITESPACE",
+                                            "L56:P1178-1179: :396:<T_WHITESPACE",
                                             {
                                                 "$$type": "PHPXAttribute",
                                                 "name": [
-                                                    "L56:P1179-1186:content:313:<T_STRING"
+                                                    "L56:P1179-1186:content:262:<T_STRING"
                                                 ],
                                                 "assignment": "L56:P1186-1187:=:61",
                                                 "value": {
                                                     "$$type": "Block",
                                                     "opening": "L56:P1187-1188:{:123",
                                                     "children": [
-                                                        "L56:P1188-1200:$description:317:<T_VARIABLE"
+                                                        "L56:P1188-1200:$description:266:<T_VARIABLE"
                                                     ],
                                                     "closing": "L56:P1200-1201:}:125"
                                                 }
                                             },
-                                            "L56:P1201-1202: :397:<T_WHITESPACE"
+                                            "L56:P1201-1202: :396:<T_WHITESPACE"
                                         ],
                                         "closingElement": [
                                             "L56:P1202-1203:\/:47",
@@ -1036,43 +1036,43 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L56:P1204-1213:\n        :397:<T_WHITESPACE"
+                                            "L56:P1204-1213:\n        :396:<T_WHITESPACE"
                                         ]
                                     },
                                     {
                                         "$$type": "PHPXElement",
                                         "openingElement": [
                                             "L57:P1213-1214:<:60",
-                                            "L57:P1214-1218:link:313:<T_STRING"
+                                            "L57:P1214-1218:link:262:<T_STRING"
                                         ],
                                         "selfClosing": true,
                                         "attributes": [
-                                            "L57:P1218-1219: :397:<T_WHITESPACE",
+                                            "L57:P1218-1219: :396:<T_WHITESPACE",
                                             {
                                                 "$$type": "PHPXAttribute",
                                                 "name": [
-                                                    "L57:P1219-1222:rel:313:<T_STRING"
+                                                    "L57:P1219-1222:rel:262:<T_STRING"
                                                 ],
                                                 "assignment": "L57:P1222-1223:=:61",
-                                                "value": "L57:P1223-1235:\"stylesheet\":320:<T_CONSTANT_ENCAPSED_STRING"
+                                                "value": "L57:P1223-1235:\"stylesheet\":269:<T_CONSTANT_ENCAPSED_STRING"
                                             },
-                                            "L57:P1235-1236: :397:<T_WHITESPACE",
+                                            "L57:P1235-1236: :396:<T_WHITESPACE",
                                             {
                                                 "$$type": "PHPXAttribute",
                                                 "name": [
-                                                    "L57:P1236-1240:href:313:<T_STRING"
+                                                    "L57:P1236-1240:href:262:<T_STRING"
                                                 ],
                                                 "assignment": "L57:P1240-1241:=:61",
                                                 "value": {
                                                     "$$type": "Block",
                                                     "opening": "L57:P1241-1242:{:123",
                                                     "children": [
-                                                        "L57:P1242-1246:$css:317:<T_VARIABLE"
+                                                        "L57:P1242-1246:$css:266:<T_VARIABLE"
                                                     ],
                                                     "closing": "L57:P1246-1247:}:125"
                                                 }
                                             },
-                                            "L57:P1247-1248: :397:<T_WHITESPACE"
+                                            "L57:P1247-1248: :396:<T_WHITESPACE"
                                         ],
                                         "closingElement": [
                                             "L57:P1248-1249:\/:47",
@@ -1082,28 +1082,28 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L57:P1250-1257:\n      :397:<T_WHITESPACE"
+                                            "L57:P1250-1257:\n      :396:<T_WHITESPACE"
                                         ]
                                     }
                                 ],
                                 "closingElement": [
                                     "L58:P1257-1258:<:60",
                                     "L58:P1258-1259:\/:47",
-                                    "L58:P1259-1263:head:313:<T_STRING",
+                                    "L58:P1259-1263:head:262:<T_STRING",
                                     "L58:P1263-1264:>:62"
                                 ]
                             },
                             {
                                 "$$type": "PHPXText",
                                 "tokens": [
-                                    "L58:P1264-1271:\n      :397:<T_WHITESPACE"
+                                    "L58:P1264-1271:\n      :396:<T_WHITESPACE"
                                 ]
                             },
                             {
                                 "$$type": "PHPXElement",
                                 "openingElement": [
                                     "L59:P1271-1272:<:60",
-                                    "L59:P1272-1276:body:313:<T_STRING",
+                                    "L59:P1272-1276:body:262:<T_STRING",
                                     "L59:P1276-1277:>:62"
                                 ],
                                 "selfClosing": false,
@@ -1112,7 +1112,7 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L59:P1277-1286:\n        :397:<T_WHITESPACE"
+                                            "L59:P1277-1286:\n        :396:<T_WHITESPACE"
                                         ]
                                     },
                                     {
@@ -1121,7 +1121,7 @@
                                             "$$type": "Block",
                                             "opening": "L60:P1286-1287:{:123",
                                             "children": [
-                                                "L60:P1287-1297:PageHeader:313:<T_STRING",
+                                                "L60:P1287-1297:PageHeader:262:<T_STRING",
                                                 {
                                                     "$$type": "Block",
                                                     "opening": "L60:P1297-1298:(:40",
@@ -1130,25 +1130,25 @@
                                                             "$$type": "Block",
                                                             "opening": "L60:P1298-1299:[:91",
                                                             "children": [
-                                                                "L60:P1299-1306:'title':320:<T_CONSTANT_ENCAPSED_STRING",
-                                                                "L60:P1306-1307: :397:<T_WHITESPACE",
-                                                                "L60:P1307-1309:=>:269:<T_DOUBLE_ARROW",
-                                                                "L60:P1309-1310: :397:<T_WHITESPACE",
-                                                                "L60:P1310-1316:$title:317:<T_VARIABLE",
+                                                                "L60:P1299-1306:'title':269:<T_CONSTANT_ENCAPSED_STRING",
+                                                                "L60:P1306-1307: :396:<T_WHITESPACE",
+                                                                "L60:P1307-1309:=>:390:<T_DOUBLE_ARROW",
+                                                                "L60:P1309-1310: :396:<T_WHITESPACE",
+                                                                "L60:P1310-1316:$title:266:<T_VARIABLE",
                                                                 "L60:P1316-1317:,:44",
-                                                                "L60:P1317-1318: :397:<T_WHITESPACE",
-                                                                "L60:P1318-1324:'tags':320:<T_CONSTANT_ENCAPSED_STRING",
-                                                                "L60:P1324-1325: :397:<T_WHITESPACE",
-                                                                "L60:P1325-1327:=>:269:<T_DOUBLE_ARROW",
-                                                                "L60:P1327-1328: :397:<T_WHITESPACE",
+                                                                "L60:P1317-1318: :396:<T_WHITESPACE",
+                                                                "L60:P1318-1324:'tags':269:<T_CONSTANT_ENCAPSED_STRING",
+                                                                "L60:P1324-1325: :396:<T_WHITESPACE",
+                                                                "L60:P1325-1327:=>:390:<T_DOUBLE_ARROW",
+                                                                "L60:P1327-1328: :396:<T_WHITESPACE",
                                                                 {
                                                                     "$$type": "Block",
                                                                     "opening": "L60:P1328-1329:[:91",
                                                                     "children": [
-                                                                        "L60:P1329-1335:'test':320:<T_CONSTANT_ENCAPSED_STRING",
+                                                                        "L60:P1329-1335:'test':269:<T_CONSTANT_ENCAPSED_STRING",
                                                                         "L60:P1335-1336:,:44",
-                                                                        "L60:P1336-1337: :397:<T_WHITESPACE",
-                                                                        "L60:P1337-1346:'example':320:<T_CONSTANT_ENCAPSED_STRING"
+                                                                        "L60:P1336-1337: :396:<T_WHITESPACE",
+                                                                        "L60:P1337-1346:'example':269:<T_CONSTANT_ENCAPSED_STRING"
                                                                     ],
                                                                     "closing": "L60:P1346-1347:]:93"
                                                                 }
@@ -1165,7 +1165,7 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L60:P1350-1359:\n        :397:<T_WHITESPACE"
+                                            "L60:P1350-1359:\n        :396:<T_WHITESPACE"
                                         ]
                                     },
                                     {
@@ -1174,7 +1174,7 @@
                                             "$$type": "Block",
                                             "opening": "L61:P1359-1360:{:123",
                                             "children": [
-                                                "L61:P1360-1368:PageMain:313:<T_STRING",
+                                                "L61:P1360-1368:PageMain:262:<T_STRING",
                                                 {
                                                     "$$type": "Block",
                                                     "opening": "L61:P1368-1369:(:40",
@@ -1183,21 +1183,21 @@
                                                             "$$type": "Block",
                                                             "opening": "L61:P1369-1370:[:91",
                                                             "children": [
-                                                                "L61:P1370-1377:'items':320:<T_CONSTANT_ENCAPSED_STRING",
-                                                                "L61:P1377-1378: :397:<T_WHITESPACE",
-                                                                "L61:P1378-1380:=>:269:<T_DOUBLE_ARROW",
-                                                                "L61:P1380-1381: :397:<T_WHITESPACE",
+                                                                "L61:P1370-1377:'items':269:<T_CONSTANT_ENCAPSED_STRING",
+                                                                "L61:P1377-1378: :396:<T_WHITESPACE",
+                                                                "L61:P1378-1380:=>:390:<T_DOUBLE_ARROW",
+                                                                "L61:P1380-1381: :396:<T_WHITESPACE",
                                                                 {
                                                                     "$$type": "Block",
                                                                     "opening": "L61:P1381-1382:[:91",
                                                                     "children": [
-                                                                        "L61:P1382-1390:'Item 1':320:<T_CONSTANT_ENCAPSED_STRING",
+                                                                        "L61:P1382-1390:'Item 1':269:<T_CONSTANT_ENCAPSED_STRING",
                                                                         "L61:P1390-1391:,:44",
-                                                                        "L61:P1391-1392: :397:<T_WHITESPACE",
-                                                                        "L61:P1392-1400:'Item 2':320:<T_CONSTANT_ENCAPSED_STRING",
+                                                                        "L61:P1391-1392: :396:<T_WHITESPACE",
+                                                                        "L61:P1392-1400:'Item 2':269:<T_CONSTANT_ENCAPSED_STRING",
                                                                         "L61:P1400-1401:,:44",
-                                                                        "L61:P1401-1402: :397:<T_WHITESPACE",
-                                                                        "L61:P1402-1410:'Item 3':320:<T_CONSTANT_ENCAPSED_STRING"
+                                                                        "L61:P1401-1402: :396:<T_WHITESPACE",
+                                                                        "L61:P1402-1410:'Item 3':269:<T_CONSTANT_ENCAPSED_STRING"
                                                                     ],
                                                                     "closing": "L61:P1410-1411:]:93"
                                                                 }
@@ -1214,7 +1214,7 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L61:P1414-1423:\n        :397:<T_WHITESPACE"
+                                            "L61:P1414-1423:\n        :396:<T_WHITESPACE"
                                         ]
                                     },
                                     {
@@ -1223,7 +1223,7 @@
                                             "$$type": "Block",
                                             "opening": "L62:P1423-1424:{:123",
                                             "children": [
-                                                "L62:P1424-1434:PageFooter:313:<T_STRING",
+                                                "L62:P1424-1434:PageFooter:262:<T_STRING",
                                                 {
                                                     "$$type": "Block",
                                                     "opening": "L62:P1434-1435:(:40",
@@ -1232,11 +1232,11 @@
                                                             "$$type": "Block",
                                                             "opening": "L62:P1435-1436:[:91",
                                                             "children": [
-                                                                "L62:P1436-1442:'year':320:<T_CONSTANT_ENCAPSED_STRING",
-                                                                "L62:P1442-1443: :397:<T_WHITESPACE",
-                                                                "L62:P1443-1445:=>:269:<T_DOUBLE_ARROW",
-                                                                "L62:P1445-1446: :397:<T_WHITESPACE",
-                                                                "L62:P1446-1450:2021:311:<T_LNUMBER"
+                                                                "L62:P1436-1442:'year':269:<T_CONSTANT_ENCAPSED_STRING",
+                                                                "L62:P1442-1443: :396:<T_WHITESPACE",
+                                                                "L62:P1443-1445:=>:390:<T_DOUBLE_ARROW",
+                                                                "L62:P1445-1446: :396:<T_WHITESPACE",
+                                                                "L62:P1446-1450:2021:260:<T_LNUMBER"
                                                             ],
                                                             "closing": "L62:P1450-1451:]:93"
                                                         }
@@ -1250,55 +1250,55 @@
                                     {
                                         "$$type": "PHPXText",
                                         "tokens": [
-                                            "L62:P1453-1460:\n      :397:<T_WHITESPACE"
+                                            "L62:P1453-1460:\n      :396:<T_WHITESPACE"
                                         ]
                                     }
                                 ],
                                 "closingElement": [
                                     "L63:P1460-1461:<:60",
                                     "L63:P1461-1462:\/:47",
-                                    "L63:P1462-1466:body:313:<T_STRING",
+                                    "L63:P1462-1466:body:262:<T_STRING",
                                     "L63:P1466-1467:>:62"
                                 ]
                             },
                             {
                                 "$$type": "PHPXText",
                                 "tokens": [
-                                    "L63:P1467-1472:\n    :397:<T_WHITESPACE"
+                                    "L63:P1467-1472:\n    :396:<T_WHITESPACE"
                                 ]
                             }
                         ],
                         "closingElement": [
                             "L64:P1472-1473:<:60",
                             "L64:P1473-1474:\/:47",
-                            "L64:P1474-1478:html:313:<T_STRING",
+                            "L64:P1474-1478:html:262:<T_STRING",
                             "L64:P1478-1479:>:62"
                         ]
                     },
-                    "L64:P1479-1482:\n  :397:<T_WHITESPACE"
+                    "L64:P1479-1482:\n  :396:<T_WHITESPACE"
                 ],
                 "closing": "L65:P1482-1483:):41"
             },
             "L65:P1483-1484:;:59",
-            "L65:P1484-1485:\n:397:<T_WHITESPACE"
+            "L65:P1484-1485:\n:396:<T_WHITESPACE"
         ],
         "closing": "L66:P1485-1486:}:125"
     },
     {
         "$$type": "Expression",
-        "value": "L66:P1486-1488:\n\n:397:<T_WHITESPACE"
+        "value": "L66:P1486-1488:\n\n:396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L68:P1488-1494:return:350:<T_RETURN"
+        "value": "L68:P1488-1494:return:313:<T_RETURN"
     },
     {
         "$$type": "Expression",
-        "value": "L68:P1494-1495: :397:<T_WHITESPACE"
+        "value": "L68:P1494-1495: :396:<T_WHITESPACE"
     },
     {
         "$$type": "Expression",
-        "value": "L68:P1495-1499:Page:313:<T_STRING"
+        "value": "L68:P1495-1499:Page:262:<T_STRING"
     },
     {
         "$$type": "Block",
@@ -1312,6 +1312,6 @@
     },
     {
         "$$type": "Expression",
-        "value": "L68:P1502-1503:\n:397:<T_WHITESPACE"
+        "value": "L68:P1502-1503:\n:396:<T_WHITESPACE"
     }
 ]
