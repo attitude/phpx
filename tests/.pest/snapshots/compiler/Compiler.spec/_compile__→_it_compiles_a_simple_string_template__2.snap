@@ -1,0 +1,42 @@
+[
+    {
+        "$$type": "PHPXFragment",
+        "openingElement": "L1:P0-2:<>:15932:<",
+        "children": [
+            {
+                "$$type": "PHPXText",
+                "tokens": [
+                    "L1:P2-7:Hello:262:<T_STRING",
+                    "L1:P7-8:,:44",
+                    "L1:P8-9: :396:<T_WHITESPACE"
+                ]
+            },
+            {
+                "$$type": "PHPXExpressionContainer",
+                "expression": {
+                    "$$type": "Block",
+                    "opening": "L1:P9-10:{:123",
+                    "children": [
+                        "L1:P10-15:$name:266:<T_VARIABLE",
+                        "L1:P15-16: :396:<T_WHITESPACE",
+                        "L1:P16-18:??:404:<T_COALESCE",
+                        "L1:P18-19: :396:<T_WHITESPACE",
+                        "L1:P19-28:'unnamed':269:<T_CONSTANT_ENCAPSED_STRING"
+                    ],
+                    "closing": "L1:P28-29:}:125"
+                }
+            },
+            {
+                "$$type": "PHPXText",
+                "tokens": [
+                    "L1:P29-30:!:33"
+                ]
+            }
+        ],
+        "closingElement": [
+            "L1:P30-31:<:60",
+            "L1:P31-32:\/:47",
+            "L1:P32-33:>:62"
+        ]
+    }
+]

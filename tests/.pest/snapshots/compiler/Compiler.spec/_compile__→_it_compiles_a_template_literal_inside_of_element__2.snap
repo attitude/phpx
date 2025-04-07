@@ -1,0 +1,54 @@
+[
+    {
+        "$$type": "PHPXElement",
+        "openingElement": [
+            "L1:P0-1:<:60",
+            "L1:P1-2:p:262:<T_STRING",
+            "L1:P2-3:>:62"
+        ],
+        "selfClosing": false,
+        "attributes": [],
+        "children": [
+            {
+                "$$type": "TemplateLiteral",
+                "opening": "L1:P4-5:`:96",
+                "children": [
+                    "L1:P5-23:Hello, my name is :268:<T_ENCAPSED_AND_WHITESPACE",
+                    {
+                        "$$type": "Block",
+                        "opening": "L1:P23-25:${:399:<T_DOLLAR_OPEN_CURLY_BRACES",
+                        "children": [
+                            "L1:P25-30:$name:266:<T_VARIABLE",
+                            "L1:P30-31: :396:<T_WHITESPACE",
+                            "L1:P31-33:??:404:<T_COALESCE",
+                            "L1:P33-34: :396:<T_WHITESPACE",
+                            "L1:P34-53:'yet to be defined':269:<T_CONSTANT_ENCAPSED_STRING"
+                        ],
+                        "closing": "L1:P53-54:}:125"
+                    },
+                    "L1:P54-72:, and I come from :268:<T_ENCAPSED_AND_WHITESPACE",
+                    {
+                        "$$type": "Block",
+                        "opening": "L1:P72-74:${:399:<T_DOLLAR_OPEN_CURLY_BRACES",
+                        "children": [
+                            "L1:P74-82:$country:266:<T_VARIABLE",
+                            "L1:P82-83: :396:<T_WHITESPACE",
+                            "L1:P83-85:??:404:<T_COALESCE",
+                            "L1:P85-86: :396:<T_WHITESPACE",
+                            "L1:P86-93:'Earth':269:<T_CONSTANT_ENCAPSED_STRING"
+                        ],
+                        "closing": "L1:P93-94:}:125"
+                    },
+                    "L1:P94-95:!:268:<T_ENCAPSED_AND_WHITESPACE"
+                ],
+                "closing": "L1:P95-96:`:96"
+            }
+        ],
+        "closingElement": [
+            "L1:P97-98:<:60",
+            "L1:P98-99:\/:47",
+            "L1:P99-100:p:262:<T_STRING",
+            "L1:P100-101:>:62"
+        ]
+    }
+]

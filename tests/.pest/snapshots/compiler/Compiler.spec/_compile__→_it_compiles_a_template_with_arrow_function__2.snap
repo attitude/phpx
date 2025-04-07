@@ -1,0 +1,71 @@
+[
+    {
+        "$$type": "PHPXFragment",
+        "openingElement": "L1:P0-2:<>:15932:<",
+        "children": [
+            {
+                "$$type": "PHPXText",
+                "tokens": [
+                    "L1:P2-7:Hello:262:<T_STRING",
+                    "L1:P7-8:,:44",
+                    "L1:P8-9: :396:<T_WHITESPACE"
+                ]
+            },
+            {
+                "$$type": "PHPXExpressionContainer",
+                "expression": {
+                    "$$type": "Block",
+                    "opening": "L1:P9-10:{:123",
+                    "children": [
+                        "L1:P10-15:$name:266:<T_VARIABLE",
+                        "L1:P15-16: :396:<T_WHITESPACE",
+                        "L1:P16-18:??:404:<T_COALESCE",
+                        "L1:P18-19: :396:<T_WHITESPACE",
+                        "L1:P19-21:fn:311:<T_FN",
+                        {
+                            "$$type": "Block",
+                            "opening": "L1:P21-22:(:40",
+                            "children": [
+                                "L1:P22-25:$it:266:<T_VARIABLE"
+                            ],
+                            "closing": "L1:P25-26:):41"
+                        },
+                        "L1:P26-27: :396:<T_WHITESPACE",
+                        "L1:P27-29:=>:390:<T_DOUBLE_ARROW",
+                        "L1:P29-30: :396:<T_WHITESPACE",
+                        "L1:P30-37:ucfirst:262:<T_STRING",
+                        {
+                            "$$type": "Block",
+                            "opening": "L1:P37-38:(:40",
+                            "children": [
+                                "L1:P38-41:$it:266:<T_VARIABLE"
+                            ],
+                            "closing": "L1:P41-42:):41"
+                        },
+                        "L1:P42-43:):41",
+                        {
+                            "$$type": "Block",
+                            "opening": "L1:P43-44:(:40",
+                            "children": [
+                                "L1:P44-49:$type:266:<T_VARIABLE"
+                            ],
+                            "closing": "L1:P49-50:):41"
+                        }
+                    ],
+                    "closing": "L1:P50-51:}:125"
+                }
+            },
+            {
+                "$$type": "PHPXText",
+                "tokens": [
+                    "L1:P51-52:!:33"
+                ]
+            }
+        ],
+        "closingElement": [
+            "L1:P52-53:<:60",
+            "L1:P53-54:\/:47",
+            "L1:P54-55:>:62"
+        ]
+    }
+]
