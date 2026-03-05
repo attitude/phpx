@@ -1,0 +1,117 @@
+{
+  "name": "phpx-language-support",
+  "displayName": "PHPX Language Support",
+  "description": "Syntax highlighting and language support for PHPX - JSX-like syntax for PHP",
+  "version": "0.1.0",
+  "publisher": "attitude",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "phpx",
+    "php",
+    "jsx",
+    "template",
+    "syntax"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/attitude/phpx"
+  },
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onLanguage:phpx"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "phpx",
+        "aliases": [
+          "PHPX",
+          "phpx"
+        ],
+        "extensions": [
+          ".phpx"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "phpx",
+        "scopeName": "source.phpx",
+        "path": "./syntaxes/phpx.tmLanguage.json",
+        "embeddedLanguages": {
+          "source.php": "php",
+          "text.html.basic": "html"
+        }
+      },
+      {
+        "scopeName": "source.phpx.embedded",
+        "path": "./syntaxes/phpx-embedded.tmLanguage.json",
+        "injectTo": [
+          "source.php"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "phpx.compileFile",
+        "title": "PHPX: Compile Current File"
+      },
+      {
+        "command": "phpx.showCompiledOutput",
+        "title": "PHPX: Show Compiled PHP Output"
+      }
+    ],
+    "configuration": {
+      "title": "PHPX",
+      "properties": {
+        "phpx.phpExecutablePath": {
+          "type": "string",
+          "default": "php",
+          "description": "Path to the PHP executable used for PHPX compilation."
+        },
+        "phpx.compileOnChange": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically compile PHPX to PHP on text change (debounced) to enable real-time language intelligence."
+        },
+        "phpx.compileDebounceMs": {
+          "type": "number",
+          "default": 500,
+          "minimum": 100,
+          "maximum": 5000,
+          "description": "Debounce delay (ms) for compile-on-change. Lower values give faster feedback but use more CPU."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "yarn compile && node ./out/test/runTest.js",
+    "test:grammar": "yarn compile && node ./out/test/grammar.test.js",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package --no-yarn --allow-missing-repository"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vscode/test-electron": "^2.3.8",
+    "@vscode/vsce": "^3.7.1",
+    "eslint": "^8.54.0",
+    "mocha": "^10.2.0",
+    "typescript": "^5.3.2",
+    "vscode-tmgrammar-test": "^0.1.2"
+  }
+}

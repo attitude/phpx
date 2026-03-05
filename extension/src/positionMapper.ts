@@ -1,0 +1,202 @@
+import * as fs from 'fs';
+import * as vscode from 'vscode';
+import { PHPXCompiler } from './compiler';
+
+/**
+ * Position mapping between PHPX source and compiled PHP.
+ *
+ * The PHPX compiler preserves line counts, so the line number is always
+ * the same. However, inside JSX regions the column offsets differ because
+ * `<tag attr={$val}>text</tag>` becomes `['$', 'tag', ['attr'=>($val)], ['text']]`.
+ *
+ * This module resolves positions by finding the word/symbol under the cursor
+ * in the PHPX source, then locating the same token on the corresponding line
+ * of the compiled PHP (and vice-versa).
+ */
+
+/**
+ * PHP identifier pattern: variable ($name) or identifier (name).
+ * Matches the same tokens the PHP language server would consider "words".
+ */
+const PHP_WORD_PATTERN = /\$?[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*/g;
+
+/**
+ * Given a PHPX document and a cursor position, return the mapped position
+ * in the compiled PHP file where the same word/token appears on the same line.
+ *
+ * Returns the original position if no word is found or mapping fails (this is
+ * fine for pure-PHP lines that are identical in both files).
+ */
+export function mapPositionToPhp(
+	document: vscode.TextDocument,
+	position: vscode.Position,
+	phpUri: vscode.Uri,
+): vscode.Position {
+	// Get the word at the cursor in the PHPX source
+	const wordRange = document.getWordRangeAtPosition(position, PHP_WORD_PATTERN);
+	if (!wordRange) {
+		return position;
+	}
+	const word = document.getText(wordRange);
+	if (!word) {
+		return position;
+	}
+
+	// Determine which occurrence this is on the PHPX line
+	// (handles cases where the same variable appears multiple times)
+	const phpxLine = document.lineAt(position.line).text;
+	const occurrenceIndex = getNthOccurrence(
+		phpxLine,
+		word,
+		wordRange.start.character,
+	);
+
+	// Read the corresponding line from the compiled PHP file
+	let phpContent: string;
+	try {
+		phpContent = fs.readFileSync(phpUri.fsPath, 'utf-8');
+	} catch {
+		return position;
+	}
+	const phpLines = phpContent.split('\n');
+	if (position.line >= phpLines.length) {
+		return position;
+	}
+	const phpLine = phpLines[position.line];
+
+	// Find the same occurrence of the word on the PHP line
+	const phpCol = findNthOccurrence(phpLine, word, occurrenceIndex);
+	if (phpCol === -1) {
+		return position;
+	}
+
+	return new vscode.Position(position.line, phpCol);
+}
+
+/**
+ * Given a PHP file line and a position in it, map back to the PHPX source position.
+ * Used for reverse-mapping results from the PHP language server.
+ */
+export function mapPositionToPhpx(
+	phpUri: vscode.Uri,
+	phpxUri: vscode.Uri,
+	position: vscode.Position,
+): vscode.Position {
+	let phpContent: string;
+	let phpxContent: string;
+	try {
+		phpContent = fs.readFileSync(phpUri.fsPath, 'utf-8');
+		phpxContent = fs.readFileSync(phpxUri.fsPath, 'utf-8');
+	} catch {
+		return position;
+	}
+
+	const phpLines = phpContent.split('\n');
+	const phpxLines = phpxContent.split('\n');
+
+	if (position.line >= phpLines.length || position.line >= phpxLines.length) {
+		return position;
+	}
+
+	const phpLine = phpLines[position.line];
+	const phpxLine = phpxLines[position.line];
+
+	// If the lines are identical, no mapping needed
+	if (phpLine === phpxLine) {
+		return position;
+	}
+
+	// Find what word is at the position in the PHP line
+	const word = getWordAt(phpLine, position.character);
+	if (!word) {
+		return position;
+	}
+
+	const occurrenceIndex = getNthOccurrence(phpLine, word.text, word.start);
+	const phpxCol = findNthOccurrence(phpxLine, word.text, occurrenceIndex);
+	if (phpxCol === -1) {
+		return position;
+	}
+
+	return new vscode.Position(position.line, phpxCol);
+}
+
+/**
+ * Map a Range from PHP back to PHPX source.
+ */
+export function mapRangeToPhpx(
+	phpUri: vscode.Uri,
+	phpxUri: vscode.Uri,
+	range: vscode.Range,
+): vscode.Range {
+	const start = mapPositionToPhpx(phpUri, phpxUri, range.start);
+	const end = mapPositionToPhpx(phpUri, phpxUri, range.end);
+	return new vscode.Range(start, end);
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/**
+ * Get the word (PHP identifier or variable) at a character offset in a line.
+ */
+function getWordAt(
+	line: string,
+	charOffset: number,
+): { text: string; start: number } | null {
+	const matches = [...line.matchAll(PHP_WORD_PATTERN)];
+	for (const match of matches) {
+		const start = match.index!;
+		const end = start + match[0].length;
+		if (charOffset >= start && charOffset < end) {
+			return { text: match[0], start };
+		}
+	}
+	return null;
+}
+
+/**
+ * Determine which occurrence (0-based) of `word` the `charOffset` falls within
+ * on the given line.
+ */
+function getNthOccurrence(
+	line: string,
+	word: string,
+	charOffset: number,
+): number {
+	let n = 0;
+	const regex = new RegExp(escapeRegex(word), 'g');
+	let match: RegExpExecArray | null;
+	while ((match = regex.exec(line)) !== null) {
+		if (match.index === charOffset) {
+			return n;
+		}
+		// Also match if cursor is inside the word
+		if (charOffset >= match.index && charOffset < match.index + word.length) {
+			return n;
+		}
+		n++;
+	}
+	return 0; // fallback: first occurrence
+}
+
+/**
+ * Find the starting character offset of the nth occurrence (0-based) of `word`
+ * in the given line. Returns -1 if not found.
+ */
+function findNthOccurrence(line: string, word: string, n: number): number {
+	let count = 0;
+	const regex = new RegExp(escapeRegex(word), 'g');
+	let match: RegExpExecArray | null;
+	while ((match = regex.exec(line)) !== null) {
+		if (count === n) {
+			return match.index;
+		}
+		count++;
+	}
+	// If the exact nth wasn't found, return the last match or -1
+	return -1;
+}
+
+function escapeRegex(str: string): string {
+	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}

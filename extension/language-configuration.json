@@ -1,0 +1,42 @@
+{
+  "comments": {
+    "lineComment": "//",
+    "blockComment": ["/*", "*/"]
+  },
+  "brackets": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+    ["<", ">"]
+  ],
+  "autoClosingPairs": [
+    { "open": "{", "close": "}" },
+    { "open": "[", "close": "]" },
+    { "open": "(", "close": ")" },
+    { "open": "'", "close": "'", "notIn": ["string", "comment"] },
+    { "open": "\"", "close": "\"", "notIn": ["string", "comment"] },
+    { "open": "`", "close": "`", "notIn": ["string", "comment"] },
+    { "open": "/**", "close": " */", "notIn": ["string"] },
+    { "open": "<", "close": ">", "notIn": ["string", "comment"] }
+  ],
+  "surroundingPairs": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+    ["'", "'"],
+    ["\"", "\""],
+    ["`", "`"],
+    ["<", ">"]
+  ],
+  "folding": {
+    "markers": {
+      "start": "^\\s*//\\s*#?region\\b",
+      "end": "^\\s*//\\s*#?endregion\\b"
+    }
+  },
+  "indentationRules": {
+    "increaseIndentPattern": "^\\s*((if|while|for|foreach|else|elseif|switch|case|default|function|class|interface|trait|try|catch|finally)\\b.*:|.*\\{[^}\"']*$|<[a-zA-Z][^>]*[^/]>\\s*$)",
+    "decreaseIndentPattern": "^\\s*(\\}|</[a-zA-Z][^>]*>|\\?>)"
+  },
+  "wordPattern": "(\\$?[a-zA-Z_\\x80-\\xff][a-zA-Z0-9_\\x80-\\xff]*)|([0-9]+\\.?[0-9]*)|([\\x{00C0}-\\x{1FFF}\\x{2C00}-\\x{D7FF}\\w]+)"
+}

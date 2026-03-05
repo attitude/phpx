@@ -3,6 +3,9 @@
     "PHPX"
   ],
   "files.associations": {
-		"*.phpx": "hack"
-	},
+    "*.phpx": "phpx"
+  },
+  "chat.tools.terminal.autoApprove": {
+    "npm install": true
+  },
 }
