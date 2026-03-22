@@ -159,6 +159,18 @@ describe('Attitude\ArrayRenderer\HTML', function () {
     expect((new Renderer)($html))->toBe($expected);
   });
 
+  it('maps className to class attribute', function () {
+    $html = ['$', 'div', ['className' => 'my-class'], 'content'];
+
+    expect((new Renderer)($html))->toBe('<div class="my-class">content</div>');
+  });
+
+  it('maps htmlFor to for attribute', function () {
+    $html = ['$', 'label', ['htmlFor' => 'input-id'], 'Label'];
+
+    expect((new Renderer)($html))->toBe('<label for="input-id">Label</label>');
+  });
+
   it('handles empty string attributes', function () {
     $html = ['$',  'div', [
       'class' => ['container', 'main-container'],
@@ -196,11 +208,23 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   });
 
   it('handles dangerouslySetInnerHTML', function () {
-    $html = ['$', 'div', ['dangerouslySetInnerHTML' => '<h1>Hello World!</h1>']];
+    $html = ['$', 'div', ['dangerouslySetInnerHTML' => ['__html' => '<h1>Hello World!</h1>']]];
 
     $expected = '<div><h1>Hello World!</h1></div>';
 
     expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('throws when dangerouslySetInnerHTML and children are both present', function () {
+    $html = ['$', 'div', ['dangerouslySetInnerHTML' => ['__html' => '<b>raw</b>']], 'child text'];
+
+    expect(fn() => (new Renderer)($html))->toThrow(\Exception::class);
+  });
+
+  it('throws when dangerouslySetInnerHTML is not an array with __html key', function () {
+    $html = ['$', 'div', ['dangerouslySetInnerHTML' => '<b>raw</b>']];
+
+    expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
   });
 
   it('handles nested fragments', function () {
@@ -298,7 +322,7 @@ HTML;
           ['$', 'h1', null, [['Blog']]],
           null,
         ]],
-        ['$', 'main', ['dangerouslySetInnerHTML' => '<h2>Recent Articles</h2>']],
+        ['$', 'main', ['dangerouslySetInnerHTML' => ['__html' => '<h2>Recent Articles</h2>']]],
         ['$', 'aside', null, [
           ['$', 'ul', null, [[
             ['$', 'li', null, [['$', 'a', ['href' => '/blog/2024-03-12/index.html'],
@@ -466,7 +490,7 @@ HTML;
                 ['$', 'h1', null, [['Blog']]],
                 null,
               ]],
-              [[['$', 'main', ['dangerouslySetInnerHTML' => '<h2>Recent Articles</h2>']]]],
+              [[['$', 'main', ['dangerouslySetInnerHTML' => ['__html' => '<h2>Recent Articles</h2>']]]]],
               ['$', 'aside', null, [
                 ['$', 'ul', null, [[
                   ['$', 'li', null, [['$', 'a', ['href' => '/blog/2024-03-12/index.html'],
@@ -765,7 +789,7 @@ HTML;
     });
 
     it('does not escape dangerouslySetInnerHTML content', function () {
-      $html = ['$', 'div', ['dangerouslySetInnerHTML' => '<b>intentional &amp; safe</b>']];
+      $html = ['$', 'div', ['dangerouslySetInnerHTML' => ['__html' => '<b>intentional &amp; safe</b>']]];
 
       expect((new Renderer)($html))->toBe('<div><b>intentional &amp; safe</b></div>');
     });
@@ -906,6 +930,20 @@ HTML;
       $html = ['$', 'div', null, 'hello'];
 
       expect((new Renderer)($html))->toBe('<div>hello</div>');
+    });
+  });
+
+  describe('node type validation', function () {
+    it('throws InvalidArgumentException for a node missing the type at index 1', function () {
+      $html = ['$'];
+
+      expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('throws InvalidArgumentException for a non-string non-Closure node type', function () {
+      $html = ['$', 42];
+
+      expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
     });
   });
 });

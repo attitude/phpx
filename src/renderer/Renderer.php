@@ -7,10 +7,10 @@ final class Renderer {
   public bool $pretty = false;
   public bool $react = false;
   public string $indentation = "\t";
-  protected array $components = [];
+  private array $components = [];
   private \WeakMap $arityCache;
 
-  public function __construct(protected string $encoding = 'UTF-8') {
+  public function __construct(private string $encoding = 'UTF-8') {
     $this->arityCache = new \WeakMap();
   }
 
@@ -18,7 +18,7 @@ final class Renderer {
     return $this->render($node, $components);
   }
 
-  public function getNodeType(array $node): string|\Closure {
+  private function getNodeType(array $node): string|\Closure {
     if (!array_key_exists(0, $node) || $node[0] !== '$') {
       throw new \InvalidArgumentException("Serialized node requires first element to be '$', got `" . (array_key_exists(0, $node) ? $node[0] : 'undefined') . "` instead.");
     }
@@ -31,7 +31,7 @@ final class Renderer {
     return $node[1];
   }
 
-  public function getNodeProps(array $node): array {
+  private function getNodeProps(array $node): array {
     if (!array_key_exists(2, $node) || $node[2] === null) {
       return [];
     }
@@ -39,10 +39,6 @@ final class Renderer {
       throw new \InvalidArgumentException("Serialized node props (index 2) must be an array or null, got `" . gettype($node[2]) . "` instead.");
     }
     return $node[2];
-  }
-
-  public function getNodeChildren(array $node): bool|int|float|string|array|null {
-    return $node[3] ?? $this->getNodeProps($node)['children'] ?? [];
   }
 
   public function render(bool|int|float|string|array|null $node, array $components = []): string {
@@ -53,28 +49,28 @@ final class Renderer {
     return $html;
   }
 
-  private function callComponent(\Closure|callable $component, array $props): mixed {
-    $fn = $component instanceof \Closure ? $component : \Closure::fromCallable($component);
-    $arity = $this->arityCache[$fn] ?? ($this->arityCache[$fn] = (new \ReflectionFunction($fn))->getNumberOfParameters());
+  private function callComponent(callable $component, array $props): mixed {
+    if ($component instanceof \Closure) {
+      $arity = $this->arityCache[$component] ??= (new \ReflectionFunction($component))->getNumberOfParameters();
+    } else {
+      $arity = (new \ReflectionFunction(\Closure::fromCallable($component)))->getNumberOfParameters();
+    }
     if ($arity > 1) {
       throw new \InvalidArgumentException("Component must accept 0 or 1 parameter (\$props). Got {$arity} parameters. Pass children via \$props['children'] instead.");
     }
-    return $arity === 0 ? $fn() : $fn($props);
+    return $arity === 0 ? $component() : $component($props);
   }
 
-  protected function format(string $rendered, int $nesting): string {
+  private function format(string $rendered, int $nesting): string {
     return str_repeat($this->indentation, max(0, $nesting)).$rendered;
   }
 
-  protected function renderNode(bool|int|float|string|array|null $node, int $nesting): string {
+  private function renderNode(bool|int|float|string|array|null $node, int $nesting): string {
     if (is_string($node) || is_numeric($node)) {
       return htmlspecialchars((string) $node, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
     }
     if (is_bool($node) || is_null($node)) {
       return '';
-    }
-    if (!is_array($node)) {
-      throw new \Exception("Invalid node type: `" . gettype($node) . "`");
     }
     if (empty($node)) {
       return '';
@@ -102,7 +98,11 @@ final class Renderer {
       if (array_key_exists('children', $props)) {
         throw new \Exception("Can't use children and dangerouslySetInnerHTML at the same time");
       }
-      $children = $props['dangerouslySetInnerHTML'];
+      $raw = $props['dangerouslySetInnerHTML'];
+      if (!is_array($raw) || !array_key_exists('__html', $raw)) {
+        throw new \InvalidArgumentException("dangerouslySetInnerHTML must be an array with an '__html' key.");
+      }
+      $children = $raw['__html'];
       $escapeChildren = false;
       unset($props['dangerouslySetInnerHTML']);
     } else {
@@ -192,7 +192,7 @@ final class Renderer {
       }
 
       if ($value instanceof \DateTimeInterface) {
-        $parts[] = "$key=\"{$value->format('Y-m-d\TH:i:s')}\"";
+        $parts[] = "$key=\"" . htmlspecialchars($value->format('Y-m-d\TH:i:s'), ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) . "\"";
         continue;
       }
 
@@ -206,22 +206,16 @@ final class Renderer {
     $parts = [];
     $previousWasElement = false;
 
-    foreach (self::concatenateStringMembers($node, $this->react, $this->encoding) as $child) {
+    foreach ($this->concatenateStringMembers($node) as $child) {
       if (is_array($child)) {
-        if (!array_key_exists(0, $child)) {
-          throw new \InvalidArgumentException("Fragment child must be a serialized node array (starting with '\$') or a nested children array, got an associative or empty array instead.");
-        }
-        if ($child[0] !== '$') {
-          throw new \Exception("Unexpected unflattened array in children");
-        }
         $rendered = $this->renderNode($child, $nesting);
         if ($this->pretty && $previousWasElement) {
           $rendered = "\n" . $this->format($rendered, $nesting);
         }
         $parts[] = $rendered;
         $previousWasElement = true;
-      } else if (is_string($child) || is_numeric($child)) {
-        $parts[] = (string) $child;
+      } else if (is_string($child)) {
+        $parts[] = $child;
         $previousWasElement = false;
       }
     }
@@ -229,54 +223,34 @@ final class Renderer {
     return implode('', $parts);
   }
 
-  protected static function concatenateStringMembers(array $array, bool $react, string $encoding = 'UTF-8'): array {
+  private function concatenateStringMembers(array $array): array {
     $combinedArray = [];
     $currentString = '';
-
     $length = count($array);
 
     foreach ($array as $index => $item) {
-      if (
-        is_string($item) || is_numeric($item)
-      ) {
-        $escapedValue = htmlspecialchars((string) $item, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $encoding);
-        if ($react) {
-          $isFirst = $index === 0;
-          $isLast = $index === $length - 1;
+      if (is_string($item) || is_numeric($item)) {
+        $escapedValue = htmlspecialchars((string) $item, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
+        if ($this->react) {
           $stringifiedValue = (string) $item;
-
-          $canBeTrimmedFromStart = !$isFirst && ltrim($stringifiedValue) !== $stringifiedValue;
-          $canBeTrimmedFromEnd = !$isLast && rtrim($stringifiedValue) !== $stringifiedValue;
-
-          if ($canBeTrimmedFromStart && $canBeTrimmedFromEnd) {
-            $currentString .= '<!-- -->' . $escapedValue . '<!-- -->';
-          } else if ($canBeTrimmedFromEnd) {
-            $currentString .= $escapedValue . '<!-- -->';
-          } else if ($canBeTrimmedFromStart) {
-            $currentString .= '<!-- -->' . $escapedValue;
-          } else {
-            $currentString .= $escapedValue;
-          }
+          $prefix = $index !== 0 && ltrim($stringifiedValue) !== $stringifiedValue ? '<!-- -->' : '';
+          $suffix = $index !== $length - 1 && rtrim($stringifiedValue) !== $stringifiedValue ? '<!-- -->' : '';
+          $currentString .= $prefix . $escapedValue . $suffix;
         } else {
           $currentString .= $escapedValue;
         }
-      } else {
+      } else if (is_array($item)) {
         if ($currentString !== '') {
           $combinedArray[] = $currentString;
           $currentString = '';
         }
-
-        if (is_array($item)) {
-          if (!array_key_exists(0, $item)) {
-            throw new \InvalidArgumentException("Fragment child must be a serialized node array (starting with '\$') or a nested children array, got an associative or empty array instead.");
-          }
-          if ($item[0] === '$') {
-            $combinedArray[] = $item;
-          } else {
-            $combinedArray = [...$combinedArray, ...self::concatenateStringMembers($item, $react, $encoding)];
-          }
-        } else {
+        if (!array_key_exists(0, $item)) {
+          throw new \InvalidArgumentException("Fragment child must be a serialized node array (starting with '\$') or a nested children array, got an associative or empty array instead.");
+        }
+        if ($item[0] === '$') {
           $combinedArray[] = $item;
+        } else {
+          $combinedArray = [...$combinedArray, ...$this->concatenateStringMembers($item)];
         }
       }
     }
