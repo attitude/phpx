@@ -34,6 +34,7 @@ run_pest() {
         echo "Error: Pest exited with code $exit_code — check for PHP errors or configuration issues" >&2
         return $exit_code
     fi
+    return 0
 }
 
 echo "Running initial test suite..."
