@@ -159,13 +159,22 @@ final class Renderer {
    * Recursively resolves a StyleProp-like value into a flat associative array.
    * Accepts stdClass, associative arrays, or indexed arrays of those (nested arbitrarily).
    * Filters out null and false values. Later keys override earlier ones.
+   * It throws on empty strings and boolean true.
    */
   private function resolveProps(mixed $value): array {
-    if ($value === null || $value === false || $value === '') {
+    if ($value === true) {
+      throw new \InvalidArgumentException("Invalid prop value: true is not allowed. In PHP logical operators work differently than in JavaScript, so these values are more likely to be the result of a mistake than intentional.");
+    }
+
+    if ($value === '') {
+      throw new \InvalidArgumentException("Invalid prop value: empty string is not allowed.");
+    }
+
+    if ($value === null || $value === false) {
       return [];
     }
     if ($value instanceof \stdClass) {
-      return (array) $value;
+      $value = (array) $value;
     }
     if (!is_array($value)) {
       return [];
@@ -202,8 +211,11 @@ final class Renderer {
       }
 
       if (is_bool($value)) {
-        if ($value)
+        if (str_contains($key, '-')) {
+          $parts[] = $this->formatAttribute($key, $value ? 'true' : 'false');
+        } elseif ($value) {
           $parts[] = $key;
+        }
         continue;
       }
 

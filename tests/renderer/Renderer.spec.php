@@ -206,13 +206,29 @@ describe('Attitude\ArrayRenderer\HTML', function () {
 
   it('skips style attribute entirely when all values resolve to falsy', function () {
     $html = ['$', 'div', [
-      'style' => [false, null, ''],
+      'style' => [false, null],
       'class' => 'box',
     ]];
 
     $expected = '<div class="box"></div>';
 
     expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('throws on invalid true style values', function () {
+    $html = ['$', 'div', [
+      'style' => (object) [true],
+    ]];
+
+    expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+  });
+
+  it('throws on invalid empty string style values', function () {
+    $html = ['$', 'div', [
+      'style' => (object) [''],
+    ]];
+
+    expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
   });
 
   it('maps className to class attribute', function () {
