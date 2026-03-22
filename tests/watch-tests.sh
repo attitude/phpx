@@ -19,6 +19,12 @@ if [[ ! -x "$PEST" ]]; then
     exit 1
 fi
 
+if ! command -v fswatch &>/dev/null; then
+    echo "Error: fswatch is not installed or not on PATH" >&2
+    echo "Install it with: brew install fswatch" >&2
+    exit 1
+fi
+
 # Runs pest, swallowing exit code 1 (test failures are expected) but
 # propagating any other non-zero code as a visible error.
 run_pest() {
