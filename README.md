@@ -146,13 +146,14 @@ $node = ['$', 'h1', ['className' => 'title'], 'Hello, World!'];
 echo $renderer($node); // <h1 class="title">Hello, World!</h1>
 ```
 
-Scalar values pass through unchanged; `null` and `bool` values render as empty strings (matching React behaviour):
+Scalar values are rendered as text with HTML-escaping (via `htmlspecialchars`); `null` and `bool` values render as empty strings (matching React behaviour):
 
 ```php
-echo $renderer('plain text'); // plain text
-echo $renderer(42);           // 42
-echo $renderer(null);         // (empty)
-echo $renderer(true);         // (empty)
+echo $renderer('plain text');  // plain text
+echo $renderer(42);            // 42
+echo $renderer('<b>hi</b>');   // &lt;b&gt;hi&lt;/b&gt;
+echo $renderer(null);          // (empty)
+echo $renderer(true);          // (empty)
 ```
 
 #### Components
@@ -180,7 +181,7 @@ echo $renderer($node, [
         return ['$', 'time', null, date('Y-m-d')];
     },
 ]);
-// <time>2026-03-22</time>
+// <time>YYYY-MM-DD</time>
 ```
 
 Inline closures work too — pass a `\Closure` directly as the element type:
@@ -256,7 +257,7 @@ The `Renderer` automatically escapes all untrusted output using `htmlspecialchar
 |---|---|
 | Text node strings | Yes — `<`, `>`, `&`, `"`, `'` all encoded |
 | Attribute values (string/numeric) | Yes — attribute break-out via `"` or `'` is prevented |
-| `style` object values | Yes — CSS value injection is prevented |
+| `style` object values | Yes — prevents HTML attribute break-out; CSS content itself is not sanitised |
 | `data-*` attribute values | Yes — same encoding as regular attributes |
 | `dangerouslySetInnerHTML` | **No** — raw HTML is intentionally injected; only use with trusted content |
 
