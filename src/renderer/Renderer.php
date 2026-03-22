@@ -200,7 +200,7 @@ final class Renderer {
           return "<$type".(empty($attributeString) ? '' : ' ' . $attributeString).">{$childrenRendered}</$type>";
         }
       } else {
-        $children = self::concatenateStringMembers($node, $this->react);
+        $children = self::concatenateStringMembers($node, $this->react, $this->encoding);
 
         $childrenRendered = [];
 
@@ -223,7 +223,7 @@ final class Renderer {
               throw new \Exception("Unexpected unflattened array in children");
             }
           } else if (is_string($child) || is_numeric($child)) {
-            $childrenRendered[] = $this->renderNode($child, $nesting + 1);
+            $childrenRendered[] = (string) $child;
             $previousChildWasElement = false;
           }
         }
@@ -235,7 +235,7 @@ final class Renderer {
     }
   }
 
-  protected static function concatenateStringMembers(array $array, bool $react): array {
+  protected static function concatenateStringMembers(array $array, bool $react, string $encoding = 'UTF-8'): array {
     $combinedArray = [];
     $currentString = '';
 
@@ -245,6 +245,7 @@ final class Renderer {
       if (
         is_string($item) || is_numeric($item)
       ) {
+        $escapedValue = htmlspecialchars((string) $item, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $encoding);
         if ($react) {
           $isFirst = $index === 0;
           $isLast = $index === $length - 1;
@@ -254,16 +255,16 @@ final class Renderer {
           $canBeTrimmedFromEnd = !$isLast && rtrim($stringifiedValue) !== $stringifiedValue;
 
           if ($canBeTrimmedFromStart && $canBeTrimmedFromEnd) {
-            $currentString .= '<!-- -->' . $stringifiedValue . '<!-- -->';
+            $currentString .= '<!-- -->' . $escapedValue . '<!-- -->';
           } else if ($canBeTrimmedFromEnd) {
-            $currentString .= $stringifiedValue . '<!-- -->';
+            $currentString .= $escapedValue . '<!-- -->';
           } else if ($canBeTrimmedFromStart) {
-            $currentString .= '<!-- -->' . $stringifiedValue;
+            $currentString .= '<!-- -->' . $escapedValue;
           } else {
-            $currentString .= $stringifiedValue;
+            $currentString .= $escapedValue;
           }
         } else {
-          $currentString .= (string) $item;
+          $currentString .= $escapedValue;
         }
       } else {
         if ($currentString !== '') {
@@ -275,7 +276,7 @@ final class Renderer {
           if ($item[0] === '$') {
             $combinedArray[] = $item;
           } else {
-            $combinedArray = [...$combinedArray, ...self::concatenateStringMembers($item, $react)];
+            $combinedArray = [...$combinedArray, ...self::concatenateStringMembers($item, $react, $encoding)];
           }
         } else {
           $combinedArray[] = $item;
