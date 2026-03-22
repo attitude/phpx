@@ -70,12 +70,22 @@ final class Renderer {
   private function callComponent(\Closure|callable $component, array $props): mixed {
     if ($component instanceof \Closure) {
       $arity = $this->arityCache[$component] ?? ($this->arityCache[$component] = (new \ReflectionFunction($component))->getNumberOfParameters());
-      if ($arity > 1) {
-        throw new \InvalidArgumentException("Component must accept 0 or 1 parameter (\$props). Got {$arity} parameters. Pass children via \$props['children'] instead.");
-      }
-      return $arity === 0 ? $component() : $component($props);
+    } else if (is_array($component)) {
+      // [$object|$class, $method]
+      $rf = new \ReflectionMethod($component[0], $component[1]);
+      $arity = $rf->getNumberOfParameters();
+    } else if (is_string($component) && str_contains($component, '::')) {
+      [$class, $method] = explode('::', $component, 2);
+      $rf = new \ReflectionMethod($class, $method);
+      $arity = $rf->getNumberOfParameters();
+    } else {
+      $arity = (new \ReflectionFunction(\Closure::fromCallable($component)))->getNumberOfParameters();
     }
-    return call_user_func($component, $props);
+
+    if ($arity > 1) {
+      throw new \InvalidArgumentException("Component must accept 0 or 1 parameter (\$props). Got {$arity} parameters. Pass children via \$props['children'] instead.");
+    }
+    return $arity === 0 ? call_user_func($component) : call_user_func($component, $props);
   }
 
   protected function format(string $rendered, int $nesting): string {

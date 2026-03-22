@@ -4,6 +4,28 @@ use Attitude\PHPX\Renderer\Renderer;
 
 require_once __DIR__.'/../../src/index.php';
 
+class PhpxTestStaticComponent {
+  public static function render(): array {
+    return ['$', 'b', null, 'static zero'];
+  }
+  public static function renderWithProps(array $props): array {
+    return ['$', 'b', null, $props['text']];
+  }
+}
+
+class PhpxTestInstanceComponent {
+  public function render(): array {
+    return ['$', 'i', null, 'instance zero'];
+  }
+  public function renderWithProps(array $props): array {
+    return ['$', 'i', null, $props['text']];
+  }
+}
+
+function phpx_test_two_arg_component(array $props, string $extra): array {
+  return ['$', 'span', null, $extra];
+}
+
 describe('Attitude\ArrayRenderer\HTML', function () {
   it('generates a string', function () {
     $html = 'Hello World!';
@@ -620,6 +642,66 @@ HTML;
       expect((new Renderer)($html, [
         'Badge' => fn() => ['$', 'div', null, 'Alternative component'],
       ]))->toBe('<span class="from-closure">Content</span>');
+    });
+  });
+
+  describe('Non-Closure callable components', function () {
+    it('calls a 0-arg named function component without props', function () {
+      function phpx_test_zero_arg_component(): array {
+        return ['$', 'span', null, 'from named function'];
+      }
+
+      $html = ['$', 'Foo', null];
+
+      expect((new Renderer)($html, ['Foo' => 'phpx_test_zero_arg_component']))->toBe('<span>from named function</span>');
+    });
+
+    it('calls a 1-arg named function component with props', function () {
+      function phpx_test_one_arg_component(array $props): array {
+        return ['$', 'span', null, $props['label']];
+      }
+
+      $html = ['$', 'Foo', ['label' => 'from props']];
+
+      expect((new Renderer)($html, ['Foo' => 'phpx_test_one_arg_component']))->toBe('<span>from props</span>');
+    });
+
+    it('calls a 0-arg static method component', function () {
+      $html = ['$', 'Foo', null];
+
+      expect((new Renderer)($html, ['Foo' => ['PhpxTestStaticComponent', 'render']]))->toBe('<b>static zero</b>');
+    });
+
+    it('calls a 1-arg static method component with props', function () {
+      $html = ['$', 'Foo', ['text' => 'hello']];
+
+      expect((new Renderer)($html, ['Foo' => ['PhpxTestStaticComponent', 'renderWithProps']]))->toBe('<b>hello</b>');
+    });
+
+    it('calls a 0-arg instance method component', function () {
+      $html = ['$', 'Foo', null];
+      $obj = new PhpxTestInstanceComponent();
+
+      expect((new Renderer)($html, ['Foo' => [$obj, 'render']]))->toBe('<i>instance zero</i>');
+    });
+
+    it('calls a 1-arg instance method component with props', function () {
+      $html = ['$', 'Foo', ['text' => 'world']];
+      $obj = new PhpxTestInstanceComponent();
+
+      expect((new Renderer)($html, ['Foo' => [$obj, 'renderWithProps']]))->toBe('<i>world</i>');
+    });
+
+    it('calls a static method via Class::method string syntax', function () {
+      $html = ['$', 'Foo', null];
+
+      expect((new Renderer)($html, ['Foo' => 'PhpxTestStaticComponent::render']))->toBe('<b>static zero</b>');
+    });
+
+    it('throws when a non-Closure callable has more than 1 parameter', function () {
+      $html = ['$', 'Foo', null];
+
+      expect(fn() => (new Renderer)($html, ['Foo' => 'phpx_test_two_arg_component']))->toThrow(\InvalidArgumentException::class);
     });
   });
 
