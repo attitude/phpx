@@ -78,7 +78,9 @@ final class Renderer {
         return '';
       } else if ($node[0] === '$') {
         $type = $this->getNodeType($node);
-        assert(is_string($type) || $type instanceof \Closure, "Type must be a string or closure.");
+        if (!is_string($type) && !($type instanceof \Closure)) {
+          throw new \InvalidArgumentException("Type must be a string or closure, got " . gettype($type) . ".");
+        }
 
         $nodeProps = $this->getNodeProps($node);
 
