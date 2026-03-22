@@ -13,7 +13,7 @@
 		"test": "./vendor/bin/pest",
 		"test:update-snapshots": "./vendor/bin/pest --update-snapshots",
 		"test:coverage": "./vendor/bin/pest --coverage",
-		"test:watch": "./tests/watch-tests.sh"
+		"test:watch": "COMPOSER_PROCESS_TIMEOUT=0 ./tests/watch-tests.sh"
 	},
 	"minimum-stability": "dev",
 	"autoload": {
@@ -33,7 +33,6 @@
 		"monolog/monolog": "^3.0"
 	},
 	"config": {
-        "process-timeout": 0,
 		"allow-plugins": {
 			"pestphp/pest-plugin": true
 		}
