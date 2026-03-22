@@ -130,9 +130,9 @@ final class Renderer {
                 $styleKey = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $styleKey));
                 $styleString .= "$styleKey:$styleValue;";
               }
-              $value = rtrim($styleString, ';');
+              $value = htmlspecialchars(rtrim($styleString, ';'), ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
             } else if (is_string($value) || is_numeric($value)) {
-              $value = (string) $value;
+              $value = htmlspecialchars((string) $value, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
             } else if ($key === "data" && (is_object($value) || is_array($value))) {
               foreach ((array) $value as $dataKey => $dataValue) {
                 if (is_bool($dataValue)) {
@@ -142,7 +142,7 @@ final class Renderer {
 
                   continue;
                 } else if (is_string($dataValue) || is_numeric($dataValue)) {
-                  $dataValue = (string) $dataValue;
+                  $dataValue = htmlspecialchars((string) $dataValue, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
                 } else if (is_null($dataValue)) {
                   continue;
                 } else {

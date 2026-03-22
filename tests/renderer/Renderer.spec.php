@@ -622,4 +622,78 @@ HTML;
       ]))->toBe('<span class="from-closure">Content</span>');
     });
   });
+
+  describe('XSS prevention', function () {
+    it('escapes HTML special characters in text node strings', function () {
+      $html = ['$', 'p', null, '<script>alert("xss")</script>'];
+
+      expect((new Renderer)($html))->toBe('<p>&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;</p>');
+    });
+
+    it('escapes entities in bare string nodes', function () {
+      expect((new Renderer)('<b>bold</b> & "quoted"'))->toBe('&lt;b&gt;bold&lt;/b&gt; &amp; &quot;quoted&quot;');
+    });
+
+    it('escapes HTML tags injected into attribute values', function () {
+      $html = ['$', 'div', ['title' => '<img src=x onerror=alert(1)>']];
+
+      expect((new Renderer)($html))->toBe('<div title="&lt;img src=x onerror=alert(1)&gt;"></div>');
+    });
+
+    it('escapes double-quote injection in attribute values to prevent attribute break-out', function () {
+      $html = ['$', 'div', ['class' => '" onmouseover="alert(1)']];
+
+      expect((new Renderer)($html))->toBe('<div class="&quot; onmouseover=&quot;alert(1)"></div>');
+    });
+
+    it('escapes ampersands in attribute values', function () {
+      $html = ['$', 'a', ['href' => '/search?q=foo&bar=baz']];
+
+      expect((new Renderer)($html))->toBe('<a href="/search?q=foo&amp;bar=baz"></a>');
+    });
+
+    it('escapes single-quote injection in attribute values', function () {
+      $html = ['$', 'div', ['data-value' => "' onmouseover='alert(1)"]];
+
+      expect((new Renderer)($html))->toBe('<div data-value="&apos; onmouseover=&apos;alert(1)"></div>');
+    });
+
+    it('escapes double-quote injection in style attribute values', function () {
+      $html = ['$', 'div', ['style' => (object)['background' => 'red"} *{color:red}']]];
+
+      expect((new Renderer)($html))->toBe('<div style="background:red&quot;} *{color:red}"></div>');
+    });
+
+    it('escapes double-quote injection in data-* attribute values', function () {
+      $html = ['$', 'div', ['data' => (object)['value' => '" onxss="1']]];
+
+      expect((new Renderer)($html))->toBe('<div data-value="&quot; onxss=&quot;1"></div>');
+    });
+
+    it('escapes ampersands in data-* attribute values', function () {
+      $html = ['$', 'div', ['data' => (object)['query' => 'foo&bar']]];
+
+      expect((new Renderer)($html))->toBe('<div data-query="foo&amp;bar"></div>');
+    });
+
+    it('escapes HTML special chars in text node array fragments', function () {
+      $html = ['$', 'p', null, ['<b>bold</b>', ' & ', '"quoted"']];
+
+      expect((new Renderer)($html))->toBe('<p>&lt;b&gt;bold&lt;/b&gt; &amp; &quot;quoted&quot;</p>');
+    });
+
+    it('does not escape dangerouslySetInnerHTML content', function () {
+      $html = ['$', 'div', ['dangerouslySetInnerHTML' => '<b>intentional &amp; safe</b>']];
+
+      expect((new Renderer)($html))->toBe('<div><b>intentional &amp; safe</b></div>');
+    });
+
+    it('escapes script injection passed through a named component prop', function () {
+      $html = ['$', 'Wrapper', ['label' => '<script>alert(1)</script>']];
+
+      expect((new Renderer)($html, [
+        'Wrapper' => fn(array $props) => ['$', 'div', ['title' => $props['label']], null],
+      ]))->toBe('<div title="&lt;script&gt;alert(1)&lt;/script&gt;"></div>');
+    });
+  });
 });
