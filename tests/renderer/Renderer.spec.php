@@ -744,4 +744,56 @@ HTML;
       expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
     });
   });
+
+  describe('tag name validation', function () {
+    it('throws InvalidArgumentException for a tag name containing whitespace', function () {
+      $html = ['$', "div onmouseover=alert(1) x", null];
+
+      expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('throws InvalidArgumentException for a tag name containing angle brackets', function () {
+      $html = ['$', "div><script>alert(1)</script><div", null];
+
+      expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('throws InvalidArgumentException for a tag name containing a quote', function () {
+      $html = ['$', 'div"evil', null];
+
+      expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('throws InvalidArgumentException for a tag name containing a slash', function () {
+      $html = ['$', 'div/script', null];
+
+      expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('accepts valid custom element names with hyphens', function () {
+      $html = ['$', 'my-element', null, 'content'];
+
+      expect((new Renderer)($html))->toBe('<my-element>content</my-element>');
+    });
+  });
+
+  describe('props validation', function () {
+    it('throws InvalidArgumentException when props is a string', function () {
+      $html = ['$', 'div', 'not-an-array'];
+
+      expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('throws InvalidArgumentException when props is an integer', function () {
+      $html = ['$', 'div', 42];
+
+      expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('treats null props the same as an empty array', function () {
+      $html = ['$', 'div', null, 'hello'];
+
+      expect((new Renderer)($html))->toBe('<div>hello</div>');
+    });
+  });
 });

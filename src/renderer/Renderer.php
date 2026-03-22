@@ -32,7 +32,13 @@ final class Renderer {
   }
 
   public function getNodeProps(array $node): array {
-    return $node[2] ?? [];
+    if (!array_key_exists(2, $node) || $node[2] === null) {
+      return [];
+    }
+    if (!is_array($node[2])) {
+      throw new \InvalidArgumentException("Serialized node props (index 2) must be an array or null, got `" . gettype($node[2]) . "` instead.");
+    }
+    return $node[2];
   }
 
   /**
@@ -101,6 +107,11 @@ final class Renderer {
 
         if (array_key_exists($type, $this->components)) {
           return $this->renderNode($this->callComponent($this->components[$type], $props), $nesting);
+        }
+
+        // Validate the tag name to prevent tag-name injection
+        if (!preg_match('/^[a-zA-Z][a-zA-Z0-9\-\.]*$/', $type)) {
+          throw new \InvalidArgumentException("Invalid HTML tag name: `{$type}`");
         }
 
         $shouldEscapeHtml = true;
