@@ -26,8 +26,22 @@ final class Renderer {
     return $node[2] ?? [];
   }
 
+  /**
+   * @deprecated Use getNodeChildrenProps instead.
+   */
   public function getNodeChildren(array $node): bool|int|float|string|array|null {
     return $node[3] ?? $this->getNodeProps($node)['children'] ?? [];
+  }
+
+  public function getNodeChildrenProps(array $node): array {
+    if (array_key_exists(3, $node)) {
+      return ['children' => $node[3]];
+    }
+    $props = $this->getNodeProps($node);
+    if (array_key_exists('children', $props)) {
+      return ['children' => $props['children']];
+    }
+    return [];
   }
 
   public function render(bool|int|float|string|array|null $node, array $components = []): string {
@@ -56,9 +70,8 @@ final class Renderer {
 
         $props = $this->getNodeProps($node);
 
-        $hasChildren = array_key_exists(3, $node) || array_key_exists('children', $props);
-        $children = $this->getNodeChildren($node);
-        $mergedProps = array_merge($props ?? [], $hasChildren ? ['children' => $children] : []);
+        $childrenProps = $this->getNodeChildrenProps($node);
+        $mergedProps = array_merge($props ?? [], $childrenProps);
 
         if (!is_string($type) && $type instanceof \Closure) {
           $id = spl_object_id($type);
@@ -82,6 +95,8 @@ final class Renderer {
             // Throw error in development mode
             throw new \Exception("Can't use children and dangerouslySetInnerHTML at the same time");
           }
+        } else {
+          $children = $mergedProps['children'] ?? [];
         }
 
         unset($props['children']);
