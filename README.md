@@ -182,7 +182,7 @@ When used directly as the element type (index 1 of the node array), only a `\Clo
 
 #### Prop conventions
 
-`className` and `htmlFor` map to `class` and `for`. `style` and `data` accept arrays/objects and are serialised to inline CSS and `data-*` attributes respectively, with camelCase keys converted to kebab-case. Array attribute values are flattened and space-joined. `null` omits the attribute; for plain (non-hyphenated) attributes `true` renders a valueless boolean attribute (e.g. `checked`), while for hyphenated attributes (e.g. `aria-expanded`, `data-active`) `true` and `false` are serialised as the strings `"true"` and `"false"` to preserve their semantic meaning.
+`className` and `htmlFor` map to `class` and `for`. `style` accepts arrays/objects and is serialised to inline CSS, with camelCase keys converted to kebab-case. `data` accepts arrays/objects and is serialised to `data-*` attributes, with keys lowercased. Array attribute values are flattened and space-joined. `null` omits the attribute; for plain (non-hyphenated) attributes `true` renders a valueless boolean attribute (e.g. `checked`), while for hyphenated attributes (e.g. `aria-expanded`, `data-active`) `true` and `false` are serialised as the strings `"true"` and `"false"` to preserve their semantic meaning.
 
 Use `dangerouslySetInnerHTML` to inject raw HTML — value must be `['__html' => '...']` and is **not** escaped; only use with trusted content.
 
