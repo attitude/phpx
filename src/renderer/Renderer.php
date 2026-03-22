@@ -53,6 +53,17 @@ final class Renderer {
     return $html;
   }
 
+  private function callComponent(\Closure|callable $component, array $props): mixed {
+    if ($component instanceof \Closure) {
+      $arity = $this->arityCache[$component] ?? ($this->arityCache[$component] = (new \ReflectionFunction($component))->getNumberOfParameters());
+      if ($arity > 1) {
+        throw new \InvalidArgumentException("Component must accept 0 or 1 parameter (\$props). Got {$arity} parameters. Pass children via \$props['children'] instead.");
+      }
+      return $arity === 0 ? $component() : $component($props);
+    }
+    return call_user_func($component, $props);
+  }
+
   protected function format(string $rendered, int $nesting): string {
     return str_repeat($this->indentation, max(0, $nesting)).$rendered;
   }
@@ -75,26 +86,11 @@ final class Renderer {
         $props = array_merge($nodeProps, $childrenProps);
 
         if (!is_string($type) && $type instanceof \Closure) {
-          $arity = $this->arityCache[$type] ?? ($this->arityCache[$type] = (new \ReflectionFunction($type))->getNumberOfParameters());
-          if ($arity > 1) {
-            throw new \InvalidArgumentException("Component closure must accept 0 or 1 parameter (\$props). Got {$arity} parameters. Pass children via \$props['children'] instead.");
-          }
-          $result = $arity === 0 ? $type() : $type($props);
-          return $this->renderNode($result, $nesting);
+          return $this->renderNode($this->callComponent($type, $props), $nesting);
         }
 
         if (array_key_exists($type, $this->components)) {
-          $component = $this->components[$type];
-          if ($component instanceof \Closure) {
-            $arity = $this->arityCache[$component] ?? ($this->arityCache[$component] = (new \ReflectionFunction($component))->getNumberOfParameters());
-            if ($arity > 1) {
-              throw new \InvalidArgumentException("Component '{$type}' must accept 0 or 1 parameter (\$props). Got {$arity} parameters. Pass children via \$props['children'] instead.");
-            }
-            $result = $arity === 0 ? $component() : $component($props);
-          } else {
-            $result = call_user_func($component, $props);
-          }
-          return $this->renderNode($result, $nesting);
+          return $this->renderNode($this->callComponent($this->components[$type], $props), $nesting);
         }
 
         $shouldEscapeHtml = true;
