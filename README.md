@@ -178,66 +178,23 @@ echo $renderer(['$', $greet, ['name' => 'Alice']]);
 // <span>Hi, Alice!</span>
 ```
 
-Any PHP callable is accepted — named functions, static methods (`'Class::method'` or `['Class', 'method']`), and instance methods (`[$obj, 'method']`). Components accept 0 or 1 parameter (0-param components are called without arguments); children are passed via `$props['children']`.
+Any PHP callable works; children are passed via `$props['children']`.
 
 #### Prop conventions
 
-| Prop | Behaviour |
-|---|---|
-| `className` | Rendered as `class` |
-| `htmlFor` | Rendered as `for` |
-| Any attribute with an array value | Recursively flattened and joined with a space: `['a', 'b']` → `"a b"` |
-| `style` (array/object) | Properties serialised to inline CSS with camelCase → kebab-case conversion: `['fontSize' => '16px']` → `font-size:16px` |
-| `data` (array/object) | Expanded to `data-*` attributes with camelCase → kebab-case conversion |
-| `dangerouslySetInnerHTML` | Raw HTML injected without escaping; value must be `['__html' => '...']` (cannot be combined with `children`) |
-| Boolean (`true`) | Rendered as a valueless attribute: `['checked' => true]` → `checked` |
-| `null` value | Attribute is omitted from output |
-| `DateTime` / `DateTimeImmutable` | Formatted as `Y-m-d\TH:i:s` (ISO 8601 without timezone offset) |
+`className` and `htmlFor` map to `class` and `for`. `style` and `data` accept arrays and are serialised to inline CSS and `data-*` attributes respectively, with camelCase keys converted to kebab-case. Array attribute values are flattened and space-joined. `null` omits the attribute; `true` renders it as a valueless boolean attribute.
 
-> **Note:** All attribute names are lowercased — camelCase names like `onClick` become `onclick`.
+Use `dangerouslySetInnerHTML` to inject raw HTML — value must be `['__html' => '...']` and is **not** escaped; only use with trusted content.
 
 #### Renderer options
 
-| Property | Type | Default | Description |
-|---|---|---|---|
-| `$pretty` | `bool` | `false` | Enable indented output (public property, set directly) |
-| `$indentation` | `string` | `"\t"` | Indentation string used when `$pretty` is `true` (public property) |
-| `$void` | `bool` | `false` | Use HTML5-style `>` instead of XHTML-style `/>` for void elements |
-| `$react` | `bool` | `false` | React-compatible whitespace: inserts `<!-- -->` comment markers around leading/trailing whitespace in text nodes |
-| `encoding` | `string` | `'UTF-8'` | Constructor argument: character encoding for `htmlspecialchars` — `new Renderer(encoding: 'ISO-8859-1')` |
+`$pretty` (bool) enables indented output; `$indentation` (string, default `"\t"`) sets the indent character. `$void` switches void elements to HTML5-style `>`. `$react` adds `<!-- -->` markers around whitespace-only text nodes for React-compatible output. Pass `encoding:` to the constructor to override the default `UTF-8`.
 
 ---
 
 ## Security
 
-### XSS prevention
-
-The `Renderer` automatically escapes all untrusted output using `htmlspecialchars` with `ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE`. This applies to every output path:
-
-| Context | Escaped |
-|---|---|
-| Text node strings | Yes — `<`, `>`, `&`, `"`, `'` all encoded |
-| Attribute values (string/numeric) | Yes — attribute break-out via `"` or `'` is prevented |
-| `style` object values | Yes — prevents HTML attribute break-out; CSS content itself is not sanitised |
-| `data-*` attribute values | Yes — same encoding as regular attributes |
-| `dangerouslySetInnerHTML` | **No** — raw HTML is intentionally injected; only use with trusted content |
-
-In addition, the renderer validates:
-
-- **Tag names** must match `^[a-zA-Z][a-zA-Z0-9\-\.]*$` — whitespace, angle brackets, quotes, and slashes are rejected
-- **Attribute names** must match `^[a-z][a-z0-9\-:._]*$` — whitespace and quotes are rejected
-- **Data attribute keys** are validated with the same pattern
-
-```php
-$renderer(['$', 'p', null, $userInput]);
-// <script>alert(1)</script>  →  &lt;script&gt;alert(1)&lt;/script&gt;
-
-$renderer(['$', 'div', ['title' => $userInput]]);
-// " onxss="1  →  title="&quot; onxss=&quot;1"
-
-// dangerouslySetInnerHTML bypasses all escaping — caller is responsible:
-$renderer(['$', 'div', ['dangerouslySetInnerHTML' => ['__html' => $trustedHtml]]]);
-```
+All text and attribute values are escaped via `htmlspecialchars` (`ENT_QUOTES | ENT_HTML5`). Tag and attribute names are validated against strict patterns. The only exception is `dangerouslySetInnerHTML`, which intentionally bypasses escaping — treat it like `innerHTML` and only pass trusted content.
 
 ---
 
@@ -248,8 +205,6 @@ Compile `.phpx` files to `.php` from the command line:
 ```shell
 php scripts/compile.php path/to/component.phpx
 ```
-
-This reads the `.phpx` file, compiles it, and writes the output to a `.php` file with the same name.
 
 ---
 
