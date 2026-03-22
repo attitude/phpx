@@ -19,7 +19,9 @@ final class Renderer {
   }
 
   public function getNodeType(array $node): string|\Closure {
-    assert($node[0] === '$', "Serialized node requires first element to be '$', got `{$node[0]}` instead.");
+    if (!array_key_exists(0, $node) || $node[0] !== '$') {
+      throw new \InvalidArgumentException("Serialized node requires first element to be '$', got `" . (array_key_exists(0, $node) ? $node[0] : 'undefined') . "` instead.");
+    }
     return $node[1];
   }
 
