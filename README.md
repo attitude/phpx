@@ -178,7 +178,7 @@ echo $renderer(['$', $greet, ['name' => 'Alice']]);
 // <span>Hi, Alice!</span>
 ```
 
-Any PHP callable works; children are passed via `$props['children']`.
+When used directly as the element type (index 1 of the node array), only a `\Closure` is supported. In the components map, however, values may be any PHP callable (accepting 0 or 1 parameter); children are passed via `$props['children']`.
 
 #### Prop conventions
 
