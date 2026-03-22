@@ -227,6 +227,36 @@ describe('Attitude\ArrayRenderer\HTML', function () {
     expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
   });
 
+  it('renders dangerouslySetInnerHTML via a special Fragment component name', function () {
+    $html = ['$', 'article', null, [
+      ['$', 'Fragment', ['dangerouslySetInnerHTML' => ['__html' => '<h1>Raw Title</h1><p>Raw paragraph.</p>']]],
+    ]];
+
+    $expected = '<article><h1>Raw Title</h1><p>Raw paragraph.</p></article>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('renders dangerouslySetInnerHTML in a Closure component', function () {
+    $Button = fn(array $props) => ['$', 'button', [
+      'type' => 'button',
+      'class' => 'btn',
+      'dangerouslySetInnerHTML' => ['__html' => '<strong>Save</strong>'],
+    ]];
+
+    $html = ['$', $Button];
+
+    $expected = '<button type="button" class="btn"><strong>Save</strong></button>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('throws when Fragment receives both dangerouslySetInnerHTML and children', function () {
+    $html = ['$', 'Fragment', ['dangerouslySetInnerHTML' => ['__html' => '<b>raw</b>']], 'child text'];
+
+    expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+  });
+
   it('handles nested fragments', function () {
     $html = ['$', 'div', ['class' => 'container'], [
       [
