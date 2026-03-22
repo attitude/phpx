@@ -155,7 +155,7 @@ echo $renderer(null);         // (empty)
 echo $renderer(true);         // (empty)
 ```
 
-#### Named components
+#### Components
 
 Pass an associative array of named components as closures. Each component receives a `$props` array (including `children`):
 
@@ -170,7 +170,7 @@ echo $renderer($node, [
 // <p>Hello, World!</p>
 ```
 
-A closure that declares no parameters is called without arguments:
+A component that declares no parameters is called without arguments:
 
 ```php
 $node = ['$', 'Timestamp', null];
@@ -192,15 +192,40 @@ echo $renderer(['$', $greet, ['name' => 'Alice']]);
 // <span>Hi, Alice!</span>
 ```
 
+Other callable types:
+
+```php
+// Named function
+function MyHeading(array $props): array {
+    return ['$', 'h2', null, $props['children']];
+}
+echo $renderer(['$', 'MyHeading', null, 'Title'], ['MyHeading' => 'MyHeading']);
+// <h2>Title</h2>
+
+// Static method
+echo $renderer(['$', 'Foo', null], ['Foo' => 'MyClass::render']);
+echo $renderer(['$', 'Foo', null], ['Foo' => ['MyClass', 'render']]);
+
+// Instance method
+$obj = new MyComponent();
+echo $renderer(['$', 'Foo', null], ['Foo' => [$obj, 'render']]);
+```
+
 #### Prop conventions
 
 | Prop | Behaviour |
 |---|---|
-| `className` | Rendered as `class` (or kept as-is when `$react = true`) |
-| `class` (array) | Array values joined with a space: `['a', 'b']` → `class="a b"` |
-| `style` (object) | `stdClass` properties serialised to inline CSS: `color:red;font-size:16px` |
-| `dangerouslySetInnerHTML` | Raw HTML injected without escaping (cannot be combined with `children`) |
+| `className` | Rendered as `class` |
 | `htmlFor` | Rendered as `for` |
+| `class` (array) | Array values joined with a space: `['a', 'b']` → `class="a b"` |
+| `style` (array/object) | Properties serialised to inline CSS with camelCase → kebab-case conversion: `['fontSize' => '16px']` → `font-size:16px` |
+| `data` (array/object) | Expanded to `data-*` attributes with camelCase → kebab-case conversion |
+| `dangerouslySetInnerHTML` | Raw HTML injected without escaping; value must be `['__html' => '...']` (cannot be combined with `children`) |
+| Boolean (`true`) | Rendered as a valueless attribute: `['checked' => true]` → `checked` |
+| `null` value | Attribute is omitted from output |
+| `DateTime` / `DateTimeImmutable` | Formatted as `Y-m-d\TH:i:s` (ISO 8601 without timezone offset) |
+
+> **Note:** All attribute names are lowercased — camelCase names like `onClick` become `onclick`.
 
 #### Pretty-printing
 
@@ -215,8 +240,8 @@ $renderer->indentation = '  '; // default: "\t"
 |---|---|---|---|
 | `$pretty` | `bool` | `false` | Enable indented output |
 | `$indentation` | `string` | `"\t"` | Indentation string used when `$pretty` is `true` |
-| `$void` | `bool` | `false` | Self-close all elements (e.g. for XML output) |
-| `$react` | `bool` | `false` | React-compatible output (`className` kept as-is) |
+| `$void` | `bool` | `false` | Use HTML5-style `>` instead of XHTML-style `/>` for void elements |
+| `$react` | `bool` | `false` | React-compatible whitespace: inserts `<!-- -->` comment markers around leading/trailing whitespace in text nodes |
 | `$encoding` | `string` | `'UTF-8'` | Character encoding for `htmlspecialchars` escaping |
 
 ---
@@ -235,6 +260,12 @@ The `Renderer` automatically escapes all untrusted output using `htmlspecialchar
 | `data-*` attribute values | Yes — same encoding as regular attributes |
 | `dangerouslySetInnerHTML` | **No** — raw HTML is intentionally injected; only use with trusted content |
 
+In addition, the renderer validates:
+
+- **Tag names** must match `^[a-zA-Z][a-zA-Z0-9\-\.]*$` — whitespace, angle brackets, quotes, and slashes are rejected
+- **Attribute names** must match `^[a-z][a-z0-9\-:._]*$` — whitespace and quotes are rejected
+- **Data attribute keys** are validated with the same pattern
+
 **Safe by default:**
 
 ```php
@@ -251,17 +282,30 @@ $renderer(['$', 'div', ['title' => $userInput]]);
 
 ```php
 // Raw HTML — you are responsible for sanitising $trustedHtml:
-$renderer(['$', 'div', ['dangerouslySetInnerHTML' => $trustedHtml]]);
+$renderer(['$', 'div', ['dangerouslySetInnerHTML' => ['__html' => $trustedHtml]]]);
 ```
+
+---
+
+## CLI compilation
+
+Compile `.phpx` files to `.php` from the command line:
+
+```shell
+php scripts/compile.php path/to/component.phpx
+```
+
+This reads the `.phpx` file, compiles it, and writes the output to a `.php` file with the same name.
 
 ---
 
 ## Running tests
 
 ```shell
-composer test           # run the test suite
-composer test:watch     # re-run on file changes
-composer test:coverage  # generate a coverage report
+composer test                    # run the test suite
+composer test:watch              # re-run on file changes
+composer test:coverage           # generate a coverage report
+composer test:update-snapshots   # update test snapshots
 ```
 
 ---
