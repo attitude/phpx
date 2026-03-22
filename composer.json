@@ -13,7 +13,7 @@
 		"test": "./vendor/bin/pest",
 		"test:update-snapshots": "./vendor/bin/pest --update-snapshots",
 		"test:coverage": "./vendor/bin/pest --coverage",
-		"test:watch": "COMPOSER_PROCESS_TIMEOUT=0 ./tests/watch-tests.sh"
+		"test:watch": "./tests/watch-tests.sh"
 	},
 	"minimum-stability": "dev",
 	"autoload": {
