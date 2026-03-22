@@ -159,6 +159,78 @@ describe('Attitude\ArrayRenderer\HTML', function () {
     expect((new Renderer)($html))->toBe($expected);
   });
 
+  it('resolves style from a recursive array of objects with falsy filtering', function () {
+    $isActive = true;
+    $isLarge = false;
+
+    $html = ['$', 'div', [
+      'style' => [
+        (object) ['color' => 'red'],
+        $isActive ? (object) ['fontWeight' => 'bold'] : null,
+        $isLarge ? (object) ['fontSize' => '24px'] : null,
+        null,
+        [
+          (object) ['margin' => '0'],
+          false,
+        ],
+      ],
+    ]];
+
+    $expected = '<div style="color:red;font-weight:bold;margin:0"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('filters null and false values within a resolved style object', function () {
+    $html = ['$', 'div', [
+      'style' => (object) ['color' => 'red', 'display' => null, 'opacity' => false, 'margin' => '0'],
+    ]];
+
+    $expected = '<div style="color:red;margin:0"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('allows later style objects to override earlier ones', function () {
+    $html = ['$', 'div', [
+      'style' => [
+        (object) ['color' => 'red', 'margin' => '10px'],
+        (object) ['color' => 'blue'],
+      ],
+    ]];
+
+    $expected = '<div style="color:blue;margin:10px"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('skips style attribute entirely when all values resolve to falsy', function () {
+    $html = ['$', 'div', [
+      'style' => [false, null],
+      'class' => 'box',
+    ]];
+
+    $expected = '<div class="box"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('throws on invalid true style values', function () {
+    $html = ['$', 'div', [
+      'style' => (object) [true],
+    ]];
+
+    expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+  });
+
+  it('throws on invalid empty string style values', function () {
+    $html = ['$', 'div', [
+      'style' => (object) [''],
+    ]];
+
+    expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+  });
+
   it('maps className to class attribute', function () {
     $html = ['$', 'div', ['className' => 'my-class'], 'content'];
 
@@ -283,7 +355,7 @@ describe('Attitude\ArrayRenderer\HTML', function () {
       ],
     ]];
 
-    $expected = '<div data-attribute="value" data-active></div>';
+    $expected = '<div data-attribute="value" data-baz="false" data-active="true"></div>';
 
     expect((new Renderer)($html))->toBe($expected);
   });
@@ -548,7 +620,7 @@ HTML;
       ['$', 'input', ['type'=>'checkbox', 'checked'=>true, 'disabled'=>true]],
     ]];
 
-    $expected = '<div data-foo><input type="checkbox" checked disabled /></div>';
+    $expected = '<div data-foo="true"><input type="checkbox" checked disabled /></div>';
 
     expect((new Renderer)($html))->toBe($expected);
   });
@@ -558,7 +630,256 @@ HTML;
       ['$', 'input', ['type'=>'checkbox', 'checked'=>true, 'disabled'=>true]],
     ]];
 
-    $expected = '<div data-foo data-bar="2"><input type="checkbox" checked disabled /></div>';
+    $expected = '<div data-foo="true" data-bar="2"><input type="checkbox" checked disabled /></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('renders direct aria-* attributes', function () {
+    $html = ['$', 'button', [
+      'aria-label' => 'Close',
+      'aria-expanded' => false,
+      'aria-pressed' => true,
+      'aria-disabled' => null,
+    ]];
+
+    // false → "false", true → "true", null → omitted
+    $expected = '<button aria-label="Close" aria-expanded="false" aria-pressed="true"></button>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('renders aria attributes passed as an object', function () {
+    $html = ['$', 'button', [
+      'aria' => (object) [
+        'label' => 'Close',
+        'expanded' => false,
+        'pressed' => true,
+        'hidden' => null,
+      ],
+    ]];
+
+    // false → "false" (meaningful in ARIA), true → "true", null → omitted
+    $expected = '<button aria-label="Close" aria-expanded="false" aria-pressed="true"></button>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('renders aria attributes passed as an array', function () {
+    $html = ['$', 'div', [
+      'role' => 'dialog',
+      'aria' => ['labelledby' => 'title-id', 'describedby' => 'desc-id'],
+    ]];
+
+    $expected = '<div role="dialog" aria-labelledby="title-id" aria-describedby="desc-id"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('renders camelCase aria keys as lowercase (no mid-word hyphens)', function () {
+    $html = ['$', 'div', [
+      'aria' => (object) ['labelledBy' => 'title', 'describedBy' => 'desc', 'testId' => '123'],
+    ]];
+
+    $expected = '<div aria-labelledby="title" aria-describedby="desc" aria-testid="123"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('produces valid ARIA attribute names for camelCase sub-keys', function () {
+    $html = ['$', 'div', [
+      'aria' => (object) [
+        'labelledBy' => 'heading-id',
+        'describedBy' => 'desc-id',
+        'activeDescendant' => 'item-1',
+      ],
+    ]];
+
+    // Correct ARIA attribute names have no mid-word hyphens.
+    $valid = '<div aria-labelledby="heading-id" aria-describedby="desc-id" aria-activedescendant="item-1"></div>';
+
+    $rendered = (new Renderer)($html);
+    expect($rendered)->toBe($valid);
+  });
+
+  it('escapes special chars in aria attribute values', function () {
+    $html = ['$', 'button', [
+      'aria' => (object) ['label' => '"Close" & <dialog>'],
+    ]];
+
+    $expected = '<button aria-label="&quot;Close&quot; &amp; &lt;dialog&gt;"></button>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('throws InvalidArgumentException for an invalid aria key', function () {
+    $html = ['$', 'div', ['aria' => (object) ['bad key' => 'value']]];
+
+    expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+  });
+
+  it('renders generic namespaced attributes via an object', function () {
+    $html = ['$', 'div', [
+      'x' => (object) ['foo' => 'bar', 'baz' => null, 'active' => true, 'hidden' => false],
+    ]];
+
+    // All namespaces use string booleans consistently
+    $expected = '<div x-foo="bar" x-active="true" x-hidden="false"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('renders generic namespaced attributes via an associative array', function () {
+    $html = ['$', 'div', [
+      'my' => ['ns' => 'one', 'other' => 'two'],
+    ]];
+
+    $expected = '<div my-ns="one" my-other="two"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('does not treat an indexed array value as a namespace', function () {
+    // 'foo' has an indexed array — should space-join like class, not expand as namespace
+    $html = ['$', 'div', ['foo' => ['a', 'b']]];
+
+    $expected = '<div foo="a b"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('resolves namespaced attrs from a recursive array of objects', function () {
+    $isEditable = true;
+    $isHidden = false;
+
+    $html = ['$', 'div', [
+      'data' => [
+        (object) ['id' => '123'],
+        $isEditable ? (object) ['editable' => true] : null,
+        $isHidden ? (object) ['hidden' => true] : null,
+        null,
+      ],
+    ]];
+
+    $expected = '<div data-id="123" data-editable="true"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('resolves aria attrs from a recursive array of objects', function () {
+    $isExpanded = true;
+
+    $html = ['$', 'button', [
+      'aria' => [
+        (object) ['label' => 'Menu'],
+        $isExpanded ? (object) ['expanded' => true] : null,
+      ],
+    ]];
+
+    $expected = '<button aria-label="Menu" aria-expanded="true"></button>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('filters falsy values from class arrays', function () {
+    $isPrimary = true;
+    $isLarge = false;
+
+    $html = ['$', 'div', [
+      'class' => ['btn', $isPrimary ? 'btn-primary' : null, $isLarge ? 'btn-lg' : null, null],
+    ]];
+
+    $expected = '<div class="btn btn-primary"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('renders class from an object using clsx-like behavior', function () {
+    $html = ['$', 'div', [
+      'class' => (object) ['active' => true, 'disabled' => false, 'highlighted' => true],
+    ]];
+
+    $expected = '<div class="active highlighted"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('renders class from an associative array using clsx-like behavior', function () {
+    $html = ['$', 'button', [
+      'class' => ['btn' => true, 'btn-primary' => true, 'btn-lg' => false],
+    ]];
+
+    $expected = '<button class="btn btn-primary"></button>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('resolves class from a recursive array of objects (clsx-like)', function () {
+    $isActive = true;
+    $isLarge = false;
+
+    $html = ['$', 'div', [
+      'class' => [
+        (object) ['base' => true, 'container' => true],
+        $isActive ? (object) ['active' => true] : null,
+        $isLarge ? (object) ['large' => true] : null,
+      ],
+    ]];
+
+    $expected = '<div class="base container active"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('omits class attribute when all object values are falsy', function () {
+    $html = ['$', 'div', [
+      'class' => (object) ['disabled' => false, 'hidden' => false],
+      'id' => 'test',
+    ]];
+
+    $expected = '<div id="test"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('renders a Stringable object as its string value', function () {
+    $obj = new class implements \Stringable {
+      public function __toString(): string {
+        return 'custom-value';
+      }
+    };
+
+    $html = ['$', 'div', ['data-info' => $obj]];
+
+    $expected = '<div data-info="custom-value"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('escapes HTML in Stringable object output', function () {
+    $obj = new class implements \Stringable {
+      public function __toString(): string {
+        return '<script>alert("xss")</script>';
+      }
+    };
+
+    $html = ['$', 'div', ['title' => $obj]];
+
+    $expected = '<div title="&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;"></div>';
+
+    expect((new Renderer)($html))->toBe($expected);
+  });
+
+  it('uses Stringable __toString() for style attribute instead of CSS parsing', function () {
+    $style = new class implements \Stringable {
+      public function __toString(): string {
+        return 'color:red;font-weight:bold';
+      }
+    };
+
+    $html = ['$', 'div', ['style' => $style]];
+
+    $expected = '<div style="color:red;font-weight:bold"></div>';
 
     expect((new Renderer)($html))->toBe($expected);
   });
