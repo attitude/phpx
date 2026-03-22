@@ -70,14 +70,6 @@ final class Renderer {
   private function callComponent(\Closure|callable $component, array $props): mixed {
     if ($component instanceof \Closure) {
       $arity = $this->arityCache[$component] ?? ($this->arityCache[$component] = (new \ReflectionFunction($component))->getNumberOfParameters());
-    } else if (is_array($component)) {
-      // [$object|$class, $method]
-      $rf = new \ReflectionMethod($component[0], $component[1]);
-      $arity = $rf->getNumberOfParameters();
-    } else if (is_string($component) && str_contains($component, '::')) {
-      [$class, $method] = explode('::', $component, 2);
-      $rf = new \ReflectionMethod($class, $method);
-      $arity = $rf->getNumberOfParameters();
     } else {
       $arity = (new \ReflectionFunction(\Closure::fromCallable($component)))->getNumberOfParameters();
     }
@@ -95,176 +87,164 @@ final class Renderer {
   protected function renderNode(bool|int|float|string|array|null $node, int $nesting): string {
     if (is_string($node) || is_numeric($node)) {
       return htmlspecialchars((string) $node, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
-    } else if (is_bool($node) || is_null($node)) {
+    }
+    if (is_bool($node) || is_null($node)) {
       return '';
-    } else if (is_array($node)) {
-      if (empty($node)) {
-        return '';
-      } else if ($node[0] === '$') {
-        $type = $this->getNodeType($node);
-
-        $nodeProps = $this->getNodeProps($node);
-
-        $childrenProps = $this->getNodeChildrenProps($node);
-        $props = array_merge($nodeProps, $childrenProps);
-
-        if ($type instanceof \Closure) {
-          return $this->renderNode($this->callComponent($type, $props), $nesting);
-        }
-
-        if (array_key_exists($type, $this->components)) {
-          return $this->renderNode($this->callComponent($this->components[$type], $props), $nesting);
-        }
-
-        // Validate the tag name to prevent tag-name injection
-        if (!preg_match('/^[a-zA-Z][a-zA-Z0-9\-\.]*$/', $type)) {
-          throw new \InvalidArgumentException("Invalid HTML tag name: `{$type}`");
-        }
-
-        $shouldEscapeHtml = true;
-
-        if (array_key_exists('dangerouslySetInnerHTML', $props)) {
-          $children = $props['dangerouslySetInnerHTML'];
-          unset($props['dangerouslySetInnerHTML']);
-          $shouldEscapeHtml = false;
-
-          if (array_key_exists('children', $props)) {
-            // Throw error in development mode
-            throw new \Exception("Can't use children and dangerouslySetInnerHTML at the same time");
-          }
-        } else {
-          $children = $props['children'] ?? [];
-        }
-
-        unset($props['children']);
-
-        $attributeString = [];
-
-        foreach ($props as $key => $value) {
-          if ($key === 'className') {
-            $key = 'class';
-          } else if ($key === 'htmlFor') {
-            $key = 'for';
-          }
-
-          $key = strtolower($key);
-
-          // Validate attribute name to prevent name-injection attacks
-          if (!preg_match('/^[a-z][a-z0-9\-:._]*$/', $key)) {
-            throw new \InvalidArgumentException("Invalid attribute name: `{$key}`");
-          }
-
-          if ($value !== null) {
-            if (is_bool($value)) {
-              if ($value === true) {
-                $attributeString[] = $key;
-              }
-
-              continue;
-            } else if ($key === "style" && (is_object($value) || is_array($value))) {
-              $styleString = "";
-              foreach ((array) $value as $styleKey => $styleValue) {
-                // Transform key from camelCase to kebab-case
-                $styleKey = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $styleKey));
-                $styleString .= "$styleKey:$styleValue;";
-              }
-              $value = htmlspecialchars(rtrim($styleString, ';'), ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
-            } else if ($key === "data" && (is_object($value) || is_array($value))) {
-              foreach ((array) $value as $dataKey => $dataValue) {
-                // Normalize data key to kebab-case and validate to prevent name-injection
-                $dataKey = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', (string) $dataKey));
-                if (!preg_match('/^[a-z][a-z0-9\-:._]*$/', $dataKey)) {
-                  throw new \InvalidArgumentException("Invalid data attribute key: `{$dataKey}`");
-                }
-
-                if (is_bool($dataValue)) {
-                  if ($dataValue === true) {
-                    $attributeString[] = "data-$dataKey";
-                  }
-
-                  continue;
-                } else if (is_null($dataValue)) {
-                  continue;
-                }
-
-                $attributeString[] = "data-$dataKey=\"" . htmlspecialchars((string) $dataValue, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) . "\"";
-              }
-
-              continue;
-            } else if (is_array($value)) {
-              $_flattened = [];
-
-              // Flatten array
-              array_walk_recursive($value, function ($a) use (&$_flattened) {
-                $_flattened[] = $a;
-              });
-
-              $value = htmlspecialchars(implode(" ", $_flattened), ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
-            } else if ($value instanceof \DateTimeInterface) {
-              $value = $value->format('Y-m-d\TH:i:s');
-            } else {
-              $value = htmlspecialchars((string) $value, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
-            }
-
-            $attributeString[] = "$key=\"$value\"";
-          }
-        }
-
-        $attributeString = implode(" ", $attributeString);
-
-        if (is_string($children)) {
-          $childrenRendered = $shouldEscapeHtml ? htmlspecialchars($children, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) : $children;
-        } else {
-          $childrenRendered = $this->renderNode($children, $nesting + 1);
-
-          if ($this->pretty && (strstr($childrenRendered, "\n") || strstr($childrenRendered, "<"))) {
-            $childrenRendered = "\n".$this->format($childrenRendered, $nesting + 1)."\n".$this->format('', $nesting);
-          }
-        }
-
-        // Handle void elements:
-        if (in_array($type, ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'])) {
-          return "<$type".(empty($attributeString) ? '' : ' ' . $attributeString).($this->void ? ">" : " />");
-        } else {
-          return "<$type".(empty($attributeString) ? '' : ' ' . $attributeString).">{$childrenRendered}</$type>";
-        }
-      } else {
-        $children = self::concatenateStringMembers($node, $this->react, $this->encoding);
-
-        $childrenRendered = [];
-
-        $previousChildWasElement = false;
-
-        foreach ($children as $child) {
-          if (is_array($child)) {
-            if (!array_key_exists(0, $child)) {
-              throw new \InvalidArgumentException("Fragment child must be a serialized node array (starting with '\$') or a nested children array, got an associative or empty array instead.");
-            }
-            if ($child[0] === '$') {
-              $_child = $this->renderNode($child, $nesting);
-
-              if ($this->pretty) {
-                if ($previousChildWasElement) {
-                  $_child = "\n".$this->format($_child, $nesting);
-                }
-              }
-
-              $childrenRendered[] = $_child;
-              $previousChildWasElement = true;
-            } else {
-              throw new \Exception("Unexpected unflattened array in children");
-            }
-          } else if (is_string($child) || is_numeric($child)) {
-            $childrenRendered[] = (string) $child;
-            $previousChildWasElement = false;
-          }
-        }
-
-        return implode('', $childrenRendered);
-      }
-    } else {
+    }
+    if (!is_array($node)) {
       throw new \Exception("Invalid node type: `" . gettype($node) . "`");
     }
+    if (empty($node)) {
+      return '';
+    }
+    if (($node[0] ?? null) !== '$') {
+      return $this->renderFragment($node, $nesting);
+    }
+
+    $type = $this->getNodeType($node);
+    $props = $this->getNodeProps($node);
+    if (array_key_exists(3, $node)) {
+      $props['children'] = $node[3];
+    }
+
+    if ($type instanceof \Closure || array_key_exists($type, $this->components)) {
+      $component = $type instanceof \Closure ? $type : $this->components[$type];
+      return $this->renderNode($this->callComponent($component, $props), $nesting);
+    }
+
+    if (!preg_match('/^[a-zA-Z][a-zA-Z0-9\-\.]*$/', $type)) {
+      throw new \InvalidArgumentException("Invalid HTML tag name: `{$type}`");
+    }
+
+    if (array_key_exists('dangerouslySetInnerHTML', $props)) {
+      if (array_key_exists('children', $props)) {
+        throw new \Exception("Can't use children and dangerouslySetInnerHTML at the same time");
+      }
+      $children = $props['dangerouslySetInnerHTML'];
+      $escapeChildren = false;
+      unset($props['dangerouslySetInnerHTML']);
+    } else {
+      $children = $props['children'] ?? [];
+      $escapeChildren = true;
+    }
+
+    unset($props['children']);
+
+    $attrs = $this->renderAttributes($props);
+
+    if (is_string($children)) {
+      $childrenHtml = $escapeChildren
+        ? htmlspecialchars($children, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding)
+        : $children;
+    } else {
+      $childrenHtml = $this->renderNode($children, $nesting + 1);
+      if ($this->pretty && (strstr($childrenHtml, "\n") || strstr($childrenHtml, "<"))) {
+        $childrenHtml = "\n" . $this->format($childrenHtml, $nesting + 1) . "\n" . $this->format('', $nesting);
+      }
+    }
+
+    $open = "<$type" . ($attrs !== '' ? " $attrs" : '');
+    if (in_array($type, ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'])) {
+      return $open . ($this->void ? '>' : ' />');
+    }
+    return "$open>$childrenHtml</$type>";
+  }
+
+  private function renderAttributes(array $props): string {
+    $parts = [];
+
+    foreach ($props as $key => $value) {
+      if ($key === 'className')
+        $key = 'class';
+      else if ($key === 'htmlFor')
+        $key = 'for';
+
+      $key = strtolower($key);
+
+      if (!preg_match('/^[a-z][a-z0-9\-:._]*$/', $key)) {
+        throw new \InvalidArgumentException("Invalid attribute name: `{$key}`");
+      }
+
+      if ($value === null)
+        continue;
+
+      if (is_bool($value)) {
+        if ($value)
+          $parts[] = $key;
+        continue;
+      }
+
+      if ($key === 'style' && (is_array($value) || is_object($value))) {
+        $css = '';
+        foreach ((array) $value as $prop => $val) {
+          $css .= strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $prop)) . ":$val;";
+        }
+        $parts[] = "style=\"" . htmlspecialchars(rtrim($css, ';'), ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) . "\"";
+        continue;
+      }
+
+      if ($key === 'data' && (is_array($value) || is_object($value))) {
+        foreach ((array) $value as $dataKey => $dataValue) {
+          $dataKey = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', (string) $dataKey));
+          if (!preg_match('/^[a-z][a-z0-9\-:._]*$/', $dataKey)) {
+            throw new \InvalidArgumentException("Invalid data attribute key: `{$dataKey}`");
+          }
+          if ($dataValue === null)
+            continue;
+          if (is_bool($dataValue)) {
+            if ($dataValue)
+              $parts[] = "data-$dataKey";
+            continue;
+          }
+          $parts[] = "data-$dataKey=\"" . htmlspecialchars((string) $dataValue, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) . "\"";
+        }
+        continue;
+      }
+
+      if (is_array($value)) {
+        $flat = [];
+        array_walk_recursive($value, function ($v) use (&$flat) {
+          $flat[] = $v; });
+        $parts[] = "$key=\"" . htmlspecialchars(implode(' ', $flat), ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) . "\"";
+        continue;
+      }
+
+      if ($value instanceof \DateTimeInterface) {
+        $parts[] = "$key=\"{$value->format('Y-m-d\TH:i:s')}\"";
+        continue;
+      }
+
+      $parts[] = "$key=\"" . htmlspecialchars((string) $value, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) . "\"";
+    }
+
+    return implode(' ', $parts);
+  }
+
+  private function renderFragment(array $node, int $nesting): string {
+    $parts = [];
+    $previousWasElement = false;
+
+    foreach (self::concatenateStringMembers($node, $this->react, $this->encoding) as $child) {
+      if (is_array($child)) {
+        if (!array_key_exists(0, $child)) {
+          throw new \InvalidArgumentException("Fragment child must be a serialized node array (starting with '\$') or a nested children array, got an associative or empty array instead.");
+        }
+        if ($child[0] !== '$') {
+          throw new \Exception("Unexpected unflattened array in children");
+        }
+        $rendered = $this->renderNode($child, $nesting);
+        if ($this->pretty && $previousWasElement) {
+          $rendered = "\n" . $this->format($rendered, $nesting);
+        }
+        $parts[] = $rendered;
+        $previousWasElement = true;
+      } else if (is_string($child) || is_numeric($child)) {
+        $parts[] = (string) $child;
+        $previousWasElement = false;
+      }
+    }
+
+    return implode('', $parts);
   }
 
   protected static function concatenateStringMembers(array $array, bool $react, string $encoding = 'UTF-8'): array {
