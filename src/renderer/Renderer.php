@@ -22,6 +22,12 @@ final class Renderer {
     if (!array_key_exists(0, $node) || $node[0] !== '$') {
       throw new \InvalidArgumentException("Serialized node requires first element to be '$', got `" . (array_key_exists(0, $node) ? $node[0] : 'undefined') . "` instead.");
     }
+    if (!array_key_exists(1, $node)) {
+      throw new \InvalidArgumentException("Serialized node is missing the type at index 1.");
+    }
+    if (!is_string($node[1]) && !($node[1] instanceof \Closure)) {
+      throw new \InvalidArgumentException("Serialized node type must be a string or Closure, got `" . gettype($node[1]) . "` instead.");
+    }
     return $node[1];
   }
 
@@ -126,6 +132,11 @@ final class Renderer {
           // Transform key from camelCase to kebab-case
           $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $key));
 
+          // Validate attribute name to prevent name-injection attacks
+          if (!preg_match('/^[a-z][a-z0-9\-:._]*$/', $key)) {
+            throw new \InvalidArgumentException("Invalid attribute name: `{$key}`");
+          }
+
           if ($value !== null) {
             if (is_bool($value)) {
               if ($value === true) {
@@ -145,6 +156,12 @@ final class Renderer {
               $value = htmlspecialchars((string) $value, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
             } else if ($key === "data" && (is_object($value) || is_array($value))) {
               foreach ((array) $value as $dataKey => $dataValue) {
+                // Normalize data key to kebab-case and validate to prevent name-injection
+                $dataKey = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', (string) $dataKey));
+                if (!preg_match('/^[a-z][a-z0-9\-:._]*$/', $dataKey)) {
+                  throw new \InvalidArgumentException("Invalid data attribute key: `{$dataKey}`");
+                }
+
                 if (is_bool($dataValue)) {
                   if ($dataValue === true) {
                     $attributeString[] = "data-$dataKey";
@@ -173,7 +190,7 @@ final class Renderer {
 
               $value = htmlspecialchars(implode(" ", $_flattened), ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
             } else if ($value instanceof \JsonSerializable) {
-              $value = htmlspecialchars(json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES);
+              $value = htmlspecialchars(json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
             } else if ($value instanceof \DateTime || $value instanceof \DateTimeImmutable) {
               $value = $value->format('c');
             } else if ($value instanceof \stdClass) {
