@@ -188,7 +188,7 @@ Use `dangerouslySetInnerHTML` to inject raw HTML — value must be `['__html' =>
 
 #### Renderer options
 
-`$pretty` (bool) enables indented output; `$indentation` (string, default `"\t"`) sets the indent character. `$void` switches void elements to HTML5-style `>`. `$react` adds `<!-- -->` markers around whitespace-only text nodes for React-compatible output. Pass `encoding:` to the constructor to override the default `UTF-8`.
+`$pretty` (bool) enables indented output; `$indentation` (string, default `"\t"`) sets the indent character. `$void` switches void elements to HTML5-style `>`. `$react` adds `<!-- -->` markers around leading and trailing whitespace in string children (even when the text also contains non-whitespace) for React-compatible output. Pass `encoding:` to the constructor to override the default `UTF-8`.
 
 ---
 
