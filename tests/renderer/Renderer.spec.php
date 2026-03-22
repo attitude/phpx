@@ -604,7 +604,7 @@ HTML;
       ['$', 'input', ['type'=>'checkbox', 'checked'=>true, 'disabled'=>true]],
     ]];
 
-    $expected = '<div data-foo><input type="checkbox" checked disabled /></div>';
+    $expected = '<div data-foo="true"><input type="checkbox" checked disabled /></div>';
 
     expect((new Renderer)($html))->toBe($expected);
   });
@@ -622,11 +622,13 @@ HTML;
   it('renders direct aria-* attributes', function () {
     $html = ['$', 'button', [
       'aria-label' => 'Close',
-      'aria-expanded' => 'false',
+      'aria-expanded' => false,
+      'aria-pressed' => true,
       'aria-disabled' => null,
     ]];
 
-    $expected = '<button aria-label="Close" aria-expanded="false"></button>';
+    // false → "false", true → "true", null → omitted
+    $expected = '<button aria-label="Close" aria-expanded="false" aria-pressed="true"></button>';
 
     expect((new Renderer)($html))->toBe($expected);
   });
