@@ -8,6 +8,17 @@ PEST="$PROJECT_ROOT/vendor/bin/pest"
 
 cd "$PROJECT_ROOT"
 
+if [[ "${COMPOSER_PROCESS_TIMEOUT:-300}" != "0" ]]; then
+    BLUE=$'\033[38;2;96;165;250m'
+    RED=$'\033[38;2;239;68;68m'
+    RESET=$'\033[0m'
+    echo "${RED}COMPOSER_PROCESS_TIMEOUT is not set to 0. Composer will kill this process after ${COMPOSER_PROCESS_TIMEOUT:-300}s.${RESET}" >&2
+    echo "Run with: ${BLUE}COMPOSER_PROCESS_TIMEOUT=0 composer test:watch${RESET}" >&2
+    echo "" >&2
+
+    exit 0
+fi
+
 if [[ ! -f "$PEST" ]]; then
     echo "Error: Pest binary not found at $PEST" >&2
     echo "Run: composer install" >&2
@@ -43,18 +54,20 @@ run_pest --parallel
 echo ""
 echo "Watching tests/ and src/ for changes..."
 
-fswatch -e '.*' -i '\.php$' \
-    "$PROJECT_ROOT/tests" \
-    "$PROJECT_ROOT/src" \
-  | while IFS= read -r changed_file; do
+while IFS= read -r changed_file; do
       relative_file="${changed_file#"$PROJECT_ROOT/"}"
 
       echo ""
-      if [[ "$relative_file" == tests/* ]]; then
-          echo "Test changed: $relative_file"
+      if echo "$relative_file" | grep -qiE '^tests/.*\.(spec|test)\.php$'; then
+          echo "Test file changed: $relative_file"
           run_pest "$relative_file"
+      elif [[ "$relative_file" == tests/* ]]; then
+          echo "Non-test helper/support file changed under tests/: $relative_file"
+          exit 0
       elif [[ "$relative_file" == src/* ]]; then
           echo "Source changed: $relative_file"
           run_pest --parallel
       fi
-  done
+  done < <(fswatch -e '.*' -i '\.php$' \
+    "$PROJECT_ROOT/tests" \
+    "$PROJECT_ROOT/src")
