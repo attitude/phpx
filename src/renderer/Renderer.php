@@ -38,9 +38,9 @@ final class Renderer {
     if (array_key_exists(3, $node)) {
       return ['children' => $node[3]];
     }
-    $props = $this->getNodeProps($node);
-    if (array_key_exists('children', $props)) {
-      return ['children' => $props['children']];
+    $nodeProps = $this->getNodeProps($node);
+    if (array_key_exists('children', $nodeProps)) {
+      return ['children' => $nodeProps['children']];
     }
     return [];
   }
@@ -69,19 +69,19 @@ final class Renderer {
         $type = $this->getNodeType($node);
         assert(is_string($type) || $type instanceof \Closure, "Type must be a string or closure.");
 
-        $props = $this->getNodeProps($node);
+        $nodeProps = $this->getNodeProps($node);
 
         $childrenProps = $this->getNodeChildrenProps($node);
-        $mergedProps = array_merge($props ?? [], $childrenProps);
+        $props = array_merge($nodeProps ?? [], $childrenProps);
 
         if (!is_string($type) && $type instanceof \Closure) {
           $arity = $this->arityCache[$type] ?? ($this->arityCache[$type] = (new \ReflectionFunction($type))->getNumberOfParameters());
-          $result = $arity === 0 ? $type() : $type($mergedProps);
+          $result = $arity === 0 ? $type() : $type($props);
           return $this->renderNode($result, $nesting);
         }
 
         if (array_key_exists($type, $this->components)) {
-          return $this->renderNode(call_user_func($this->components[$type], $mergedProps), $nesting);
+          return $this->renderNode(call_user_func($this->components[$type], $props), $nesting);
         }
 
         $shouldEscapeHtml = true;
@@ -96,7 +96,7 @@ final class Renderer {
             throw new \Exception("Can't use children and dangerouslySetInnerHTML at the same time");
           }
         } else {
-          $children = $mergedProps['children'] ?? [];
+          $children = $props['children'] ?? [];
         }
 
         unset($props['children']);
@@ -158,7 +158,7 @@ final class Renderer {
                 $_flattened[] = $a;
               });
 
-              $value = implode(" ", $value);
+              $value = implode(" ", $_flattened);
             } else if ($value instanceof \JsonSerializable) {
               $value = htmlspecialchars(json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES);
             } else if ($value instanceof \DateTime || $value instanceof \DateTimeImmutable) {
@@ -204,7 +204,6 @@ final class Renderer {
       } else {
         $children = self::concatenateStringMembers($node, $this->react);
 
-        $elements = 0;
         $childrenRendered = [];
 
         $previousChildWasElement = false;
@@ -212,7 +211,6 @@ final class Renderer {
         foreach ($children as $i => $child) {
           if (is_array($child)) {
             if ($child[0] === '$') {
-              $elements++;
               $_child = $this->renderNode($child, $nesting);
 
               if ($this->pretty) {
