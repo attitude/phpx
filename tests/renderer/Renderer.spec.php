@@ -701,5 +701,47 @@ HTML;
         'Wrapper' => fn(array $props) => ['$', 'div', ['title' => $props['label']], null],
       ]))->toBe('<div title="&lt;script&gt;alert(1)&lt;/script&gt;"></div>');
     });
+
+    it('throws InvalidArgumentException for an attribute name containing whitespace', function () {
+      $html = ['$', 'div', ['bad name' => 'value']];
+
+      expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('throws InvalidArgumentException for an attribute name containing quotes', function () {
+      $html = ['$', 'div', ['"evil"' => 'value']];
+
+      expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('throws InvalidArgumentException for an invalid data attribute key', function () {
+      $html = ['$', 'div', ['data' => ['"injected' => 'value']]];
+
+      expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('throws InvalidArgumentException for an invalid data key containing whitespace', function () {
+      $html = ['$', 'div', ['data' => ['bad key' => 'value']]];
+
+      expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+    });
+  });
+
+  describe('fragment child validation', function () {
+    it('throws InvalidArgumentException for an empty array child inside a fragment', function () {
+      $html = ['$', 'div', null, [
+        [],
+      ]];
+
+      expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('throws InvalidArgumentException for an associative array child (no index 0) inside a fragment', function () {
+      $html = ['$', 'div', null, [
+        ['key' => 'value'],
+      ]];
+
+      expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+    });
   });
 });

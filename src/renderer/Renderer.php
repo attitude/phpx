@@ -238,6 +238,9 @@ final class Renderer {
 
         foreach ($children as $child) {
           if (is_array($child)) {
+            if (!array_key_exists(0, $child)) {
+              throw new \InvalidArgumentException("Fragment child must be a serialized node array (starting with '\$') or a nested children array, got an associative or empty array instead.");
+            }
             if ($child[0] === '$') {
               $_child = $this->renderNode($child, $nesting);
 
@@ -303,6 +306,9 @@ final class Renderer {
         }
 
         if (is_array($item)) {
+          if (!array_key_exists(0, $item)) {
+            throw new \InvalidArgumentException("Fragment child must be a serialized node array (starting with '\$') or a nested children array, got an associative or empty array instead.");
+          }
           if ($item[0] === '$') {
             $combinedArray[] = $item;
           } else {
