@@ -102,16 +102,13 @@ final class Renderer {
         return '';
       } else if ($node[0] === '$') {
         $type = $this->getNodeType($node);
-        if (!is_string($type) && !($type instanceof \Closure)) {
-          throw new \InvalidArgumentException("Type must be a string or closure, got " . gettype($type) . ".");
-        }
 
         $nodeProps = $this->getNodeProps($node);
 
         $childrenProps = $this->getNodeChildrenProps($node);
         $props = array_merge($nodeProps, $childrenProps);
 
-        if (!is_string($type) && $type instanceof \Closure) {
+        if ($type instanceof \Closure) {
           return $this->renderNode($this->callComponent($type, $props), $nesting);
         }
 
