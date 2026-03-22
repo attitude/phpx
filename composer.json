@@ -33,6 +33,7 @@
 		"monolog/monolog": "^3.0"
 	},
 	"config": {
+        "process-timeout": 0,
 		"allow-plugins": {
 			"pestphp/pest-plugin": true
 		}
