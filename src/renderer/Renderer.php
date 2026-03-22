@@ -63,7 +63,7 @@ final class Renderer {
 
   private function resolveDangerouslySetInnerHTML(array $props): string {
     if (array_key_exists('children', $props)) {
-      throw new \Exception("Can't use children and dangerouslySetInnerHTML at the same time");
+      throw new \InvalidArgumentException("Can't use children and dangerouslySetInnerHTML at the same time");
     }
     $raw = $props['dangerouslySetInnerHTML'];
     if (!is_array($raw) || !array_key_exists('__html', $raw) || !is_string($raw['__html'])) {

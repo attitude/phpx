@@ -254,7 +254,7 @@ describe('Attitude\ArrayRenderer\HTML', function () {
   it('throws when Fragment receives both dangerouslySetInnerHTML and children', function () {
     $html = ['$', 'Fragment', ['dangerouslySetInnerHTML' => ['__html' => '<b>raw</b>']], 'child text'];
 
-    expect(fn() => (new Renderer)($html))->toThrow(\Exception::class);
+    expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
   });
 
   it('handles nested fragments', function () {
