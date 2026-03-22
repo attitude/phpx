@@ -76,9 +76,21 @@ final class Renderer {
     return str_repeat($this->indentation, max(0, $nesting)).$rendered;
   }
 
+  private function escape(mixed $value): string {
+    return htmlspecialchars((string) $value, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
+  }
+
+  private function formatAttribute(string $key, mixed $value): string {
+    return "$key=\"" . $this->escape($value) . "\"";
+  }
+
+  private function toKebabCase(string $value): string {
+    return strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $value));
+  }
+
   private function renderNode(bool|int|float|string|array|null $node, int $nesting): string {
     if (is_string($node) || is_numeric($node)) {
-      return htmlspecialchars((string) $node, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
+      return $this->escape($node);
     }
     if (is_bool($node) || is_null($node)) {
       return '';
@@ -127,7 +139,7 @@ final class Renderer {
 
     if (is_string($children)) {
       $childrenHtml = $escapeChildren
-        ? htmlspecialchars($children, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding)
+        ? $this->escape($children)
         : $children;
     } else {
       $childrenHtml = $this->renderNode($children, $nesting + 1);
@@ -143,23 +155,51 @@ final class Renderer {
     return "$open>$childrenHtml</$type>";
   }
 
+  /**
+   * Recursively resolves a StyleProp-like value into a flat associative array.
+   * Accepts stdClass, associative arrays, or indexed arrays of those (nested arbitrarily).
+   * Filters out null and false values. Later keys override earlier ones.
+   */
+  private function resolveProps(mixed $value): array {
+    if ($value === null || $value === false || $value === '') {
+      return [];
+    }
+    if ($value instanceof \stdClass) {
+      return (array) $value;
+    }
+    if (!is_array($value)) {
+      return [];
+    }
+    if (!empty($value) && is_string(array_key_first($value))) {
+      return $value;
+    }
+
+    $result = [];
+    foreach ($value as $item) {
+      foreach ($this->resolveProps($item) as $k => $v) {
+        $result[$k] = $v;
+      }
+    }
+    return $result;
+  }
+
   private function renderAttributes(array $props): string {
     $parts = [];
 
     foreach ($props as $key => $value) {
-      if ($key === 'className')
-        $key = 'class';
-      else if ($key === 'htmlFor')
-        $key = 'for';
-
-      $key = strtolower($key);
+      $key = match ($key) {
+        'className' => 'class',
+        'htmlFor' => 'for',
+        default => strtolower($key),
+      };
 
       if (!preg_match('/^[a-z][a-z0-9\-:._]*$/', $key)) {
         throw new \InvalidArgumentException("Invalid attribute name: `{$key}`");
       }
 
-      if ($value === null)
+      if ($value === null) {
         continue;
+      }
 
       if (is_bool($value)) {
         if ($value)
@@ -167,47 +207,67 @@ final class Renderer {
         continue;
       }
 
-      if ($key === 'style' && (is_array($value) || is_object($value))) {
-        $css = '';
-        foreach ((array) $value as $prop => $val) {
-          $css .= strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $prop)) . ":$val;";
-        }
-        $parts[] = "style=\"" . htmlspecialchars(rtrim($css, ';'), ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) . "\"";
-        continue;
-      }
-
-      if ($key === 'data' && (is_array($value) || is_object($value))) {
-        foreach ((array) $value as $dataKey => $dataValue) {
-          $dataKey = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', (string) $dataKey));
-          if (!preg_match('/^[a-z][a-z0-9\-:._]*$/', $dataKey)) {
-            throw new \InvalidArgumentException("Invalid data attribute key: `{$dataKey}`");
-          }
-          if ($dataValue === null)
-            continue;
-          if (is_bool($dataValue)) {
-            if ($dataValue)
-              $parts[] = "data-$dataKey";
-            continue;
-          }
-          $parts[] = "data-$dataKey=\"" . htmlspecialchars((string) $dataValue, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) . "\"";
-        }
-        continue;
-      }
-
-      if (is_array($value)) {
-        $flat = [];
-        array_walk_recursive($value, function ($v) use (&$flat) {
-          $flat[] = $v; });
-        $parts[] = "$key=\"" . htmlspecialchars(implode(' ', $flat), ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) . "\"";
+      if ($value instanceof \Stringable) {
+        $parts[] = $this->formatAttribute($key, $value);
         continue;
       }
 
       if ($value instanceof \DateTimeInterface) {
-        $parts[] = "$key=\"" . htmlspecialchars($value->format('Y-m-d\TH:i:s'), ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) . "\"";
+        $parts[] = $this->formatAttribute($key, $value->format('Y-m-d\TH:i:s'));
         continue;
       }
 
-      $parts[] = "$key=\"" . htmlspecialchars((string) $value, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) . "\"";
+      if (is_array($value) || $value instanceof \stdClass) {
+        $resolved = $this->resolveProps($value);
+
+        if ($key === 'style') {
+          $css = '';
+          foreach ($resolved as $prop => $sv) {
+            if ($sv !== null && $sv !== false)
+              $css .= $this->toKebabCase((string) $prop) . ":$sv;";
+          }
+          if ($css !== '')
+            $parts[] = $this->formatAttribute('style', rtrim($css, ';'));
+          continue;
+        }
+
+        if ($key === 'class' && (!empty($resolved) || $value instanceof \stdClass || (is_array($value) && !array_is_list($value)))) {
+          $classes = array_keys(array_filter($resolved));
+          if (!empty($classes))
+            $parts[] = $this->formatAttribute('class', implode(' ', $classes));
+          continue;
+        }
+
+        if (!empty($resolved) && preg_match('/^[a-z][a-z0-9]*$/', $key)) {
+          $count = count($parts);
+          foreach ($resolved as $subKey => $subValue) {
+            $subKey = strtolower((string) $subKey);
+            if (!preg_match('/^[a-z][a-z0-9\-:._]*$/', $subKey)) {
+              throw new \InvalidArgumentException("Invalid `{$key}-*` attribute key: `{$subKey}`");
+            }
+            if ($subValue === null)
+              continue;
+            if (is_bool($subValue))
+              $subValue = $subValue ? 'true' : 'false';
+            $parts[] = $this->formatAttribute("$key-$subKey", $subValue);
+          }
+          if (count($parts) > $count)
+            continue;
+        }
+
+        if (is_array($value)) {
+          $flat = [];
+          array_walk_recursive($value, function ($item) use (&$flat) {
+            if ($item !== null && $item !== false && $item !== '')
+              $flat[] = $item;
+          });
+          if (!empty($flat))
+            $parts[] = $this->formatAttribute($key, implode(' ', $flat));
+        }
+        continue;
+      }
+
+      $parts[] = $this->formatAttribute($key, $value);
     }
 
     return implode(' ', $parts);
@@ -241,7 +301,7 @@ final class Renderer {
 
     foreach ($array as $index => $item) {
       if (is_string($item) || is_numeric($item)) {
-        $escapedValue = htmlspecialchars((string) $item, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
+        $escapedValue = $this->escape($item);
         if ($this->react) {
           $stringifiedValue = (string) $item;
           $prefix = $index !== 0 && ltrim($stringifiedValue) !== $stringifiedValue ? '<!-- -->' : '';
