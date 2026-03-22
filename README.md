@@ -221,6 +221,41 @@ $renderer->indentation = '  '; // default: "\t"
 
 ---
 
+## Security
+
+### XSS prevention
+
+The `Renderer` automatically escapes all untrusted output using `htmlspecialchars` with `ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE`. This applies to every output path:
+
+| Context | Escaped |
+|---|---|
+| Text node strings | Yes — `<`, `>`, `&`, `"`, `'` all encoded |
+| Attribute values (string/numeric) | Yes — attribute break-out via `"` or `'` is prevented |
+| `style` object values | Yes — CSS value injection is prevented |
+| `data-*` attribute values | Yes — same encoding as regular attributes |
+| `dangerouslySetInnerHTML` | **No** — raw HTML is intentionally injected; only use with trusted content |
+
+**Safe by default:**
+
+```php
+// User-supplied content is automatically escaped in text nodes:
+$renderer(['$', 'p', null, $userInput]);
+// <script>alert(1)</script>  →  &lt;script&gt;alert(1)&lt;/script&gt;
+
+// Attribute values are also escaped:
+$renderer(['$', 'div', ['title' => $userInput]]);
+// " onxss="1  →  title="&quot; onxss=&quot;1"
+```
+
+**`dangerouslySetInnerHTML` bypasses all escaping — only use with content you fully control:**
+
+```php
+// Raw HTML — you are responsible for sanitising $trustedHtml:
+$renderer(['$', 'div', ['dangerouslySetInnerHTML' => $trustedHtml]]);
+```
+
+---
+
 ## Running tests
 
 ```shell
