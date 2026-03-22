@@ -194,7 +194,7 @@ Use `dangerouslySetInnerHTML` to inject raw HTML — value must be `['__html' =>
 
 ## Security
 
-All text and attribute values are escaped via `htmlspecialchars` (`ENT_QUOTES | ENT_HTML5`). Tag and attribute names are validated against strict patterns. The only exception is `dangerouslySetInnerHTML`, which intentionally bypasses escaping — treat it like `innerHTML` and only pass trusted content.
+All text and attribute values are escaped via `htmlspecialchars` (`ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE`) using the renderer's configured encoding (default `UTF-8`). Tag and attribute names are validated against strict patterns. The only exception is `dangerouslySetInnerHTML`, which intentionally bypasses escaping — treat it like `innerHTML` and only pass trusted content.
 
 ---
 
