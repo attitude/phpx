@@ -41,22 +41,8 @@ final class Renderer {
     return $node[2];
   }
 
-  /**
-   * @deprecated Use getNodeChildrenProps instead.
-   */
   public function getNodeChildren(array $node): bool|int|float|string|array|null {
     return $node[3] ?? $this->getNodeProps($node)['children'] ?? [];
-  }
-
-  public function getNodeChildrenProps(array $node): array {
-    if (array_key_exists(3, $node)) {
-      return ['children' => $node[3]];
-    }
-    $nodeProps = $this->getNodeProps($node);
-    if (array_key_exists('children', $nodeProps)) {
-      return ['children' => $nodeProps['children']];
-    }
-    return [];
   }
 
   public function render(bool|int|float|string|array|null $node, array $components = []): string {
@@ -68,16 +54,12 @@ final class Renderer {
   }
 
   private function callComponent(\Closure|callable $component, array $props): mixed {
-    if ($component instanceof \Closure) {
-      $arity = $this->arityCache[$component] ?? ($this->arityCache[$component] = (new \ReflectionFunction($component))->getNumberOfParameters());
-    } else {
-      $arity = (new \ReflectionFunction(\Closure::fromCallable($component)))->getNumberOfParameters();
-    }
-
+    $fn = $component instanceof \Closure ? $component : \Closure::fromCallable($component);
+    $arity = $this->arityCache[$fn] ?? ($this->arityCache[$fn] = (new \ReflectionFunction($fn))->getNumberOfParameters());
     if ($arity > 1) {
       throw new \InvalidArgumentException("Component must accept 0 or 1 parameter (\$props). Got {$arity} parameters. Pass children via \$props['children'] instead.");
     }
-    return $arity === 0 ? call_user_func($component) : call_user_func($component, $props);
+    return $arity === 0 ? $fn() : $fn($props);
   }
 
   protected function format(string $rendered, int $nesting): string {
