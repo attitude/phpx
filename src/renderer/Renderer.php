@@ -59,7 +59,7 @@ final class Renderer {
 
   protected function renderNode(bool|int|float|string|array|null $node, int $nesting): string {
     if (is_string($node) || is_numeric($node)) {
-      return (string) $node;
+      return htmlspecialchars((string) $node, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
     } else if (is_bool($node) || is_null($node)) {
       return '';
     } else if (is_array($node)) {

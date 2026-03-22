@@ -506,6 +506,20 @@ HTML;
       expect((new Renderer)($html))->toBe('Hello from closure!');
     });
 
+    it('escapes HTML special chars in a string returned by a closure', function () {
+      $html = ['$', fn() => '<b>bold</b> & "quoted"', null];
+
+      expect((new Renderer)($html))->toBe('&lt;b&gt;bold&lt;/b&gt; &amp; &quot;quoted&quot;');
+    });
+
+    it('escapes HTML special chars in a string returned by a named component', function () {
+      $html = ['$', 'Dangerous', null];
+
+      expect((new Renderer)($html, [
+        'Dangerous' => fn() => '<script>alert(1)</script>',
+      ]))->toBe('&lt;script&gt;alert(1)&lt;/script&gt;');
+    });
+
     it('renders a closure returning null', function () {
       $html = ['$', fn() => null, null];
 
