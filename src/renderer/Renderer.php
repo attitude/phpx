@@ -156,9 +156,10 @@ final class Renderer {
   }
 
   /**
-   * Recursively resolves a StyleProp-like value into a flat associative array.
-   * Accepts stdClass, associative arrays, or indexed arrays of those (nested arbitrarily).
-   * When processing indexed arrays, null, false and empty string items are skipped.
+   * Recursively normalizes attribute/prop-like values into a flat associative array of key/value pairs.
+   * Accepts stdClass, associative arrays, or indexed arrays of those (nested arbitrarily), as used for
+   * style, class, data-/aria- attributes and other namespaced attributes. When processing indexed arrays,
+   * null, false and empty string items are skipped.
    */
   private function resolveProps(mixed $value): array {
     if ($value === null || $value === false || $value === '') {
