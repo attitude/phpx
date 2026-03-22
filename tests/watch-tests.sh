@@ -8,8 +8,29 @@ PEST="$PROJECT_ROOT/vendor/bin/pest"
 
 cd "$PROJECT_ROOT"
 
+if [[ ! -f "$PEST" ]]; then
+    echo "Error: Pest binary not found at $PEST" >&2
+    echo "Run: composer install" >&2
+    exit 1
+fi
+
+if [[ ! -x "$PEST" ]]; then
+    echo "Error: Pest binary is not executable: $PEST" >&2
+    exit 1
+fi
+
+# Runs pest, swallowing exit code 1 (test failures are expected) but
+# propagating any other non-zero code as a visible error.
+run_pest() {
+    local exit_code=0
+    "$PEST" "$@" || exit_code=$?
+    if [[ $exit_code -ne 0 && $exit_code -ne 1 ]]; then
+        echo "Error: Pest exited with code $exit_code — check for PHP errors or configuration issues" >&2
+    fi
+}
+
 echo "Running initial test suite..."
-"$PEST" --parallel || true
+run_pest --parallel
 
 echo ""
 echo "Watching tests/ and src/ for changes..."
@@ -23,9 +44,9 @@ fswatch -e '.*' -i '\.php$' \
       echo ""
       if [[ "$relative_file" == tests/* ]]; then
           echo "Test changed: $relative_file"
-          "$PEST" "$relative_file" || true
+          run_pest "$relative_file"
       elif [[ "$relative_file" == src/* ]]; then
           echo "Source changed: $relative_file"
-          "$PEST" --parallel || true
+          run_pest --parallel
       fi
   done
