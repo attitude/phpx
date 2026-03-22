@@ -76,6 +76,9 @@ final class Renderer {
 
         if (!is_string($type) && $type instanceof \Closure) {
           $arity = $this->arityCache[$type] ?? ($this->arityCache[$type] = (new \ReflectionFunction($type))->getNumberOfParameters());
+          if ($arity > 1) {
+            throw new \InvalidArgumentException("Component closure must accept 0 or 1 parameter (\$props). Got {$arity} parameters. Pass children via \$props['children'] instead.");
+          }
           $result = $arity === 0 ? $type() : $type($props);
           return $this->renderNode($result, $nesting);
         }
