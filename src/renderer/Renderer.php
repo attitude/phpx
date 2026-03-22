@@ -72,7 +72,7 @@ final class Renderer {
         $nodeProps = $this->getNodeProps($node);
 
         $childrenProps = $this->getNodeChildrenProps($node);
-        $props = array_merge($nodeProps ?? [], $childrenProps);
+        $props = array_merge($nodeProps, $childrenProps);
 
         if (!is_string($type) && $type instanceof \Closure) {
           $arity = $this->arityCache[$type] ?? ($this->arityCache[$type] = (new \ReflectionFunction($type))->getNumberOfParameters());
@@ -183,8 +183,6 @@ final class Renderer {
 
         $attributeString = implode(" ", $attributeString);
 
-        $childrenRendered = '';
-
         if (is_string($children)) {
           $childrenRendered = $shouldEscapeHtml ? htmlspecialchars($children, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) : $children;
         } else {
@@ -208,7 +206,7 @@ final class Renderer {
 
         $previousChildWasElement = false;
 
-        foreach ($children as $i => $child) {
+        foreach ($children as $child) {
           if (is_array($child)) {
             if ($child[0] === '$') {
               $_child = $this->renderNode($child, $nesting);
@@ -227,8 +225,6 @@ final class Renderer {
           } else if (is_string($child) || is_numeric($child)) {
             $childrenRendered[] = $this->renderNode($child, $nesting + 1);
             $previousChildWasElement = false;
-          } else {
-            continue;
           }
         }
 
