@@ -207,13 +207,13 @@ final class Renderer {
         continue;
       }
 
-      if ($value instanceof \Stringable) {
-        $parts[] = $this->formatAttribute($key, $value);
+      if ($value instanceof \DateTimeInterface) {
+        $parts[] = $this->formatAttribute($key, $value->format('Y-m-d\TH:i:s'));
         continue;
       }
 
-      if ($value instanceof \DateTimeInterface) {
-        $parts[] = $this->formatAttribute($key, $value->format('Y-m-d\TH:i:s'));
+      if ($value instanceof \Stringable) {
+        $parts[] = $this->formatAttribute($key, $value);
         continue;
       }
 
