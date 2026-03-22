@@ -55,11 +55,10 @@ final class Renderer {
         assert(is_string($type) || $type instanceof \Closure, "Type must be a string or callable");
 
         $props = $this->getNodeProps($node);
+
+        $hasChildren = array_key_exists(3, $node) || array_key_exists('children', $props);
         $children = $this->getNodeChildren($node);
-        $mergedProps = array_merge(
-          $props ?? [],
-          ($children ?? null) ? ['children' => $children] : []
-        );
+        $mergedProps = array_merge($props ?? [], $hasChildren ? ['children' => $children] : []);
 
         if (!is_string($type) && $type instanceof \Closure) {
           $id = spl_object_id($type);
