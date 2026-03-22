@@ -146,14 +146,12 @@ $node = ['$', 'h1', ['className' => 'title'], 'Hello, World!'];
 echo $renderer($node); // <h1 class="title">Hello, World!</h1>
 ```
 
-Scalar values are rendered as text with HTML-escaping (via `htmlspecialchars`); `null` and `bool` values render as empty strings (matching React behaviour):
+Strings and numbers are HTML-escaped; `null` and `bool` render as empty strings (matching React behaviour):
 
 ```php
-echo $renderer('plain text');  // plain text
-echo $renderer(42);            // 42
-echo $renderer('<b>hi</b>');   // &lt;b&gt;hi&lt;/b&gt;
-echo $renderer(null);          // (empty)
-echo $renderer(true);          // (empty)
+echo $renderer('<b>hi</b>'); // &lt;b&gt;hi&lt;/b&gt;
+echo $renderer(null);        // (empty)
+echo $renderer(true);        // (empty)
 ```
 
 #### Components
@@ -171,20 +169,7 @@ echo $renderer($node, [
 // <p>Hello, World!</p>
 ```
 
-A component that declares no parameters is called without arguments:
-
-```php
-$node = ['$', 'Timestamp', null];
-
-echo $renderer($node, [
-    'Timestamp' => function(): array {
-        return ['$', 'time', null, date('Y-m-d')];
-    },
-]);
-// <time>YYYY-MM-DD</time>
-```
-
-Inline closures work too — pass a `\Closure` directly as the element type:
+Pass a `\Closure` directly as the element type to skip the components map:
 
 ```php
 $greet = fn(array $props): array => ['$', 'span', null, "Hi, {$props['name']}!"];
@@ -193,24 +178,7 @@ echo $renderer(['$', $greet, ['name' => 'Alice']]);
 // <span>Hi, Alice!</span>
 ```
 
-Other callable types:
-
-```php
-// Named function
-function MyHeading(array $props): array {
-    return ['$', 'h2', null, $props['children']];
-}
-echo $renderer(['$', 'MyHeading', null, 'Title'], ['MyHeading' => 'MyHeading']);
-// <h2>Title</h2>
-
-// Static method
-echo $renderer(['$', 'Foo', null], ['Foo' => 'MyClass::render']);
-echo $renderer(['$', 'Foo', null], ['Foo' => ['MyClass', 'render']]);
-
-// Instance method
-$obj = new MyComponent();
-echo $renderer(['$', 'Foo', null], ['Foo' => [$obj, 'render']]);
-```
+Any PHP callable is accepted — named functions, static methods (`'Class::method'` or `['Class', 'method']`), and instance methods (`[$obj, 'method']`). Components accept 0 or 1 parameter (0-param components are called without arguments); children are passed via `$props['children']`.
 
 #### Prop conventions
 
@@ -218,7 +186,7 @@ echo $renderer(['$', 'Foo', null], ['Foo' => [$obj, 'render']]);
 |---|---|
 | `className` | Rendered as `class` |
 | `htmlFor` | Rendered as `for` |
-| `class` (array) | Array values joined with a space: `['a', 'b']` → `class="a b"` |
+| Any attribute with an array value | Recursively flattened and joined with a space: `['a', 'b']` → `"a b"` |
 | `style` (array/object) | Properties serialised to inline CSS with camelCase → kebab-case conversion: `['fontSize' => '16px']` → `font-size:16px` |
 | `data` (array/object) | Expanded to `data-*` attributes with camelCase → kebab-case conversion |
 | `dangerouslySetInnerHTML` | Raw HTML injected without escaping; value must be `['__html' => '...']` (cannot be combined with `children`) |
@@ -228,22 +196,15 @@ echo $renderer(['$', 'Foo', null], ['Foo' => [$obj, 'render']]);
 
 > **Note:** All attribute names are lowercased — camelCase names like `onClick` become `onclick`.
 
-#### Pretty-printing
-
-```php
-$renderer->pretty = true;
-$renderer->indentation = '  '; // default: "\t"
-```
-
 #### Renderer options
 
 | Property | Type | Default | Description |
 |---|---|---|---|
-| `$pretty` | `bool` | `false` | Enable indented output |
-| `$indentation` | `string` | `"\t"` | Indentation string used when `$pretty` is `true` |
+| `$pretty` | `bool` | `false` | Enable indented output (public property, set directly) |
+| `$indentation` | `string` | `"\t"` | Indentation string used when `$pretty` is `true` (public property) |
 | `$void` | `bool` | `false` | Use HTML5-style `>` instead of XHTML-style `/>` for void elements |
 | `$react` | `bool` | `false` | React-compatible whitespace: inserts `<!-- -->` comment markers around leading/trailing whitespace in text nodes |
-| `$encoding` | `string` | `'UTF-8'` | Character encoding for `htmlspecialchars` escaping |
+| `encoding` | `string` | `'UTF-8'` | Constructor argument: character encoding for `htmlspecialchars` — `new Renderer(encoding: 'ISO-8859-1')` |
 
 ---
 
@@ -267,22 +228,14 @@ In addition, the renderer validates:
 - **Attribute names** must match `^[a-z][a-z0-9\-:._]*$` — whitespace and quotes are rejected
 - **Data attribute keys** are validated with the same pattern
 
-**Safe by default:**
-
 ```php
-// User-supplied content is automatically escaped in text nodes:
 $renderer(['$', 'p', null, $userInput]);
 // <script>alert(1)</script>  →  &lt;script&gt;alert(1)&lt;/script&gt;
 
-// Attribute values are also escaped:
 $renderer(['$', 'div', ['title' => $userInput]]);
 // " onxss="1  →  title="&quot; onxss=&quot;1"
-```
 
-**`dangerouslySetInnerHTML` bypasses all escaping — only use with content you fully control:**
-
-```php
-// Raw HTML — you are responsible for sanitising $trustedHtml:
+// dangerouslySetInnerHTML bypasses all escaping — caller is responsible:
 $renderer(['$', 'div', ['dangerouslySetInnerHTML' => ['__html' => $trustedHtml]]]);
 ```
 
