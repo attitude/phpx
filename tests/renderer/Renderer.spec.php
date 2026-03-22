@@ -498,4 +498,114 @@ HTML;
 
     expect($renderer($html))->toBe($expected);
   });
+
+  describe('Closure as node type', function () {
+    it('renders a closure returning a string', function () {
+      $html = ['$', fn() => 'Hello from closure!', null];
+
+      expect((new Renderer)($html))->toBe('Hello from closure!');
+    });
+
+    it('renders a closure returning null', function () {
+      $html = ['$', fn() => null, null];
+
+      expect((new Renderer)($html))->toBe('');
+    });
+
+    it('renders a closure returning false', function () {
+      $html = ['$', fn() => false, null];
+
+      expect((new Renderer)($html))->toBe('');
+    });
+
+    it('renders a closure returning an HTML element', function () {
+      $html = ['$', fn() => ['$', 'span', null, 'Closure span'], null];
+
+      expect((new Renderer)($html))->toBe('<span>Closure span</span>');
+    });
+
+    it('renders a closure receiving props', function () {
+      $component = fn(array $props) => ['$', 'p', ['class' => $props['class']], $props['text']];
+
+      $html = ['$', $component, ['class' => 'greeting', 'text' => 'Hi!']];
+
+      expect((new Renderer)($html))->toBe('<p class="greeting">Hi!</p>');
+    });
+
+    it('renders a closure receiving children via props', function () {
+      $component = fn(array $props) => ['$', 'section', null, $props['children']];
+
+      $html = ['$', $component, null, [
+        ['$', 'h2', null, 'Title'],
+        ['$', 'p', null, 'Body'],
+      ]];
+
+      expect((new Renderer)($html))->toBe('<section><h2>Title</h2><p>Body</p></section>');
+    });
+
+    it('renders a closure receiving both props and children', function () {
+      $component = fn(array $props) => [
+        '$', 'div', ['class' => $props['class']], $props['children'],
+      ];
+
+      $html = ['$', $component, ['class' => 'wrapper'], [
+        ['$', 'span', null, 'Inside'],
+      ]];
+
+      expect((new Renderer)($html))->toBe('<div class="wrapper"><span>Inside</span></div>');
+    });
+
+    it('renders a closure that ignores props and returns a static element', function () {
+      $component = fn() => ['$', 'hr', []];
+
+      $html = ['$', $component, ['data-ignored' => 'yes']];
+
+      expect((new Renderer)($html))->toBe('<hr />');
+    });
+
+    it('renders nested closures', function () {
+      $inner = fn(array $props) => ['$', 'em', null, $props['text']];
+      $outer = fn(array $props) => ['$', 'strong', null, ['$', $inner, ['text' => $props['label']]]];
+
+      $html = ['$', $outer, ['label' => 'Nested']];
+
+      expect((new Renderer)($html))->toBe('<strong><em>Nested</em></strong>');
+    });
+
+    it('renders a closure alongside named components', function () {
+      $closure = fn(array $props) => ['$', 'b', null, $props['children']];
+
+      $html = ['$', 'div', null, [
+        ['$', $closure, null, 'Bold text'],
+        ['$', 'Badge', null, 'Labeled'],
+      ]];
+
+      expect((new Renderer)($html, [
+        'Badge' => fn(array $props) => ['$', 'span', ['class' => 'badge'], $props['children']],
+      ]))->toBe('<div><b>Bold text</b><span class="badge">Labeled</span></div>');
+    });
+
+    it('renders a closure returning an array fragment', function () {
+      $component = fn() => [
+        ['$', 'li', null, 'Item 1'],
+        ['$', 'li', null, 'Item 2'],
+      ];
+
+      $html = ['$', 'ul', null, [
+        ['$', $component, null],
+      ]];
+
+      expect((new Renderer)($html))->toBe('<ul><li>Item 1</li><li>Item 2</li></ul>');
+    });
+
+    it('invokes closure node types directly without consulting components map', function () {
+      $closureComponent = fn(array $props) => ['$', 'span', ['class' => 'from-closure'], $props['children']];
+
+      $html = ['$', $closureComponent, null, 'Content'];
+
+      expect((new Renderer)($html, [
+        'Badge' => fn() => ['$', 'div', null, 'Alternative component'],
+      ]))->toBe('<span class="from-closure">Content</span>');
+    });
+  });
 });
