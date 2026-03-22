@@ -84,7 +84,17 @@ final class Renderer {
         }
 
         if (array_key_exists($type, $this->components)) {
-          return $this->renderNode(call_user_func($this->components[$type], $props), $nesting);
+          $component = $this->components[$type];
+          if ($component instanceof \Closure) {
+            $arity = $this->arityCache[$component] ?? ($this->arityCache[$component] = (new \ReflectionFunction($component))->getNumberOfParameters());
+            if ($arity > 1) {
+              throw new \InvalidArgumentException("Component '{$type}' must accept 0 or 1 parameter (\$props). Got {$arity} parameters. Pass children via \$props['children'] instead.");
+            }
+            $result = $arity === 0 ? $component() : $component($props);
+          } else {
+            $result = call_user_func($component, $props);
+          }
+          return $this->renderNode($result, $nesting);
         }
 
         $shouldEscapeHtml = true;
