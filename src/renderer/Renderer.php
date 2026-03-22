@@ -158,8 +158,10 @@ final class Renderer {
   /**
    * Recursively resolves a StyleProp-like value into a flat associative array.
    * Accepts stdClass, associative arrays, or indexed arrays of those (nested arbitrarily).
-   * Filters out null and false values. Later keys override earlier ones.
-   * It throws on empty strings and boolean true.
+   * When processing indexed arrays, null and false items are skipped; boolean true or
+   * empty string items throw. Later keys override earlier ones when merging.
+   * Associative array values are returned as-is — callers are responsible for further
+   * validation of individual values.
    */
   private function resolveProps(mixed $value): array {
     if ($value === true) {
@@ -235,8 +237,13 @@ final class Renderer {
         if ($key === 'style') {
           $css = '';
           foreach ($resolved as $prop => $sv) {
-            if ($sv !== null && $sv !== false)
-              $css .= $this->toKebabCase((string) $prop) . ":$sv;";
+            if ($sv === null || $sv === false)
+              continue;
+            if ($sv === true)
+              throw new \InvalidArgumentException("Invalid style value for `{$prop}`: boolean true is not allowed.");
+            if ($sv === '')
+              throw new \InvalidArgumentException("Invalid style value for `{$prop}`: empty string is not allowed.");
+            $css .= $this->toKebabCase((string) $prop) . ":$sv;";
           }
           if ($css !== '')
             $parts[] = $this->formatAttribute('style', rtrim($css, ';'));
