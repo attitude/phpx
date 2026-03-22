@@ -688,6 +688,12 @@ HTML;
       expect((new Renderer)($html))->toBe('<div><b>intentional &amp; safe</b></div>');
     });
 
+    it('escapes HTML special chars in array-valued attributes (e.g. class arrays)', function () {
+      $html = ['$', 'div', ['class' => ['container', '" onxss="1']]];
+
+      expect((new Renderer)($html))->toBe('<div class="container &quot; onxss=&quot;1"></div>');
+    });
+
     it('escapes script injection passed through a named component prop', function () {
       $html = ['$', 'Wrapper', ['label' => '<script>alert(1)</script>']];
 

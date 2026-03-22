@@ -167,7 +167,7 @@ final class Renderer {
                 $_flattened[] = $a;
               });
 
-              $value = implode(" ", $_flattened);
+              $value = htmlspecialchars(implode(" ", $_flattened), ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
             } else if ($value instanceof \JsonSerializable) {
               $value = htmlspecialchars(json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES);
             } else if ($value instanceof \DateTime || $value instanceof \DateTimeImmutable) {
