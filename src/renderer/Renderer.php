@@ -156,7 +156,7 @@ final class Renderer {
                 } else if (is_null($dataValue)) {
                   continue;
                 } else {
-                  throw new \Exception("Invalid prop value type: `" . gettype($dataValue) . "``");
+                  throw new \Exception("Invalid prop value type: `" . gettype($dataValue) . "`");
                 }
 
                 $attributeString[] = "data-$dataKey=\"$dataValue\"";
@@ -244,7 +244,7 @@ final class Renderer {
         return implode('', $childrenRendered);
       }
     } else {
-      throw new \Exception("Invalid node type: `" . gettype($node) . "``");
+      throw new \Exception("Invalid node type: `" . gettype($node) . "`");
     }
   }
 
