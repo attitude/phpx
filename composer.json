@@ -13,7 +13,7 @@
 		"test": "./vendor/bin/pest",
 		"test:update-snapshots": "./vendor/bin/pest --update-snapshots",
 		"test:coverage": "./vendor/bin/pest --coverage",
-		"test:watch": "composer test && fswatch -e '.*' -i '\\.php$' app/ tests/ | xargs -n1 -I {} vendor/bin/pest {}"
+		"test:watch": "./tests/watch-tests.sh"
 	},
 	"minimum-stability": "dev",
 	"autoload": {
