@@ -56,12 +56,12 @@ final class Renderer {
 
         $props = $this->getNodeProps($node);
         $children = $this->getNodeChildren($node);
+        $mergedProps = array_merge(
+          $props ?? [],
+          ($children ?? null) ? ['children' => $children] : []
+        );
 
         if (!is_string($type) && $type instanceof \Closure) {
-          $mergedProps = array_merge(
-            $props ?? [],
-            ($children ?? null) ? ['children' => $children] : []
-          );
           $id = spl_object_id($type);
           $arity = $this->arityCache[$id] ?? ($this->arityCache[$id] = (new \ReflectionFunction($type))->getNumberOfParameters());
           $result = $arity === 0 ? $type() : $type($mergedProps);
@@ -69,14 +69,7 @@ final class Renderer {
         }
 
         if (array_key_exists($type, $this->components)) {
-          return $this->renderNode(
-            call_user_func(
-              $this->components[$type],
-              array_merge(
-                $props ?? [],
-                ($children ?? null) ? ['children' => $children] : []
-              )
-            ), $nesting);
+          return $this->renderNode(call_user_func($this->components[$type], $mergedProps), $nesting);
         }
 
         $shouldEscapeHtml = true;
