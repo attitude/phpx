@@ -8,9 +8,10 @@ final class Renderer {
   public bool $react = false;
   public string $indentation = "\t";
   protected array $components = [];
-  private array $arityCache = [];
+  private \WeakMap $arityCache;
 
   public function __construct(protected string $encoding = 'UTF-8') {
+    $this->arityCache = new \WeakMap();
   }
 
   public function __invoke(bool|int|float|string|array|null $node, array $components = []): string {
@@ -74,8 +75,7 @@ final class Renderer {
         $mergedProps = array_merge($props ?? [], $childrenProps);
 
         if (!is_string($type) && $type instanceof \Closure) {
-          $id = spl_object_id($type);
-          $arity = $this->arityCache[$id] ?? ($this->arityCache[$id] = (new \ReflectionFunction($type))->getNumberOfParameters());
+          $arity = $this->arityCache[$type] ?? ($this->arityCache[$type] = (new \ReflectionFunction($type))->getNumberOfParameters());
           $result = $arity === 0 ? $type() : $type($mergedProps);
           return $this->renderNode($result, $nesting);
         }
