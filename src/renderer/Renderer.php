@@ -61,6 +61,17 @@ final class Renderer {
     return $arity === 0 ? $component() : $component($props);
   }
 
+  private function resolveDangerouslySetInnerHTML(array $props): string {
+    if (array_key_exists('children', $props)) {
+      throw new \Exception("Can't use children and dangerouslySetInnerHTML at the same time");
+    }
+    $raw = $props['dangerouslySetInnerHTML'];
+    if (!is_array($raw) || !array_key_exists('__html', $raw) || !is_string($raw['__html'])) {
+      throw new \InvalidArgumentException("dangerouslySetInnerHTML must be an array with an '__html' key containing a string.");
+    }
+    return (string) $raw['__html'];
+  }
+
   private function format(string $rendered, int $nesting): string {
     return str_repeat($this->indentation, max(0, $nesting)).$rendered;
   }
@@ -90,19 +101,19 @@ final class Renderer {
       return $this->renderNode($this->callComponent($component, $props), $nesting);
     }
 
+    if ($type === 'Fragment') {
+      if (array_key_exists('dangerouslySetInnerHTML', $props)) {
+        return $this->resolveDangerouslySetInnerHTML($props);
+      }
+      return $this->renderNode($props['children'] ?? [], $nesting);
+    }
+
     if (!preg_match('/^[a-zA-Z][a-zA-Z0-9\-\.]*$/', $type)) {
       throw new \InvalidArgumentException("Invalid HTML tag name: `{$type}`");
     }
 
     if (array_key_exists('dangerouslySetInnerHTML', $props)) {
-      if (array_key_exists('children', $props)) {
-        throw new \Exception("Can't use children and dangerouslySetInnerHTML at the same time");
-      }
-      $raw = $props['dangerouslySetInnerHTML'];
-      if (!is_array($raw) || !array_key_exists('__html', $raw)) {
-        throw new \InvalidArgumentException("dangerouslySetInnerHTML must be an array with an '__html' key.");
-      }
-      $children = $raw['__html'];
+      $children = $this->resolveDangerouslySetInnerHTML($props);
       $escapeChildren = false;
       unset($props['dangerouslySetInnerHTML']);
     } else {
