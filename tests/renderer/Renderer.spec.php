@@ -807,6 +807,36 @@ HTML;
 
       expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
     });
+
+    it('renders onclick attribute with escaped value', function () {
+      $html = ['$', 'div', ['onclick' => 'doSomething()']];
+
+      expect((new Renderer)($html))->toBe('<div onclick="doSomething()"></div>');
+    });
+
+    it('escapes double-quote injection in onclick attribute value', function () {
+      $html = ['$', 'div', ['onclick' => '"injected"']];
+
+      expect((new Renderer)($html))->toBe('<div onclick="&quot;injected&quot;"></div>');
+    });
+
+    it('should never convert camelCase onClick to kebab-case on-click', function () {
+      $html = ['$', 'div', ['onClick' => 'go()']];
+
+      expect((new Renderer)($html))->toBe('<div onclick="go()"></div>');
+    });
+
+    it('formats DateTime as datetime-local value (no timezone offset)', function () {
+      $html = ['$', 'input', ['type' => 'datetime-local', 'value' => new \DateTime('2026-03-22 14:30:00')]];
+
+      expect((new Renderer)($html))->toBe('<input type="datetime-local" value="2026-03-22T14:30:00" />');
+    });
+
+    it('formats DateTimeImmutable as datetime-local value (no timezone offset)', function () {
+      $html = ['$', 'input', ['type' => 'datetime-local', 'value' => new \DateTimeImmutable('2026-03-22 09:05:07')]];
+
+      expect((new Renderer)($html))->toBe('<input type="datetime-local" value="2026-03-22T09:05:07" />');
+    });
   });
 
   describe('fragment child validation', function () {

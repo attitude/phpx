@@ -150,8 +150,7 @@ final class Renderer {
             $key = 'for';
           }
 
-          // Transform key from camelCase to kebab-case
-          $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $key));
+          $key = strtolower($key);
 
           // Validate attribute name to prevent name-injection attacks
           if (!preg_match('/^[a-z][a-z0-9\-:._]*$/', $key)) {
@@ -173,8 +172,6 @@ final class Renderer {
                 $styleString .= "$styleKey:$styleValue;";
               }
               $value = htmlspecialchars(rtrim($styleString, ';'), ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
-            } else if (is_string($value) || is_numeric($value)) {
-              $value = htmlspecialchars((string) $value, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
             } else if ($key === "data" && (is_object($value) || is_array($value))) {
               foreach ((array) $value as $dataKey => $dataValue) {
                 // Normalize data key to kebab-case and validate to prevent name-injection
@@ -189,19 +186,15 @@ final class Renderer {
                   }
 
                   continue;
-                } else if (is_string($dataValue) || is_numeric($dataValue)) {
-                  $dataValue = htmlspecialchars((string) $dataValue, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
                 } else if (is_null($dataValue)) {
                   continue;
-                } else {
-                  throw new \Exception("Invalid prop value type: `" . gettype($dataValue) . "`");
                 }
 
-                $attributeString[] = "data-$dataKey=\"$dataValue\"";
+                $attributeString[] = "data-$dataKey=\"" . htmlspecialchars((string) $dataValue, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding) . "\"";
               }
 
               continue;
-            } else if ($key !== 'data' && is_array($value)) {
+            } else if (is_array($value)) {
               $_flattened = [];
 
               // Flatten array
@@ -210,22 +203,10 @@ final class Renderer {
               });
 
               $value = htmlspecialchars(implode(" ", $_flattened), ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
-            } else if ($value instanceof \JsonSerializable) {
-              $value = htmlspecialchars(json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
-            } else if ($value instanceof \DateTime || $value instanceof \DateTimeImmutable) {
-              $value = $value->format('c');
-            } else if ($value instanceof \stdClass) {
-              $value = htmlspecialchars(json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), ENT_QUOTES);
+            } else if ($value instanceof \DateTimeInterface) {
+              $value = $value->format('Y-m-d\TH:i:s');
             } else {
-              if (gettype($value) === 'object') {
-                if (method_exists($value, '__toString')) {
-                  $value = (string) $value;
-                } else {
-                  throw new \Exception("Invalid prop `{$key}` value type: `" . gettype($value) . "``");
-                }
-              } else {
-                throw new \Exception("Invalid prop `{$key}` value type: `" . gettype($value) . "``");
-              }
+              $value = htmlspecialchars((string) $value, ENT_QUOTES | ENT_HTML5 | ENT_SUBSTITUTE, $this->encoding);
             }
 
             $attributeString[] = "$key=\"$value\"";
