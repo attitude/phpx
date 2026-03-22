@@ -26,12 +26,13 @@ if ! command -v fswatch &>/dev/null; then
 fi
 
 # Runs pest, swallowing exit code 1 (test failures are expected) but
-# propagating any other non-zero code as a visible error.
+# propagating any other non-zero code as a real error so the script fails fast.
 run_pest() {
     local exit_code=0
     "$PEST" "$@" || exit_code=$?
     if [[ $exit_code -ne 0 && $exit_code -ne 1 ]]; then
         echo "Error: Pest exited with code $exit_code — check for PHP errors or configuration issues" >&2
+        return $exit_code
     fi
 }
 
