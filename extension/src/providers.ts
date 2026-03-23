@@ -65,7 +65,9 @@ function mapLocationLinkToSource(
 		targetUri = sourceUri;
 	}
 	return {
-		originSelectionRange: link.originSelectionRange,
+		originSelectionRange: link.originSelectionRange
+			? mapRangeToPhpx(phpUri, phpxUri, link.originSelectionRange)
+			: undefined,
 		targetUri,
 		targetRange,
 		targetSelectionRange,

@@ -195,6 +195,12 @@ export function mapPositionToPhpx(
 
 /**
  * Map a Range from PHP back to PHPX source.
+ *
+ * For single-line ranges (token/symbol ranges) the end position often sits
+ * exactly one character past the word boundary, which `getWordAt` won't match.
+ * Instead of mapping the end independently, we preserve the original token
+ * length relative to the mapped start. For multi-line ranges (e.g. a full
+ * function definition) we fall back to mapping both endpoints individually.
  */
 export function mapRangeToPhpx(
 	phpUri: vscode.Uri,
@@ -202,6 +208,11 @@ export function mapRangeToPhpx(
 	range: vscode.Range,
 ): vscode.Range {
 	const start = mapPositionToPhpx(phpUri, phpxUri, range.start);
+	if (range.start.line === range.end.line) {
+		const length = range.end.character - range.start.character;
+		const end = new vscode.Position(range.end.line, start.character + length);
+		return new vscode.Range(start, end);
+	}
 	const end = mapPositionToPhpx(phpUri, phpxUri, range.end);
 	return new vscode.Range(start, end);
 }
