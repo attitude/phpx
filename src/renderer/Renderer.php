@@ -113,7 +113,7 @@ final class Renderer {
       return $this->renderNode($this->callComponent($component, $props), $nesting);
     }
 
-    if ($type === 'Fragment') {
+    if ($type === 'fragment') {
       if (array_key_exists('dangerouslySetInnerHTML', $props)) {
         return $this->resolveDangerouslySetInnerHTML($props);
       }
