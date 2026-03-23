@@ -82,6 +82,7 @@ export class PHPXCompletionProvider implements vscode.CompletionItemProvider {
 		context: vscode.CompletionContext,
 	): Promise<vscode.CompletionList | null> {
 		const phpUri = PHPXCompiler.getCompiledUri(document.uri);
+		const phpxUri = document.uri;
 		const mappedPosition = mapPositionToPhp(document, position, phpUri);
 
 		try {
@@ -92,7 +93,41 @@ export class PHPXCompletionProvider implements vscode.CompletionItemProvider {
 					mappedPosition,
 					context.triggerCharacter,
 				);
-			return result || null;
+			if (!result) {
+				return null;
+			}
+
+			// Remap edit ranges from compiled .php coordinates back to .phpx
+			const remapRange = (range: vscode.Range) =>
+				mapRangeToPhpx(phpUri, phpxUri, range);
+
+			result.items = result.items.map((item) => {
+				// item.range can be a Range or { inserting, replacing }
+				if (item.range instanceof vscode.Range) {
+					item.range = remapRange(item.range);
+				} else if (item.range) {
+					item.range = {
+						inserting: remapRange(item.range.inserting),
+						replacing: remapRange(item.range.replacing),
+					};
+				}
+
+				// item.textEdit can be TextEdit or SnippetTextEdit
+				if (item.textEdit) {
+					item.textEdit = new vscode.TextEdit(remapRange(item.textEdit.range), item.textEdit.newText);
+				}
+
+				// item.additionalTextEdits are plain TextEdits
+				if (item.additionalTextEdits) {
+					item.additionalTextEdits = item.additionalTextEdits.map(
+						(e) => new vscode.TextEdit(remapRange(e.range), e.newText),
+					);
+				}
+
+				return item;
+			});
+
+			return result;
 		} catch {
 			return null;
 		}
