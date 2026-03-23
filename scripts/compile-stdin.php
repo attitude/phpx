@@ -1,5 +1,7 @@
 <?php declare(strict_types=1);
 
+use Attitude\PHPX\Compiler\Compiler;
+
 /**
  * PHPX Compiler - stdin/stdout mode
  *
@@ -28,8 +30,6 @@ if (!$autoloaded) {
     fwrite(STDERR, "Could not find vendor/autoload.php\n");
     exit(1);
 }
-
-use Attitude\PHPX\Compiler\Compiler;
 
 $input = file_get_contents('php://stdin');
 

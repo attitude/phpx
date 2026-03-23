@@ -102,7 +102,7 @@ final class TokensList implements \JsonSerializable, \Iterator {
 				return null;
 			}
 		} else {
-			throw new \InvalidArgumentException("Invalid value type");
+			throw new \InvalidArgumentException("Invalid value type " . gettype($value));
 		}
 	}
 

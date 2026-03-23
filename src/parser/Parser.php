@@ -226,7 +226,6 @@ final class Parser {
 
 			$value[] = $this->tokens->tokenAtCursorAndForward();
 		}
-		;
 
 		if ($this->tokens->tokenAtCursor(-1)?->id === T_WHITESPACE && strstr($value[count($value) - 1]->text, "\n")) {
 			array_pop($value);

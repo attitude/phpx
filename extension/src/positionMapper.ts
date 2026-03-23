@@ -163,9 +163,12 @@ function getNthOccurrence(
 	charOffset: number,
 ): number {
 	let n = 0;
-	const regex = new RegExp(escapeRegex(word), 'g');
+	const pattern = new RegExp(PHP_WORD_PATTERN.source, 'g');
 	let match: RegExpExecArray | null;
-	while ((match = regex.exec(line)) !== null) {
+	while ((match = pattern.exec(line)) !== null) {
+		if (match[0] !== word) {
+			continue;
+		}
 		if (match.index === charOffset) {
 			return n;
 		}
@@ -184,9 +187,12 @@ function getNthOccurrence(
  */
 function findNthOccurrence(line: string, word: string, n: number): number {
 	let count = 0;
-	const regex = new RegExp(escapeRegex(word), 'g');
+	const pattern = new RegExp(PHP_WORD_PATTERN.source, 'g');
 	let match: RegExpExecArray | null;
-	while ((match = regex.exec(line)) !== null) {
+	while ((match = pattern.exec(line)) !== null) {
+		if (match[0] !== word) {
+			continue;
+		}
 		if (count === n) {
 			return match.index;
 		}
