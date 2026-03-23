@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { PHPXCompiler } from './compiler';
 import { PHPXDiagnosticsManager } from './diagnostics';
+import { initFileCache } from './positionMapper';
 import {
 	PHPXCompletionProvider,
 	PHPXHoverProvider,
@@ -28,6 +29,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const compiler = new PHPXCompiler(outputChannel);
 	const diagnosticsManager = new PHPXDiagnosticsManager();
+
+	// Initialize file caching for position mapping
+	context.subscriptions.push(initFileCache());
 
 	// ─── Compile on open / change / save ─────────────────────────────────────
 

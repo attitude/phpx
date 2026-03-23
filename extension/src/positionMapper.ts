@@ -20,6 +20,81 @@ import * as vscode from 'vscode';
 const PHP_WORD_PATTERN = /\$?[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*/g;
 
 /**
+ * File content cache with mtime validation.
+ * Maps fsPath → { content, mtime }
+ * This avoids synchronous disk reads on every hover/completion/definition request.
+ */
+const fileCache = new Map<string, { content: string; mtime: number }>();
+
+/**
+ * Initialize file watching to invalidate cache on changes.
+ * Should be called once during extension activation.
+ */
+export function initFileCache(): vscode.Disposable {
+	// Watch for file changes to invalidate cache
+	const fileWatcher = vscode.workspace.createFileSystemWatcher(
+		'**/*.{php,phpx}',
+	);
+
+	const invalidateOnChange = (uri: vscode.Uri) => {
+		fileCache.delete(uri.fsPath);
+	};
+
+	fileWatcher.onDidChange(invalidateOnChange);
+	fileWatcher.onDidCreate(invalidateOnChange);
+	fileWatcher.onDidDelete(invalidateOnChange);
+
+	// Also invalidate cache when documents are saved (for quick updates)
+	const savedDisposable = vscode.workspace.onDidSaveTextDocument((doc) => {
+		fileCache.delete(doc.uri.fsPath);
+	});
+
+	return vscode.Disposable.from(fileWatcher, savedDisposable);
+}
+
+/**
+ * Get file content with intelligent caching.
+ * - Prioritizes open documents in VS Code workspace
+ * - Falls back to cache with mtime validation
+ * - Finally reads from disk
+ */
+function getFileContent(uri: vscode.Uri): string | null {
+	const fsPath = uri.fsPath;
+
+	// 1. Check if file is open in workspace (most up-to-date)
+	const openDoc = vscode.workspace.textDocuments.find(
+		(doc) => doc.uri.fsPath === fsPath,
+	);
+	if (openDoc) {
+		return openDoc.getText();
+	}
+
+	// 2. Check cache with mtime validation
+	const cached = fileCache.get(fsPath);
+	if (cached) {
+		try {
+			const stat = fs.statSync(fsPath);
+			if (stat.mtimeMs === cached.mtime) {
+				return cached.content;
+			}
+		} catch {
+			// File was deleted or access denied; clear cache
+			fileCache.delete(fsPath);
+		}
+	}
+
+	// 3. Read from disk and cache
+	try {
+		const content = fs.readFileSync(fsPath, 'utf-8');
+		const stat = fs.statSync(fsPath);
+		fileCache.set(fsPath, { content, mtime: stat.mtimeMs });
+		return content;
+	} catch {
+		return null;
+	}
+}
+
+/**
  * Given a PHPX document and a cursor position, return the mapped position
  * in the compiled PHP file where the same word/token appears on the same line.
  *
@@ -50,13 +125,12 @@ export function mapPositionToPhp(
 		wordRange.start.character,
 	);
 
-	// Read the corresponding line from the compiled PHP file
-	let phpContent: string;
-	try {
-		phpContent = fs.readFileSync(phpUri.fsPath, 'utf-8');
-	} catch {
+	// Get compiled PHP file content (uses cache when available)
+	const phpContent = getFileContent(phpUri);
+	if (!phpContent) {
 		return position;
 	}
+
 	const phpLines = phpContent.split('\n');
 	if (position.line >= phpLines.length) {
 		return position;
@@ -81,12 +155,11 @@ export function mapPositionToPhpx(
 	phpxUri: vscode.Uri,
 	position: vscode.Position,
 ): vscode.Position {
-	let phpContent: string;
-	let phpxContent: string;
-	try {
-		phpContent = fs.readFileSync(phpUri.fsPath, 'utf-8');
-		phpxContent = fs.readFileSync(phpxUri.fsPath, 'utf-8');
-	} catch {
+	// Get file contents (uses cache when available)
+	const phpContent = getFileContent(phpUri);
+	const phpxContent = getFileContent(phpxUri);
+
+	if (!phpContent || !phpxContent) {
 		return position;
 	}
 
