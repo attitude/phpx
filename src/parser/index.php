@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 
-require_once 'NodeType.php';
-require_once 'TokensList.php';
-require_once 'Token.php';
-require_once 'Parser.php';
+require_once __DIR__ . '/NodeType.php';
+require_once __DIR__ . '/TokensList.php';
+require_once __DIR__ . '/Token.php';
+require_once __DIR__ . '/Parser.php';
