@@ -159,16 +159,23 @@ final class Renderer {
    * Recursively normalizes attribute/prop-like values into a flat associative array of key/value pairs.
    * Accepts stdClass, associative arrays, or indexed arrays of those (nested arbitrarily), as used for
    * style, class, data-/aria- attributes and other namespaced attributes. When processing indexed arrays,
-   * null, false and empty string items are skipped.
+   * null and false items are skipped; empty strings are also skipped unless $strict is true.
+   * In strict mode (used for style), non-array/non-object values throw instead of being silently ignored.
    */
-  private function resolveProps(mixed $value): array {
-    if ($value === null || $value === false || $value === '') {
+  private function resolveProps(mixed $value, bool $strict = false): array {
+    if ($value === null || $value === false) {
+      return [];
+    }
+    if (!$strict && $value === '') {
       return [];
     }
     if ($value instanceof \stdClass) {
       $value = (array) $value;
     }
     if (!is_array($value)) {
+      if ($strict) {
+        throw new \InvalidArgumentException("Invalid props value: expected an array or object, got " . get_debug_type($value) . ".");
+      }
       return [];
     }
     if (!empty($value) && is_string(array_key_first($value))) {
@@ -177,7 +184,7 @@ final class Renderer {
 
     $result = [];
     foreach ($value as $item) {
-      foreach ($this->resolveProps($item) as $k => $v) {
+      foreach ($this->resolveProps($item, $strict) as $k => $v) {
         $result[$k] = $v;
       }
     }
@@ -222,11 +229,9 @@ final class Renderer {
       }
 
       if (is_array($value) || $value instanceof \stdClass) {
-        $resolved = $this->resolveProps($value);
-
         if ($key === 'style') {
           $css = '';
-          foreach ($resolved as $prop => $sv) {
+          foreach ($this->resolveProps($value, true) as $prop => $sv) {
             if ($sv === null || $sv === false)
               continue;
             if ($sv === true)
@@ -239,6 +244,8 @@ final class Renderer {
             $parts[] = $this->formatAttribute('style', rtrim($css, ';'));
           continue;
         }
+
+        $resolved = $this->resolveProps($value);
 
         if ($key === 'class' && (!empty($resolved) || $value instanceof \stdClass || (is_array($value) && !array_is_list($value)))) {
           $classes = array_keys(array_filter($resolved));
