@@ -802,6 +802,66 @@ PHP
     );
   });
 
+  it('compiles a simple uppercase component as a variable reference', function () {
+    $defaultCompiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $defaultCompiler->compile('<Button />');
+    expect($defaultCompiler->getAST())->toMatchSnapshot();
+    expect($defaultCompiler->getCompiled())->toBe(
+      "['$', \$Button]"
+    );
+
+    $pragmaCompiler = newCompiler(
+      withLogger: false,
+      parser: newParser(withLogger: false),
+      formatter: newPragmaFormatter(),
+    );
+    $pragmaCompiler->compile('<Button />');
+    expect($pragmaCompiler->getAST())->toMatchSnapshot();
+    expect($pragmaCompiler->getCompiled())->toBe(
+      "html(\$Button)"
+    );
+  });
+
+  it('compiles an uppercase component with props and children', function () {
+    $defaultCompiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $defaultCompiler->compile('<Button type="submit">Submit</Button>');
+    expect($defaultCompiler->getAST())->toMatchSnapshot();
+    expect($defaultCompiler->getCompiled())->toBe(
+      "['$', \$Button, ['type'=>\"submit\"], ['Submit']]"
+    );
+
+    $pragmaCompiler = newCompiler(
+      withLogger: false,
+      parser: newParser(withLogger: false),
+      formatter: newPragmaFormatter(),
+    );
+    $pragmaCompiler->compile('<Button type="submit">Submit</Button>');
+    expect($pragmaCompiler->getAST())->toMatchSnapshot();
+    expect($pragmaCompiler->getCompiled())->toBe(
+      "html(\$Button, ['type'=>\"submit\"], ['Submit'])"
+    );
+  });
+
+  it('compiles mixed uppercase and lowercase elements', function () {
+    $defaultCompiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $defaultCompiler->compile('<div><Button onClick={$handleClick}>Click me</Button></div>');
+    expect($defaultCompiler->getAST())->toMatchSnapshot();
+    expect($defaultCompiler->getCompiled())->toBe(
+      "['$', 'div', null, [['$', \$Button, ['onClick'=>(\$handleClick)], ['Click me']]]]"
+    );
+
+    $pragmaCompiler = newCompiler(
+      withLogger: false,
+      parser: newParser(withLogger: false),
+      formatter: newPragmaFormatter(),
+    );
+    $pragmaCompiler->compile('<div><Button onClick={$handleClick}>Click me</Button></div>');
+    expect($pragmaCompiler->getAST())->toMatchSnapshot();
+    expect($pragmaCompiler->getCompiled())->toBe(
+      "html('div', null, [html(\$Button, ['onClick'=>(\$handleClick)], ['Click me'])])"
+    );
+  });
+
   it('throws an error when a using PHP opening tags', function () {
     $defaultCompiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     expect(fn() => $defaultCompiler->compile('<title>[<?=$todayFormatted?>]</title>'))->toThrow(\ParseError::class, 'Unexpected PHP opening tag on line 1');

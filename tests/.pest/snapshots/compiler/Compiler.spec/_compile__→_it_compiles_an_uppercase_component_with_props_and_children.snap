@@ -1,0 +1,36 @@
+[
+    {
+        "$$type": "PHPXElement",
+        "openingElement": [
+            "L1:P0-1:<:60",
+            "L1:P1-7:Button:262:<T_STRING",
+            "L1:P21-22:>:62"
+        ],
+        "selfClosing": false,
+        "attributes": [
+            "L1:P7-8: :396:<T_WHITESPACE",
+            {
+                "$$type": "PHPXAttribute",
+                "name": [
+                    "L1:P8-12:type:262:<T_STRING"
+                ],
+                "assignment": "L1:P12-13:=:61",
+                "value": "L1:P13-21:\"submit\":269:<T_CONSTANT_ENCAPSED_STRING"
+            }
+        ],
+        "children": [
+            {
+                "$$type": "PHPXText",
+                "tokens": [
+                    "L1:P22-28:Submit:262:<T_STRING"
+                ]
+            }
+        ],
+        "closingElement": [
+            "L1:P28-29:<:60",
+            "L1:P29-30:\/:47",
+            "L1:P30-36:Button:262:<T_STRING",
+            "L1:P36-37:>:62"
+        ]
+    }
+]
