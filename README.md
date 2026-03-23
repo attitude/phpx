@@ -156,10 +156,16 @@ echo $renderer(true);        // (empty)
 
 #### Components
 
+**Uppercase tag names are compiled to variable references.**
+
+`formatElement()` outputs `$Component` (a PHP variable reference) for uppercase tag names instead of the string `'Component'`. This means `<Greeting />` compiles to `['$', $Greeting, ...]` rather than `['$', 'Greeting', ...]`, so the renderer's **components map is bypassed** — a `$Greeting` closure must be in scope at evaluation time instead.
+
+> If you relied on passing components via the named map, this is a breaking change.
+
 Pass an associative array of named components as closures. Each component receives a `$props` array (including `children`):
 
 ```php
-$node = ['$', 'Greeting', ['name' => 'World']];
+$node = ['$', $Greeting, ['name' => 'World']];
 
 echo $renderer($node, [
     'Greeting' => function(array $props): array {

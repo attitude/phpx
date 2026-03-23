@@ -7,10 +7,10 @@ require_once 'FormatterInterface.php';
 final class Formatter implements FormatterInterface {
   public function formatElement(string $type, string|null $config, string|null $children): string {
     $compiled = [
-        "'$'",
-        "'{$type}'",
-        $config,
-        $children,
+      "'$'",
+      ctype_upper($type[0]) ? "\${$type}" : "'{$type}'",
+      $config,
+      $children,
     ];
 
     if (empty($compiled[3]) || $compiled[3] === 'null' || $compiled[3] === '[]') {
@@ -23,7 +23,7 @@ final class Formatter implements FormatterInterface {
       $compiled[2] = 'null';
     }
 
-    return '['.implode(', ', $compiled).']';
+    return '[' . implode(', ', $compiled) . ']';
   }
 
   public function formatFragment(string $children): string {
