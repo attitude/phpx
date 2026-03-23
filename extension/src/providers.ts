@@ -371,7 +371,42 @@ export class PHPXCodeActionProvider implements vscode.CodeActionProvider {
 				phpUri,
 				phpRange,
 			);
-			return result || null;
+
+			if (!result) {
+				return null;
+			}
+
+			return result.map((action) => {
+				if (!action.edit) {
+					return action;
+				}
+				const newEdit = new vscode.WorkspaceEdit();
+				for (const [uri, edits] of action.edit.entries()) {
+					let targetUri: vscode.Uri | null = null;
+					if (uri.fsPath === phpUri.fsPath) {
+						targetUri = document.uri;
+					} else if (PHPXCompiler.hasPhpxSource(uri)) {
+						targetUri = PHPXCompiler.getSourceUri(uri);
+					}
+					if (!targetUri) {
+						for (const e of edits) {
+							newEdit.replace(uri, e.range, e.newText);
+						}
+					} else {
+						for (const e of edits) {
+							const mappedRange = mapRangeToPhpx(uri, targetUri, e.range);
+							newEdit.replace(targetUri, mappedRange, e.newText);
+						}
+					}
+				}
+				const remapped = new vscode.CodeAction(action.title, action.kind);
+				remapped.edit = newEdit;
+				remapped.isPreferred = action.isPreferred;
+				remapped.diagnostics = action.diagnostics;
+				remapped.command = action.command;
+				remapped.disabled = action.disabled;
+				return remapped;
+			});
 		} catch {
 			return null;
 		}
