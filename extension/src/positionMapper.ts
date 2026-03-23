@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as vscode from 'vscode';
-import { PHPXCompiler } from './compiler';
 
 /**
  * Position mapping between PHPX source and compiled PHP.

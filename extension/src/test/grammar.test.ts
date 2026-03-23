@@ -173,6 +173,16 @@ export function validateGrammarStructure(): void {
 	);
 }
 
+// Mocha test suite — registers grammar tests with the test runner
+// (suite/test are globals provided by Mocha; guard against direct Node execution)
+if (typeof suite !== 'undefined') {
+	suite('PHPX Grammar', () => {
+		test('grammar JSON has valid structure', () => {
+			validateGrammarStructure();
+		});
+	});
+}
+
 // Run tests if executed directly
 if (require.main === module) {
 	validateGrammarStructure();

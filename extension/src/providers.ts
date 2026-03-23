@@ -117,7 +117,11 @@ export class PHPXHoverProvider implements vscode.HoverProvider {
 				mappedPosition,
 			);
 			if (hovers && hovers.length > 0) {
-				return hovers[0];
+				const firstHover = hovers[0];
+				const mappedRange = firstHover.range
+					? mapRangeToPhpx(phpUri, document.uri, firstHover.range)
+					: undefined;
+				return new vscode.Hover(firstHover.contents, mappedRange);
 			}
 		} catch {
 			// Silently fail — hover is best-effort
@@ -267,12 +271,41 @@ export class PHPXDocumentSymbolProvider
 		_token: vscode.CancellationToken,
 	): Promise<vscode.DocumentSymbol[] | vscode.SymbolInformation[] | null> {
 		const phpUri = PHPXCompiler.getCompiledUri(document.uri);
+		const phpxUri = document.uri;
 
 		try {
 			const result = await vscode.commands.executeCommand<
 				vscode.DocumentSymbol[] | vscode.SymbolInformation[]
 			>('vscode.executeDocumentSymbolProvider', phpUri);
-			return result || null;
+
+			if (!result || result.length === 0) {
+				return result || null;
+			}
+
+			// Remap symbol ranges back to the PHPX source
+			if ('range' in result[0]) {
+				const remapDocSymbol = (sym: vscode.DocumentSymbol): vscode.DocumentSymbol => {
+					const range = mapRangeToPhpx(phpUri, phpxUri, sym.range);
+					const selectionRange = mapRangeToPhpx(phpUri, phpxUri, sym.selectionRange);
+					const remapped = new vscode.DocumentSymbol(sym.name, sym.detail, sym.kind, range, selectionRange);
+					remapped.children = sym.children.map(remapDocSymbol);
+					return remapped;
+				};
+				return (result as vscode.DocumentSymbol[]).map(remapDocSymbol);
+			}
+
+			return (result as vscode.SymbolInformation[]).map((sym) => {
+				if (sym.location.uri.fsPath !== phpUri.fsPath) {
+					return sym;
+				}
+				const range = mapRangeToPhpx(phpUri, phpxUri, sym.location.range);
+				return new vscode.SymbolInformation(
+					sym.name,
+					sym.kind,
+					sym.containerName,
+					new vscode.Location(phpxUri, range),
+				);
+			});
 		} catch {
 			return null;
 		}
@@ -292,7 +325,25 @@ export class PHPXWorkspaceSymbolProvider
 			const result = await vscode.commands.executeCommand<
 				vscode.SymbolInformation[]
 			>('vscode.executeWorkspaceSymbolProvider', query);
-			return result || null;
+
+			if (!result) {
+				return null;
+			}
+
+			return result.map((symbol) => {
+				const loc = symbol.location;
+				if (!PHPXCompiler.hasPhpxSource(loc.uri)) {
+					return symbol;
+				}
+				const sourceUri = PHPXCompiler.getSourceUri(loc.uri);
+				const range = mapRangeToPhpx(loc.uri, sourceUri, loc.range);
+				return new vscode.SymbolInformation(
+					symbol.name,
+					symbol.kind,
+					symbol.containerName ?? '',
+					new vscode.Location(sourceUri, range),
+				);
+			});
 		} catch {
 			return null;
 		}
@@ -309,12 +360,16 @@ export class PHPXCodeActionProvider implements vscode.CodeActionProvider {
 		_token: vscode.CancellationToken,
 	): Promise<vscode.CodeAction[] | null> {
 		const phpUri = PHPXCompiler.getCompiledUri(document.uri);
+		const phpRange = new vscode.Range(
+			mapPositionToPhp(document, range.start, phpUri),
+			mapPositionToPhp(document, range.end, phpUri),
+		);
 
 		try {
 			const result = await vscode.commands.executeCommand<vscode.CodeAction[]>(
 				'vscode.executeCodeActionProvider',
 				phpUri,
-				range,
+				phpRange,
 			);
 			return result || null;
 		} catch {
