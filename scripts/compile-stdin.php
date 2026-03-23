@@ -12,7 +12,7 @@
 // Try autoload from this project first, then from a parent project's vendor
 $autoloadPaths = [
     __DIR__.'/../vendor/autoload.php',
-    __DIR__.'/../../../../autoload.php', // When installed as a Composer dependency
+    __DIR__ . '/../../../autoload.php', // When installed as a Composer dependency (vendor/attitude/phpx/scripts → vendor/autoload.php)
 ];
 
 $autoloaded = false;
