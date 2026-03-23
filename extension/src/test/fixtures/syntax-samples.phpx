@@ -1,0 +1,80 @@
+# Fragment syntax
+<>Hello, World!</>
+
+# Self-closing element
+<br />
+
+# Element with string attribute
+<div className="container">content</div>
+
+# Element with expression attribute
+<div id={$variable}>content</div>
+
+# Element with boolean attribute
+<input type="checkbox" disabled />
+
+# Spread operator in attributes
+<img {$loading} src="about:blank" {...$props} alt='Alt text' />
+
+# Template literal
+`Hello, my name is ${$name}, and I come from ${$country}!`
+
+# PHPX comment
+<>
+  {/* This is a PHPX comment */}
+  Content here
+</>
+
+# Nested elements
+<div>
+  <h1 className="title">Hello, {$name ?? ucfirst($type)}!</h1>
+  <p>
+    Welcome to PHPX!
+    <img src="about:blank" alt="Happy coding!" /> forever!
+  </p>
+</div>
+
+# Element with multi-line attributes
+<div
+  className="text-center"
+  style="color: red;"
+  data-foo="bar"
+>
+  Hello, {$name ?? 'unnamed'}!
+</div>
+
+# Namespaced attributes
+<p xmlns:cc="http://creativecommons.org/ns#">Licensed under CC</p>
+
+# Expression with ternary
+<>{$count < 0 ? <p>Hello, {$name}!</p> : null}</>
+
+# Expression with function call
+<>Hello, {$name ?? ucfirst($type)}!</>
+
+# Escaped apostrophes
+<>These\'re quotes in a string and that\'s okay!</>
+
+# Expression with arrow function
+<ul>
+  {array_map(fn($item) => (
+    <li>{$item}</li>
+  ), $items)}
+</ul>
+
+# Template literal inside element
+<p>{`Hello, my name is ${$name ?? 'yet to be defined'}, and I come from ${$country ?? 'Earth'}!`}</p>
+
+# Empty element
+<div></div>
+
+# Void element with attributes
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href={$css} />
+
+# Data attribute with kebab-case
+<li className="meals-item" data-as-table={$meal->priceFormatted instanceof StringList} />
+
+# Shorthand boolean attribute
+<div data-foo></div>

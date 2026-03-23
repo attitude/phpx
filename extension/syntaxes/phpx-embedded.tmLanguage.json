@@ -1,0 +1,254 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "PHPX Embedded",
+  "scopeName": "source.phpx.embedded",
+  "injectionSelector": "R:source.php -string -comment",
+  "patterns": [
+    { "include": "#phpx-context" },
+    { "include": "#template-literal-injection" }
+  ],
+  "repository": {
+    "phpx-context": {
+      "comment": "Only enter PHPX mode after tokens that cannot precede a PHP comparison operator",
+      "contentName": "source.phpx.embedded.context",
+      "begin": "(?<=\\(|\\{|\\[|,|&&|\\|\\||\\?|:|=|=>|\\breturn|^return)\\s*(?=<[a-zA-Z>]|</>)",
+      "end": "(?=.)",
+      "applyEndPatternLast": 1,
+      "patterns": [
+        { "include": "#phpx-fragment-injection" },
+        { "include": "#phpx-element-injection" }
+      ]
+    },
+    "phpx-fragment-injection": {
+      "name": "meta.tag.phpx.fragment.embedded",
+      "begin": "(<>)",
+      "end": "(</>)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.phpx.fragment.begin" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.phpx.fragment.end" }
+      },
+      "patterns": [
+        { "include": "#phpx-children" }
+      ]
+    },
+    "phpx-element-injection": {
+      "patterns": [
+        { "include": "#phpx-self-closing-element" },
+        { "include": "#phpx-open-close-element" }
+      ]
+    },
+    "phpx-self-closing-element": {
+      "name": "meta.tag.phpx.self-closing.embedded",
+      "begin": "(<)([a-zA-Z][a-zA-Z0-9_-]*)(?=[^>]*/>)",
+      "end": "(/>)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.phpx" },
+        "2": { "name": "entity.name.tag.phpx" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.end.phpx" }
+      },
+      "patterns": [
+        { "include": "#phpx-attributes" }
+      ]
+    },
+    "phpx-open-close-element": {
+      "name": "meta.tag.phpx.embedded",
+      "begin": "(<)([a-zA-Z][a-zA-Z0-9_-]*)(?![^>]*/>)",
+      "end": "(</)(\\2)(>)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.phpx" },
+        "2": { "name": "entity.name.tag.phpx" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.end.phpx" },
+        "2": { "name": "entity.name.tag.phpx" },
+        "3": { "name": "punctuation.definition.tag.end.phpx" }
+      },
+      "patterns": [
+        { "include": "#phpx-opening-tag-end" },
+        { "include": "#phpx-children" }
+      ]
+    },
+    "phpx-opening-tag-end": {
+      "begin": "(?<=[a-zA-Z0-9_-])",
+      "end": "(>)",
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.end.phpx" }
+      },
+      "patterns": [
+        { "include": "#phpx-attributes" }
+      ]
+    },
+    "phpx-attributes": {
+      "patterns": [
+        { "include": "#phpx-attribute-spread" },
+        { "include": "#phpx-attribute-shorthand" },
+        { "include": "#phpx-attribute-expression" },
+        { "include": "#phpx-attribute-string-double" },
+        { "include": "#phpx-attribute-string-single" },
+        { "include": "#phpx-attribute-boolean" }
+      ]
+    },
+    "phpx-attribute-spread": {
+      "name": "meta.attribute.phpx.spread",
+      "match": "(\\{)(\\.\\.\\.)(\\$[a-zA-Z_][a-zA-Z0-9_]*)(\\})",
+      "captures": {
+        "1": { "name": "punctuation.definition.brace.begin.phpx" },
+        "2": { "name": "keyword.operator.spread.phpx" },
+        "3": { "name": "variable.other.php" },
+        "4": { "name": "punctuation.definition.brace.end.phpx" }
+      }
+    },
+    "phpx-attribute-shorthand": {
+      "name": "meta.attribute.phpx.shorthand",
+      "match": "(\\{)(\\$[a-zA-Z_][a-zA-Z0-9_]*)(\\})",
+      "captures": {
+        "1": { "name": "punctuation.definition.brace.begin.phpx" },
+        "2": { "name": "variable.other.php" },
+        "3": { "name": "punctuation.definition.brace.end.phpx" }
+      }
+    },
+    "phpx-attribute-expression": {
+      "name": "meta.attribute.phpx.expression",
+      "begin": "([a-zA-Z_][a-zA-Z0-9_:-]*)(=)(\\{)",
+      "end": "(\\})",
+      "beginCaptures": {
+        "1": { "name": "entity.other.attribute-name.phpx" },
+        "2": { "name": "punctuation.separator.key-value.phpx" },
+        "3": { "name": "punctuation.definition.brace.begin.phpx" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.brace.end.phpx" }
+      },
+      "patterns": [
+        { "include": "#phpx-expression-content" }
+      ]
+    },
+    "phpx-attribute-string-double": {
+      "name": "meta.attribute.phpx.string",
+      "match": "([a-zA-Z_][a-zA-Z0-9_:-]*)(=)(\"[^\"]*\")",
+      "captures": {
+        "1": { "name": "entity.other.attribute-name.phpx" },
+        "2": { "name": "punctuation.separator.key-value.phpx" },
+        "3": { "name": "string.quoted.double.phpx" }
+      }
+    },
+    "phpx-attribute-string-single": {
+      "name": "meta.attribute.phpx.string",
+      "match": "([a-zA-Z_][a-zA-Z0-9_:-]*)(=)('[^']*')",
+      "captures": {
+        "1": { "name": "entity.other.attribute-name.phpx" },
+        "2": { "name": "punctuation.separator.key-value.phpx" },
+        "3": { "name": "string.quoted.single.phpx" }
+      }
+    },
+    "phpx-attribute-boolean": {
+      "name": "meta.attribute.phpx.boolean",
+      "match": "([a-zA-Z_][a-zA-Z0-9_:-]*)(?=\\s|/?>)",
+      "captures": {
+        "1": { "name": "entity.other.attribute-name.phpx" }
+      }
+    },
+    "phpx-children": {
+      "patterns": [
+        { "include": "#phpx-comment" },
+        { "include": "#phpx-fragment-injection" },
+        { "include": "#phpx-element-injection" },
+        { "include": "#phpx-expression-container" },
+        { "include": "#phpx-text" }
+      ]
+    },
+    "phpx-expression-container": {
+      "name": "meta.embedded.expression.phpx",
+      "begin": "(\\{)(?!/\\*)",
+      "end": "(\\})",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.brace.begin.phpx" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.brace.end.phpx" }
+      },
+      "patterns": [
+        { "include": "#phpx-expression-content" }
+      ]
+    },
+    "phpx-expression-content": {
+      "patterns": [
+        { "include": "#phpx-nested-expression" },
+        { "include": "#template-literal-injection" },
+        { "include": "#phpx-fragment-injection" },
+        { "include": "#phpx-element-injection" },
+        { "include": "source.php" }
+      ]
+    },
+    "phpx-nested-expression": {
+      "name": "meta.embedded.expression.phpx.nested",
+      "begin": "(\\{)",
+      "end": "(\\})",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.brace.begin.phpx" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.brace.end.phpx" }
+      },
+      "patterns": [
+        { "include": "#phpx-expression-content" }
+      ]
+    },
+    "phpx-comment": {
+      "name": "comment.block.phpx",
+      "begin": "(\\{)(/\\*)",
+      "end": "(\\*/)(\\})",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.brace.begin.phpx" },
+        "2": { "name": "punctuation.definition.comment.begin.phpx" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.comment.end.phpx" },
+        "2": { "name": "punctuation.definition.brace.end.phpx" }
+      }
+    },
+    "phpx-text": {
+      "match": "[^<>{}]+"
+    },
+    "template-literal-injection": {
+      "name": "string.template.phpx",
+      "begin": "(`)",
+      "end": "(`)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.string.template.begin.phpx" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.string.template.end.phpx" }
+      },
+      "patterns": [
+        { "include": "#template-literal-interpolation" },
+        {
+          "name": "string.template.content.phpx",
+          "match": "[^`$]+"
+        },
+        {
+          "name": "string.template.content.phpx",
+          "match": "\\$(?!\\{)"
+        }
+      ]
+    },
+    "template-literal-interpolation": {
+      "name": "meta.embedded.expression.template.phpx",
+      "begin": "(\\$\\{)",
+      "end": "(\\})",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.interpolation.begin.phpx" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.interpolation.end.phpx" }
+      },
+      "patterns": [
+        { "include": "#phpx-expression-content" }
+      ]
+    }
+  }
+}

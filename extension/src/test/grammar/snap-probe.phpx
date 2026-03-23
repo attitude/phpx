@@ -1,0 +1,9 @@
+<?php
+
+{ <div>hello</div> }
+
+function Foo(): array {
+  return (
+    <footer>text</footer>
+  );
+}

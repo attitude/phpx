@@ -1,0 +1,80 @@
+# SYNTAX TEST "source.phpx" "PHPX in PHP function bodies"
+
+<?php
+
+function Foo(): array {
+  return (
+    <div>
+#   ^ punctuation.definition.tag.begin.phpx
+#    ^^^ entity.name.tag.phpx
+#       ^ punctuation.definition.tag.end.phpx
+      Hello
+    </div>
+#   ^^ punctuation.definition.tag.end.phpx
+#     ^^^ entity.name.tag.phpx
+#        ^ punctuation.definition.tag.end.phpx
+  );
+}
+
+function Bar(): array {
+  return (
+    <br />
+#   ^ punctuation.definition.tag.begin.phpx
+#    ^^ entity.name.tag.phpx
+#       ^^ punctuation.definition.tag.end.phpx
+  );
+}
+
+function Baz(): array {
+  return (
+    <>
+#   ^^ punctuation.definition.tag.phpx.fragment.begin
+    </>
+#   ^^^ punctuation.definition.tag.phpx.fragment.end
+  );
+}
+
+function Attrs(): array {
+  return (
+    <img src="/foo.png" />
+#        ^^^ entity.other.attribute-name.phpx
+#           ^ punctuation.separator.key-value.phpx
+  );
+}
+
+function BoolAttr(): array {
+  return (
+    <input disabled />
+#          ^^^^^^^^ entity.other.attribute-name.phpx
+  );
+}
+
+function Expr(): array {
+  $x = 'hi';
+  return (
+    <p>{$x}</p>
+#      ^ punctuation.definition.brace.begin.phpx
+#         ^ punctuation.definition.brace.end.phpx
+  );
+}
+
+function CustomElement(): array {
+  return (
+    <my-element />
+#   ^ punctuation.definition.tag.begin.phpx
+#    ^^^^^^^^^^ entity.name.tag.phpx
+#               ^^ punctuation.definition.tag.end.phpx
+  );
+}
+
+function CustomElementWithChildren(): array {
+  return (
+    <web-component>Hello</web-component>
+#   ^ punctuation.definition.tag.begin.phpx
+#    ^^^^^^^^^^^^^ entity.name.tag.phpx
+#                 ^ punctuation.definition.tag.end.phpx
+#                       ^^ punctuation.definition.tag.end.phpx
+#                         ^^^^^^^^^^^^^ entity.name.tag.phpx
+#                                      ^ punctuation.definition.tag.end.phpx
+  );
+}
