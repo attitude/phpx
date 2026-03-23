@@ -231,6 +231,22 @@ describe('Attitude\ArrayRenderer\HTML', function () {
     expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
   });
 
+  it('throws when indexed style array contains a boolean', function () {
+    $html = ['$', 'div', [
+      'style' => [true],
+    ]];
+
+    expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+  });
+
+  it('throws when indexed style array contains a plain string', function () {
+    $html = ['$', 'div', [
+      'style' => ['color:red'],
+    ]];
+
+    expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+  });
+
   it('maps className to class attribute', function () {
     $html = ['$', 'div', ['className' => 'my-class'], 'content'];
 
