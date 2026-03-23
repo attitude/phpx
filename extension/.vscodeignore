@@ -4,10 +4,9 @@ src/**
 out/test/**
 node_modules/**
 .gitignore
-.yarnrc
-.yarnrc.yml
-.yarn/**
-yarn.lock
+.npmrc
+pnpm-lock.yaml
+pnpm-workspace.yaml
 vsc-extension-quickstart.md
 **/tsconfig.json
 **/.eslintrc.json

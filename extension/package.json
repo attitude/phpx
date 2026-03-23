@@ -92,13 +92,13 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "yarn compile",
+    "vscode:prepublish": "pnpm compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "test": "yarn compile && node ./out/test/runTest.js",
-    "test:grammar": "yarn compile && node ./out/test/grammar.test.js",
+    "test": "pnpm compile && node ./out/test/runTest.js",
+    "test:grammar": "pnpm compile && node ./out/test/grammar.test.js",
     "lint": "eslint src --ext ts",
-    "package": "vsce package --no-yarn --allow-missing-repository"
+    "package": "vsce package --no-dependencies --allow-missing-repository"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
