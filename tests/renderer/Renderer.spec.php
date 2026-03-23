@@ -315,9 +315,9 @@ describe('Attitude\ArrayRenderer\HTML', function () {
     expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
   });
 
-  it('renders dangerouslySetInnerHTML via a special Fragment component name', function () {
+  it('renders dangerouslySetInnerHTML via a special fragment component name', function () {
     $html = ['$', 'article', null, [
-      ['$', 'Fragment', ['dangerouslySetInnerHTML' => ['__html' => '<h1>Raw Title</h1><p>Raw paragraph.</p>']]],
+      ['$', 'fragment', ['dangerouslySetInnerHTML' => ['__html' => '<h1>Raw Title</h1><p>Raw paragraph.</p>']]],
     ]];
 
     $expected = '<article><h1>Raw Title</h1><p>Raw paragraph.</p></article>';
@@ -339,8 +339,8 @@ describe('Attitude\ArrayRenderer\HTML', function () {
     expect((new Renderer)($html))->toBe($expected);
   });
 
-  it('throws when Fragment receives both dangerouslySetInnerHTML and children', function () {
-    $html = ['$', 'Fragment', ['dangerouslySetInnerHTML' => ['__html' => '<b>raw</b>']], 'child text'];
+  it('throws when fragment receives both dangerouslySetInnerHTML and children', function () {
+    $html = ['$', 'fragment', ['dangerouslySetInnerHTML' => ['__html' => '<b>raw</b>']], 'child text'];
 
     expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
   });
