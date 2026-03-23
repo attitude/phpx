@@ -185,7 +185,16 @@ export function mapPositionToPhpx(
 	}
 
 	const occurrenceIndex = getNthOccurrence(phpLine, word.text, word.start);
-	const phpxCol = findNthOccurrence(phpxLine, word.text, occurrenceIndex);
+	let phpxCol = findNthOccurrence(phpxLine, word.text, occurrenceIndex);
+
+	// Handle uppercase components: PHP has `$ClientCounter` but PHPX has `ClientCounter`
+	// (no leading `$`). When the direct lookup fails, retry without the `$` prefix.
+	if (phpxCol === -1 && word.text.startsWith('$')) {
+		const unprefixed = word.text.slice(1);
+		const unprefixedIndex = getNthOccurrence(phpLine, word.text, word.start);
+		phpxCol = findNthOccurrence(phpxLine, unprefixed, unprefixedIndex);
+	}
+
 	if (phpxCol === -1) {
 		return position;
 	}
@@ -209,7 +218,19 @@ export function mapRangeToPhpx(
 ): vscode.Range {
 	const start = mapPositionToPhpx(phpUri, phpxUri, range.start);
 	if (range.start.line === range.end.line) {
-		const length = range.end.character - range.start.character;
+		// Use the actual token length from the PHPX line (e.g. `ClientCounter` is
+		// one char shorter than `$ClientCounter`). Fall back to the PHP length only
+		// if no word is found at the mapped position.
+		const phpxContent = getFileContent(phpxUri);
+		let length = range.end.character - range.start.character;
+		if (phpxContent) {
+			const phpxLines = phpxContent.split('\n');
+			const phpxLine = phpxLines[start.line] ?? '';
+			const wordAtStart = getWordAt(phpxLine, start.character);
+			if (wordAtStart) {
+				length = wordAtStart.text.length;
+			}
+		}
 		const end = new vscode.Position(range.end.line, start.character + length);
 		return new vscode.Range(start, end);
 	}
