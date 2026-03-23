@@ -33,9 +33,57 @@
     },
     "phpx-in-php": {
       "patterns": [
+        { "include": "#phpx-php-block" },
+        { "include": "#phpx-paren-block" },
+        { "include": "#phpx-array-block" },
         { "include": "#phpx-fragment" },
         { "include": "#phpx-element" },
         { "include": "#template-literal" }
+      ]
+    },
+    "phpx-php-block": {
+      "comment": "PHP { } block - intercepted so PHPX patterns are available inside function bodies",
+      "begin": "\\{",
+      "end": "\\}",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.begin.bracket.curly.php" }
+      },
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.end.bracket.curly.php" }
+      },
+      "patterns": [
+        { "include": "#phpx-in-php" },
+        { "include": "source.php" }
+      ]
+    },
+    "phpx-paren-block": {
+      "comment": "PHP ( ) group - intercepted so PHPX patterns are available inside return ( ... )",
+      "begin": "\\(",
+      "end": "\\)",
+      "beginCaptures": {
+        "0": { "name": "punctuation.definition.begin.bracket.round.php" }
+      },
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.end.bracket.round.php" }
+      },
+      "patterns": [
+        { "include": "#phpx-in-php" },
+        { "include": "source.php" }
+      ]
+    },
+    "phpx-array-block": {
+      "comment": "PHP [ ] array - intercepted so PHPX patterns are available inside array values",
+      "begin": "\\[",
+      "end": "\\]",
+      "beginCaptures": {
+        "0": { "name": "punctuation.section.array.begin.php" }
+      },
+      "endCaptures": {
+        "0": { "name": "punctuation.section.array.end.php" }
+      },
+      "patterns": [
+        { "include": "#phpx-in-php" },
+        { "include": "source.php" }
       ]
     },
     "phpx-fragment": {
@@ -242,8 +290,7 @@
       }
     },
     "phpx-text": {
-      "name": "string.unquoted.phpx.text",
-      "match": "[^<>{]+"
+      "match": "[^<>{}]+"
     },
     "template-literal": {
       "name": "string.template.phpx",

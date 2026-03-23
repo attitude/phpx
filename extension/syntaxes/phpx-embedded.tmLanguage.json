@@ -2,13 +2,23 @@
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "PHPX Embedded",
   "scopeName": "source.phpx.embedded",
-  "injectionSelector": "L:source.php -string -comment",
+  "injectionSelector": "R:source.php -string -comment",
   "patterns": [
-    { "include": "#phpx-fragment-injection" },
-    { "include": "#phpx-element-injection" },
+    { "include": "#phpx-context" },
     { "include": "#template-literal-injection" }
   ],
   "repository": {
+    "phpx-context": {
+      "comment": "Only enter PHPX mode after tokens that cannot precede a PHP comparison operator",
+      "contentName": "source.phpx.embedded.context",
+      "begin": "(?<=\\(|\\{|\\[|,|&&|\\|\\||\\?|:|=|=>|\\breturn|^return)\\s*(?=<[a-zA-Z>]|</>)",
+      "end": "(?=.)",
+      "applyEndPatternLast": 1,
+      "patterns": [
+        { "include": "#phpx-fragment-injection" },
+        { "include": "#phpx-element-injection" }
+      ]
+    },
     "phpx-fragment-injection": {
       "name": "meta.tag.phpx.fragment.embedded",
       "begin": "(<>)",
@@ -202,8 +212,7 @@
       }
     },
     "phpx-text": {
-      "name": "string.unquoted.phpx.text",
-      "match": "[^<>{]+"
+      "match": "[^<>{}]+"
     },
     "template-literal-injection": {
       "name": "string.template.phpx",

@@ -1,0 +1,48 @@
+><?php
+#^^^^^ source.phpx meta.embedded.block.php punctuation.section.embedded.begin.php
+>
+>{ <div>hello</div> }
+#^ source.phpx meta.embedded.block.php punctuation.definition.begin.bracket.curly.php
+# ^ source.phpx meta.embedded.block.php
+#  ^ source.phpx meta.embedded.block.php meta.tag.phpx punctuation.definition.tag.begin.phpx
+#   ^^^ source.phpx meta.embedded.block.php meta.tag.phpx entity.name.tag.phpx
+#      ^ source.phpx meta.embedded.block.php meta.tag.phpx punctuation.definition.tag.end.phpx
+#       ^^^^^ source.phpx meta.embedded.block.php meta.tag.phpx
+#            ^^ source.phpx meta.embedded.block.php meta.tag.phpx punctuation.definition.tag.end.phpx
+#              ^^^ source.phpx meta.embedded.block.php meta.tag.phpx entity.name.tag.phpx
+#                 ^ source.phpx meta.embedded.block.php meta.tag.phpx punctuation.definition.tag.end.phpx
+#                  ^ source.phpx meta.embedded.block.php
+#                   ^ source.phpx meta.embedded.block.php punctuation.definition.end.bracket.curly.php
+>
+>function Foo(): array {
+#^^^^^^^^ source.phpx meta.embedded.block.php meta.function.php storage.type.function.php
+#        ^ source.phpx meta.embedded.block.php meta.function.php
+#         ^^^ source.phpx meta.embedded.block.php meta.function.php entity.name.function.php
+#            ^ source.phpx meta.embedded.block.php meta.function.php punctuation.definition.parameters.begin.bracket.round.php
+#             ^ source.phpx meta.embedded.block.php meta.function.php punctuation.definition.parameters.end.bracket.round.php
+#              ^ source.phpx meta.embedded.block.php meta.function.php keyword.operator.return-value.php
+#               ^ source.phpx meta.embedded.block.php meta.function.php
+#                ^^^^^ source.phpx meta.embedded.block.php meta.function.php keyword.other.type.php
+#                     ^ source.phpx meta.embedded.block.php
+#                      ^ source.phpx meta.embedded.block.php punctuation.definition.begin.bracket.curly.php
+>  return (
+#^^ source.phpx meta.embedded.block.php
+#  ^^^^^^ source.phpx meta.embedded.block.php keyword.control.return.php
+#        ^ source.phpx meta.embedded.block.php
+#         ^ source.phpx meta.embedded.block.php punctuation.definition.begin.bracket.round.php
+>    <footer>text</footer>
+#^^^^ source.phpx meta.embedded.block.php
+#    ^ source.phpx meta.embedded.block.php meta.tag.phpx punctuation.definition.tag.begin.phpx
+#     ^^^^^^ source.phpx meta.embedded.block.php meta.tag.phpx entity.name.tag.phpx
+#           ^ source.phpx meta.embedded.block.php meta.tag.phpx punctuation.definition.tag.end.phpx
+#            ^^^^ source.phpx meta.embedded.block.php meta.tag.phpx
+#                ^^ source.phpx meta.embedded.block.php meta.tag.phpx punctuation.definition.tag.end.phpx
+#                  ^^^^^^ source.phpx meta.embedded.block.php meta.tag.phpx entity.name.tag.phpx
+#                        ^ source.phpx meta.embedded.block.php meta.tag.phpx punctuation.definition.tag.end.phpx
+>  );
+#^^ source.phpx meta.embedded.block.php
+#  ^ source.phpx meta.embedded.block.php punctuation.definition.end.bracket.round.php
+#   ^ source.phpx meta.embedded.block.php punctuation.terminator.expression.php
+>}
+#^ source.phpx meta.embedded.block.php punctuation.definition.end.bracket.curly.php
+>

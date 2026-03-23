@@ -54,7 +54,8 @@
         "scopeName": "source.phpx.embedded",
         "path": "./syntaxes/phpx-embedded.tmLanguage.json",
         "injectTo": [
-          "source.php"
+          "source.php",
+          "source.phpx"
         ]
       }
     ],
@@ -96,7 +97,7 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "test": "pnpm compile && node ./out/test/runTest.js",
-    "test:grammar": "pnpm compile && node ./out/test/grammar.test.js",
+    "test:grammar": "vscode-tmgrammar-test -g ./syntaxes/phpx.tmLanguage.json './src/test/grammar/phpx.test.phpx' && vscode-tmgrammar-test -g ./syntaxes/phpx.tmLanguage.json -g '/Applications/Visual Studio Code.app/Contents/Resources/app/extensions/php/syntaxes/php.tmLanguage.json' './src/test/grammar/phpx-function.test.phpx'",
     "lint": "eslint src --ext ts",
     "package": "vsce package --no-dependencies --allow-missing-repository"
   },

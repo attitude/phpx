@@ -26,7 +26,6 @@ export async function runGrammarTests(): Promise<void> {
 			input: '<>content</>',
 			expectedScopes: [
 				{ text: '<>', scope: 'punctuation.definition.tag.phpx.fragment.begin' },
-				{ text: 'content', scope: 'string.unquoted.phpx.text' },
 				{ text: '</>', scope: 'punctuation.definition.tag.phpx.fragment.end' },
 			],
 		},
