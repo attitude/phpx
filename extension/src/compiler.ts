@@ -34,30 +34,51 @@ export class PHPXCompiler {
 	/**
 	 * Find the compile-stdin.php script.
 	 * Searches in the workspace (as the PHPX project itself, or as a dependency).
+	 * Walks up from the document's directory to handle cases where the workspace
+	 * root is not the Composer project root.
 	 */
 	private findCompilerScript(documentUri: vscode.Uri): string | undefined {
 		const workspaceFolder = vscode.workspace.getWorkspaceFolder(documentUri);
-		if (!workspaceFolder) {
-			return undefined;
+
+		this.outputChannel.appendLine(`[findCompilerScript] document: ${documentUri.fsPath}`);
+		this.outputChannel.appendLine(`[findCompilerScript] workspaceFolder: ${workspaceFolder?.uri.fsPath ?? '(none)'}`);
+
+		const candidateRoots: string[] = [];
+
+		// Workspace folder root first (fast path)
+		if (workspaceFolder) {
+			candidateRoots.push(workspaceFolder.uri.fsPath);
 		}
 
-		const searchPaths = [
-			// This IS the PHPX project
-			path.join(workspaceFolder.uri.fsPath, 'scripts', 'compile-stdin.php'),
-			// PHPX installed as a Composer dependency
-			path.join(
-				workspaceFolder.uri.fsPath,
-				'vendor',
-				'attitude',
-				'phpx',
-				'scripts',
-				'compile-stdin.php',
-			),
-		];
+		// Walk up from the document's directory to find the project root
+		let dir = path.dirname(documentUri.fsPath);
+		const stopAt = workspaceFolder?.uri.fsPath;
+		while (true) {
+			if (!candidateRoots.includes(dir)) {
+				candidateRoots.push(dir);
+			}
+			const parent = path.dirname(dir);
+			if (parent === dir || (stopAt !== undefined && dir === stopAt)) {
+				break;
+			}
+			dir = parent;
+		}
 
-		for (const p of searchPaths) {
-			if (fs.existsSync(p)) {
-				return p;
+		this.outputChannel.appendLine(`[findCompilerScript] candidate roots: ${JSON.stringify(candidateRoots)}`);
+
+		for (const root of candidateRoots) {
+			const candidates = [
+				// This IS the PHPX project
+				path.join(root, 'scripts', 'compile-stdin.php'),
+				// PHPX installed as a Composer dependency
+				path.join(root, 'vendor', 'attitude', 'phpx', 'scripts', 'compile-stdin.php'),
+			];
+			for (const p of candidates) {
+				const exists = fs.existsSync(p);
+				this.outputChannel.appendLine(`[findCompilerScript]   ${exists ? 'FOUND' : 'missing'}: ${p}`);
+				if (exists) {
+					return p;
+				}
 			}
 		}
 
@@ -65,10 +86,22 @@ export class PHPXCompiler {
 	}
 
 	/**
-	 * Find the project root (where vendor/autoload.php lives)
+	 * Find the project root (where vendor/autoload.php lives).
+	 * Walks up from the document's directory to find it.
 	 */
 	private findProjectRoot(documentUri: vscode.Uri): string {
 		const workspaceFolder = vscode.workspace.getWorkspaceFolder(documentUri);
+		let dir = path.dirname(documentUri.fsPath);
+		while (true) {
+			if (fs.existsSync(path.join(dir, 'vendor', 'autoload.php'))) {
+				return dir;
+			}
+			const parent = path.dirname(dir);
+			if (parent === dir || dir === workspaceFolder?.uri.fsPath) {
+				break;
+			}
+			dir = parent;
+		}
 		return workspaceFolder?.uri.fsPath || path.dirname(documentUri.fsPath);
 	}
 
