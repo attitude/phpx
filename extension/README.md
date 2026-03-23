@@ -60,9 +60,9 @@ $greeting = `Hello, ${$name ?? 'World'}!`;
 1. Build the extension:
    ```bash
    cd extension
-   npm install
-   npm run compile
-   npx vsce package
+   pnpm install
+   pnpm compile
+   pnpm package
    ```
 
 2. Install the `.vsix` file:
@@ -80,18 +80,18 @@ Search for "PHPX Language Support" in the VS Code Extensions marketplace.
 ### Setup
 ```bash
 cd extension
-npm install
-npm run compile
+pnpm install
+pnpm compile
 ```
 
 ### Watch Mode
 ```bash
-npm run watch
+pnpm watch
 ```
 
 ### Testing
 ```bash
-npm test
+pnpm test
 ```
 
 ### Running the Extension
