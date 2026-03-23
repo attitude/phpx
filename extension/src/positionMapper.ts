@@ -273,7 +273,3 @@ function findNthOccurrence(line: string, word: string, n: number): number {
 	}
 	return -1;
 }
-
-function escapeRegex(str: string): string {
-	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
