@@ -260,7 +260,6 @@ function getNthOccurrence(
  */
 function findNthOccurrence(line: string, word: string, n: number): number {
 	let count = 0;
-	let lastMatchIndex = -1;
 	const pattern = new RegExp(PHP_WORD_PATTERN.source, 'g');
 	let match: RegExpExecArray | null;
 	while ((match = pattern.exec(line)) !== null) {
@@ -270,11 +269,9 @@ function findNthOccurrence(line: string, word: string, n: number): number {
 		if (count === n) {
 			return match.index;
 		}
-		lastMatchIndex = match.index;
 		count++;
 	}
-	// If the exact nth wasn't found, return the last match or -1
-	return lastMatchIndex;
+	return -1;
 }
 
 function escapeRegex(str: string): string {

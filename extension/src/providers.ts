@@ -455,7 +455,14 @@ export class PHPXRenameProvider implements vscode.RenameProvider {
 				} else if (PHPXCompiler.hasPhpxSource(uri)) {
 					targetUri = PHPXCompiler.getSourceUri(uri);
 				}
-				remapped.set(targetUri, edits);
+
+				for (const edit of edits) {
+					const targetRange =
+						targetUri.fsPath === uri.fsPath
+							? edit.range
+							: mapRangeToPhpx(uri, targetUri, edit.range);
+					remapped.replace(targetUri, targetRange, edit.newText);
+				}
 			}
 
 			return remapped;
@@ -473,13 +480,25 @@ export class PHPXRenameProvider implements vscode.RenameProvider {
 	> {
 		// Ensure the position is on a renameable symbol
 		const phpUri = PHPXCompiler.getCompiledUri(document.uri);
+		const phpxUri = document.uri;
 		const mappedPosition = mapPositionToPhp(document, position, phpUri);
 
 		try {
 			const result = await vscode.commands.executeCommand<
-				{ range: vscode.Range; placeholder: string } | undefined
+				vscode.Range | { range: vscode.Range; placeholder: string } | undefined
 			>('vscode.prepareRename', phpUri, mappedPosition);
-			return result || null;
+			if (!result) {
+				return null;
+			}
+
+			if (result instanceof vscode.Range) {
+				return mapRangeToPhpx(phpUri, phpxUri, result);
+			}
+
+			return {
+				range: mapRangeToPhpx(phpUri, phpxUri, result.range),
+				placeholder: result.placeholder,
+			};
 		} catch {
 			return null;
 		}

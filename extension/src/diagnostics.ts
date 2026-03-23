@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { PHPXCompiler } from './compiler';
+import { mapRangeToPhpx } from './positionMapper';
 
 /**
  * Manages diagnostics for PHPX files.
@@ -83,27 +84,44 @@ export class PHPXDiagnosticsManager {
 			const forwarded = phpDiagnostics
 				.filter((d) => this.shouldForwardDiagnostic(d))
 				.map((d) => {
+					const mappedRange = mapRangeToPhpx(uri, phpxUri, d.range);
 					const mapped = new vscode.Diagnostic(
-						d.range, // Line numbers are preserved by the compiler
+						mappedRange,
 						d.message,
 						d.severity,
 					);
 					mapped.source = d.source ? `phpx (${d.source})` : 'phpx';
 					mapped.code = d.code;
 					mapped.relatedInformation = d.relatedInformation?.map((info) => {
-						// Remap related information URIs too
 						let infoUri = info.location.uri;
-						if (PHPXCompiler.hasPhpxSource(infoUri)) {
-							infoUri = PHPXCompiler.getSourceUri(infoUri);
+						let infoRange = info.location.range;
+
+						if (info.location.uri.fsPath === uri.fsPath) {
+							infoUri = phpxUri;
+							infoRange = mapRangeToPhpx(uri, phpxUri, info.location.range);
+						} else if (PHPXCompiler.hasPhpxSource(info.location.uri)) {
+							infoUri = PHPXCompiler.getSourceUri(info.location.uri);
+							infoRange = mapRangeToPhpx(
+								info.location.uri,
+								infoUri,
+								info.location.range,
+							);
+						} else {
+							const mappedPhpxUri = this.phpToPhpxMap.get(
+								info.location.uri.toString(),
+							);
+							if (mappedPhpxUri) {
+								infoUri = mappedPhpxUri;
+								infoRange = mapRangeToPhpx(
+									info.location.uri,
+									mappedPhpxUri,
+									info.location.range,
+								);
+							}
 						}
-						const mappedPhpxUri = this.phpToPhpxMap.get(
-							info.location.uri.toString(),
-						);
-						if (mappedPhpxUri) {
-							infoUri = mappedPhpxUri;
-						}
+
 						return new vscode.DiagnosticRelatedInformation(
-							new vscode.Location(infoUri, info.location.range),
+							new vscode.Location(infoUri, infoRange),
 							info.message,
 						);
 					});
