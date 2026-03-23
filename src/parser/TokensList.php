@@ -1,4 +1,4 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace Attitude\PHPX\Parser;
 
@@ -28,8 +28,10 @@ const TX_PHP_OPEN_SEQUENCE = ['<', '?'];
 const TX_ELEMENT_SELF_CLOSING_SEQUENCE = ['/', '>'];
 /** Token for >, value of ord('>'); */
 const TX_ELEMENT_OPENING_CLOSE = 62;
-/** Token for </T_STRING> sequence, value of ['<', '/', T_STRING, '>']; */
-const TX_ELEMENT_CLOSING_SEQUENCE = ['<', '/', T_STRING, '>'];
+/** Token sequence for </T_STRING, value of ['<', '/', T_STRING]; */
+const TX_ELEMENT_CLOSING_OPEN_SEQUENCE = ['<', '/', T_STRING];
+/** Token for >, value of ord('>'); */
+const TX_ELEMENT_CLOSING_CLOSE = 62;
 /** Token for Template Literal backtick, value of ord('`'); */
 const TX_TEMPLATE_LITERAL = 96; // ord('`');
 
@@ -100,7 +102,7 @@ final class TokensList implements \JsonSerializable, \Iterator {
 				return null;
 			}
 		} else {
-			throw new \InvalidArgumentException("Invalid value type ".gettype($value));
+			throw new \InvalidArgumentException("Invalid value type");
 		}
 	}
 
@@ -136,7 +138,7 @@ final class TokensList implements \JsonSerializable, \Iterator {
 	}
 
 	public function __toString(): string {
-		return implode('', array_map(fn ($token) => $token->text, $this->tokens));
+		return implode('', array_map(fn($token) => $token->text, $this->tokens));
 	}
 
 	// Iterator methods:

@@ -1,0 +1,56 @@
+[
+    {
+        "$$type": "PHPXElement",
+        "openingElement": [
+            "L1:P0-1:<:60",
+            [
+                "L1:P1-3:my:262:<T_STRING",
+                "L1:P3-4:-:45",
+                "L1:P4-8:list:343:<T_LIST"
+            ],
+            "L1:P8-9:>:62"
+        ],
+        "selfClosing": false,
+        "attributes": [],
+        "children": [
+            {
+                "$$type": "PHPXElement",
+                "openingElement": [
+                    "L1:P9-10:<:60",
+                    [
+                        "L1:P10-12:my:262:<T_STRING",
+                        "L1:P12-13:-:45",
+                        "L1:P13-17:item:262:<T_STRING"
+                    ],
+                    "L1:P17-18:>:62"
+                ],
+                "selfClosing": false,
+                "attributes": [],
+                "children": [
+                    {
+                        "$$type": "PHPXText",
+                        "tokens": [
+                            "L1:P18-23:First:262:<T_STRING"
+                        ]
+                    }
+                ],
+                "closingElement": [
+                    "L1:P23-24:<:60",
+                    "L1:P24-25:\/:47",
+                    "L1:P25-27:my:262:<T_STRING",
+                    "L1:P27-28:-:45",
+                    "L1:P28-32:item:262:<T_STRING",
+                    "L1:P32-33:>:62"
+                ]
+            }
+        ],
+        "closingElement": [
+            "L1:P33-34:<:60",
+            "L1:P34-35:\/:47",
+            "L1:P35-37:my:262:<T_STRING",
+            "L1:P37-38:-:45",
+            "L1:P38-42:list:343:<T_LIST",
+            "L1:P42-43:>:62"
+        ]
+    }
+]

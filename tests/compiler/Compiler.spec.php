@@ -866,4 +866,104 @@ PHP
     $defaultCompiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     expect(fn() => $defaultCompiler->compile('<title>[<?=$todayFormatted?>]</title>'))->toThrow(\ParseError::class, 'Unexpected PHP opening tag on line 1');
   });
+
+  it('compiles a self-closing custom element', function () {
+    $defaultCompiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $defaultCompiler->compile('<my-element />');
+    expect($defaultCompiler->getAST())->toMatchSnapshot();
+    expect($defaultCompiler->getCompiled())->toBe(
+      "['$', 'my-element']"
+    );
+
+    $pragmaCompiler = newCompiler(
+      withLogger: false,
+      parser: newParser(withLogger: false),
+      formatter: newPragmaFormatter(),
+    );
+    $pragmaCompiler->compile('<my-element />');
+    expect($pragmaCompiler->getAST())->toMatchSnapshot();
+    expect($pragmaCompiler->getCompiled())->toBe(
+      "html('my-element')"
+    );
+  });
+
+  it('compiles a custom element with children', function () {
+    $defaultCompiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $defaultCompiler->compile('<web-component>Hello</web-component>');
+    expect($defaultCompiler->getAST())->toMatchSnapshot();
+    expect($defaultCompiler->getCompiled())->toBe(
+      "['$', 'web-component', null, ['Hello']]"
+    );
+
+    $pragmaCompiler = newCompiler(
+      withLogger: false,
+      parser: newParser(withLogger: false),
+      formatter: newPragmaFormatter(),
+    );
+    $pragmaCompiler->compile('<web-component>Hello</web-component>');
+    expect($pragmaCompiler->getAST())->toMatchSnapshot();
+    expect($pragmaCompiler->getCompiled())->toBe(
+      "html('web-component', null, ['Hello'])"
+    );
+  });
+
+  it('compiles a custom element with attributes', function () {
+    $defaultCompiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $defaultCompiler->compile('<my-el data-value="42" />');
+    expect($defaultCompiler->getAST())->toMatchSnapshot();
+    expect($defaultCompiler->getCompiled())->toBe(
+      "['$', 'my-el', ['data-value'=>\"42\"]]"
+    );
+
+    $pragmaCompiler = newCompiler(
+      withLogger: false,
+      parser: newParser(withLogger: false),
+      formatter: newPragmaFormatter(),
+    );
+    $pragmaCompiler->compile('<my-el data-value="42" />');
+    expect($pragmaCompiler->getAST())->toMatchSnapshot();
+    expect($pragmaCompiler->getCompiled())->toBe(
+      "html('my-el', ['data-value'=>\"42\"])"
+    );
+  });
+
+  it('compiles a multi-dash custom element', function () {
+    $defaultCompiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $defaultCompiler->compile('<x-my-component />');
+    expect($defaultCompiler->getAST())->toMatchSnapshot();
+    expect($defaultCompiler->getCompiled())->toBe(
+      "['$', 'x-my-component']"
+    );
+
+    $pragmaCompiler = newCompiler(
+      withLogger: false,
+      parser: newParser(withLogger: false),
+      formatter: newPragmaFormatter(),
+    );
+    $pragmaCompiler->compile('<x-my-component />');
+    expect($pragmaCompiler->getAST())->toMatchSnapshot();
+    expect($pragmaCompiler->getCompiled())->toBe(
+      "html('x-my-component')"
+    );
+  });
+
+  it('compiles nested custom elements', function () {
+    $defaultCompiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $defaultCompiler->compile('<my-list><my-item>First</my-item></my-list>');
+    expect($defaultCompiler->getAST())->toMatchSnapshot();
+    expect($defaultCompiler->getCompiled())->toBe(
+      "['$', 'my-list', null, [['$', 'my-item', null, ['First']]]]"
+    );
+
+    $pragmaCompiler = newCompiler(
+      withLogger: false,
+      parser: newParser(withLogger: false),
+      formatter: newPragmaFormatter(),
+    );
+    $pragmaCompiler->compile('<my-list><my-item>First</my-item></my-list>');
+    expect($pragmaCompiler->getAST())->toMatchSnapshot();
+    expect($pragmaCompiler->getCompiled())->toBe(
+      "html('my-list', null, [html('my-item', null, ['First'])])"
+    );
+  });
 });

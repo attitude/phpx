@@ -1,8 +1,8 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace Attitude\PHPX\Compiler;
 
-include_once __DIR__.'/../arrayMap.php';
+include_once __DIR__ . '/../arrayMap.php';
 
 use Attitude\PHPX\Compiler\Formatter;
 use Attitude\PHPX\Parser\NodeType;
@@ -35,7 +35,7 @@ final class Compiler {
 		$this->compiled = '';
 
 		foreach ($this->ast as $node) {
-			$this->compiled .= match($node['$$type']) {
+			$this->compiled .= match ($node['$$type']) {
 				NodeType::BLOCK => $this->compileBlock($node),
 				NodeType::EXPRESSION => $this->compileExpression($node),
 				NodeType::TEMPLATE_LITERAL => $this->compileTemplateLiteral($node),
@@ -69,16 +69,16 @@ final class Compiler {
 
 		$childrenCount = count($children);
 
-		return '['.self::trimChildren(implode('', arrayMap($children, fn(array $child, int $index) => match($child['$$type']) {
-			NodeType::BLOCK => $this->compileBlock($child).', ',
-			NodeType::TEMPLATE_LITERAL => $this->compileTemplateLiteral($child).', ',
-			NodeType::PHPX_ELEMENT => $this->compilePHPXElement($child).', ',
-			NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($child).', ',
+		return '[' . self::trimChildren(implode('', arrayMap($children, fn(array $child, int $index) => match ($child['$$type']) {
+			NodeType::BLOCK => $this->compileBlock($child) . ', ',
+			NodeType::TEMPLATE_LITERAL => $this->compileTemplateLiteral($child) . ', ',
+			NodeType::PHPX_ELEMENT => $this->compilePHPXElement($child) . ', ',
+			NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($child) . ', ',
 			NodeType::PHPX_TEXT => $this->compilePHPXText($child, $index, $childrenCount),
-			NodeType::PHPX_EXPRESSION_CONTAINER => $this->compilePHPXExpressionContainer($child).', ',
+			NodeType::PHPX_EXPRESSION_CONTAINER => $this->compilePHPXExpressionContainer($child) . ', ',
 			NodeType::PHPX_COMMENT => $this->compilePHPXComment($child),
 			default => throw new \RuntimeException("Unknown child type: {$child['$$type']->value}"),
-		}))).']';
+		}))) . ']';
 	}
 
 	protected function compilePHPXFragmentElement(array $node): string {
@@ -99,8 +99,8 @@ final class Compiler {
 			'value' => $value,
 		] = $node;
 
-		$nameText = match(is_array($name)) {
-			true => implode('', array_map(fn (Token $token) => $token->text, $name)),
+		$nameText = match (is_array($name)) {
+			true => implode('', array_map(fn(Token $token) => $token->text, $name)),
 			false => $name->text,
 		};
 
@@ -139,7 +139,7 @@ final class Compiler {
 					throw new \RuntimeException("Unknown block child type: {$child}");
 				}
 			} else {
-				throw new \RuntimeException("Unknown block child type: ".gettype($child));
+				throw new \RuntimeException("Unknown block child type: " . gettype($child));
 			}
 		} else {
 			return $this->compileBlock($node, '', '');
@@ -149,19 +149,19 @@ final class Compiler {
 	protected function compilePHPXAttributes(array $attributes): string {
 		$this->logger?->debug('compilePHPXAttributes', $attributes);
 
-		$attributes = implode('', array_map(fn (array|Token $value) => match($value instanceof Token) {
+		$attributes = implode('', array_map(fn(array|Token $value) => match ($value instanceof Token) {
 			true => $value->text,
-			false => match($value['$$type']) {
-				NodeType::PHPX_ATTRIBUTE => $this->compilePHPXAttribute($value).',',
-				NodeType::BLOCK => $this->compilePHPXAttributesPropsExpression($value).',',
-				default => throw new \RuntimeException("Unknown attribute type: {$value['$$type']->value}"),
-			}
+			false => match ($value['$$type']) {
+					NodeType::PHPX_ATTRIBUTE => $this->compilePHPXAttribute($value) . ',',
+					NodeType::BLOCK => $this->compilePHPXAttributesPropsExpression($value) . ',',
+					default => throw new \RuntimeException("Unknown attribute type: {$value['$$type']->value}"),
+				}
 		}, $attributes));
 
 		if (strstr($attributes, "\n")) {
-			return '['.trim($attributes, ',').']';
+			return '[' . trim($attributes, ',') . ']';
 		} else {
-			return '['.trim($attributes, ' ,').']';
+			return '[' . trim($attributes, ' ,') . ']';
 		}
 	}
 
@@ -177,8 +177,12 @@ final class Compiler {
 			'closingElement' => $closingElement,
 		] = ['children' => [], ...$node];
 
+		$nameText = is_array($name)
+			? implode('', array_map(fn(Token $t) => $t->text, $name))
+			: $name->text;
+
 		return $this->formatter->formatElement(
-			$name->text,
+			$nameText,
 			(!empty($attributes) ? $this->compilePHPXAttributes($attributes) : null),
 			(!empty($children) ? $this->compilePHPXChildrenArray($children) : null),
 		);
@@ -216,7 +220,7 @@ final class Compiler {
 
 		$code = '';
 
-		$children = self::concatenateStringMembers(array_map(fn (mixed $child) => match($child instanceof Token) {
+		$children = self::concatenateStringMembers(array_map(fn(mixed $child) => match ($child instanceof Token) {
 			true => $child->text,
 			false => $child,
 		}, $children));
@@ -225,7 +229,7 @@ final class Compiler {
 			if (is_string($child)) {
 				$code .= $child;
 			} else {
-				$code .= match($child['$$type']) {
+				$code .= match ($child['$$type']) {
 					NodeType::BLOCK => $this->compileBlock($child),
 					NodeType::PHPX_ELEMENT => $this->compilePHPXElement($child),
 					NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($child),
@@ -237,7 +241,7 @@ final class Compiler {
 		return "({$code})";
 	}
 
-	protected function compileBlock(array $node, ?string $replaceOpening =null, ?string $replaceClosing = null): string {
+	protected function compileBlock(array $node, ?string $replaceOpening = null, ?string $replaceClosing = null): string {
 		$this->logger?->debug('compileBlock', $node);
 		assert($node['$$type'] === NodeType::BLOCK);
 
@@ -248,18 +252,18 @@ final class Compiler {
 		assert($closing instanceof Token);
 
 		return ($replaceOpening !== null ? $replaceOpening : $opening->text)
-			.implode('', array_map(fn(array|Token $value) => match($value instanceof Token) {
+			. implode('', array_map(fn(array|Token $value) => match ($value instanceof Token) {
 				true => $value->text,
-				default => match($value['$$type']) {
-					NodeType::BLOCK => $this->compileBlock($value),
-					NodeType::PHPX_ELEMENT => $this->compilePHPXElement($value),
-					NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($value),
-					NodeType::PHPX_EXPRESSION_CONTAINER => $this->compilePHPXExpressionContainer($value),
-					NodeType::TEMPLATE_LITERAL => $this->compileTemplateLiteral($value),
-					default => throw new \RuntimeException("Unknown child type: {$value['$$type']}"),
-				},
+				default => match ($value['$$type']) {
+						NodeType::BLOCK => $this->compileBlock($value),
+						NodeType::PHPX_ELEMENT => $this->compilePHPXElement($value),
+						NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($value),
+						NodeType::PHPX_EXPRESSION_CONTAINER => $this->compilePHPXExpressionContainer($value),
+						NodeType::TEMPLATE_LITERAL => $this->compileTemplateLiteral($value),
+						default => throw new \RuntimeException("Unknown child type: {$value['$$type']}"),
+					},
 			}, $children))
-			.($replaceClosing !== null ? $replaceClosing : $closing->text);
+			. ($replaceClosing !== null ? $replaceClosing : $closing->text);
 	}
 
 	protected function compileTemplateLiteral(array $node): string {
@@ -267,12 +271,12 @@ final class Compiler {
 
 		['children' => $children] = $node;
 
-		$children = array_map(fn (mixed $child) => match($child instanceof Token) {
-			true => '\''.addcslashes($child->text, '\'').'\'',
-			false => match($child['$$type']) {
-				NodeType::BLOCK => $this->compileBlock($child, '(', ')'),
-				default => throw new \RuntimeException("Unknown child type: {$child['$$type']}"),
-			},
+		$children = array_map(fn(mixed $child) => match ($child instanceof Token) {
+			true => '\'' . addcslashes($child->text, '\'') . '\'',
+			false => match ($child['$$type']) {
+					NodeType::BLOCK => $this->compileBlock($child, '(', ')'),
+					default => throw new \RuntimeException("Unknown child type: {$child['$$type']}"),
+				},
 		}, $children);
 
 		return implode('.', $children);
@@ -301,20 +305,20 @@ final class Compiler {
 				return $token->text;
 			} else {
 				if ($isFirst) {
-					return '\''.ltrim($token->text, ' ').'\', ';
+					return '\'' . ltrim($token->text, ' ') . '\', ';
 				} else if ($isLast) {
-					return '\''.rtrim($token->text, ' ').'\', ';
+					return '\'' . rtrim($token->text, ' ') . '\', ';
 				} else {
-					return '\''.$token->text.'\', ';
+					return '\'' . $token->text . '\', ';
 				}
 			}
 		} else {
 			if ($isFirst) {
-				return '\''.ltrim(implode('', array_map(fn($token) => $token->text, $tokens)), ' ').'\', ';
+				return '\'' . ltrim(implode('', array_map(fn($token) => $token->text, $tokens)), ' ') . '\', ';
 			} else if ($isLast) {
-				return '\''.rtrim(implode('', array_map(fn($token) => $token->text, $tokens)), ' ').'\', ';
+				return '\'' . rtrim(implode('', array_map(fn($token) => $token->text, $tokens)), ' ') . '\', ';
 			} else {
-				return '\''.implode('', array_map(fn($token) => $token->text, $tokens)).'\', ';
+				return '\'' . implode('', array_map(fn($token) => $token->text, $tokens)) . '\', ';
 			}
 		}
 	}

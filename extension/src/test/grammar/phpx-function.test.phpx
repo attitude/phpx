@@ -57,3 +57,24 @@ function Expr(): array {
 #         ^ punctuation.definition.brace.end.phpx
   );
 }
+
+function CustomElement(): array {
+  return (
+    <my-element />
+#   ^ punctuation.definition.tag.begin.phpx
+#    ^^^^^^^^^^ entity.name.tag.phpx
+#               ^^ punctuation.definition.tag.end.phpx
+  );
+}
+
+function CustomElementWithChildren(): array {
+  return (
+    <web-component>Hello</web-component>
+#   ^ punctuation.definition.tag.begin.phpx
+#    ^^^^^^^^^^^^^ entity.name.tag.phpx
+#                 ^ punctuation.definition.tag.end.phpx
+#                       ^^ punctuation.definition.tag.end.phpx
+#                         ^^^^^^^^^^^^^ entity.name.tag.phpx
+#                                      ^ punctuation.definition.tag.end.phpx
+  );
+}
