@@ -19,7 +19,7 @@ if (pathinfo($file, PATHINFO_EXTENSION) !== 'phpx') {
 
 $content = file_get_contents($file);
 
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 $compiler = new Compiler();
 $compiled = $compiler->compile($content);
