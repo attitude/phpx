@@ -71,9 +71,11 @@ final class TokensList implements \JsonSerializable, \Iterator {
 	public function tokenAtCursorIsWord(int $offset = 0): Token|null {
 		$token = $this->tokenAtCursor($offset);
 
-		if ($token?->id === T_STRING) {
+		if ($token === null) {
+			return null;
+		} else if ($token->id === T_STRING) {
 			return $token;
-		} else if (preg_match('/^\w+$/', $token?->text)) {
+		} else if (preg_match('/^\w+$/', $token->text)) {
 			return $token;
 		} else {
 			return null;
