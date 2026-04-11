@@ -967,3 +967,41 @@ PHP
     );
   });
 });
+
+describe('unexpected end of input', function () {
+  it('throws ParseError for unclosed element', function () {
+    $compiler = newCompiler(parser: newParser());
+    expect(fn() => $compiler->compile('<div>'))
+      ->toThrow(\ParseError::class, "Unexpected end of input, expected closing tag for '<div>'");
+  });
+
+  it('throws ParseError for missing closing > in closing tag', function () {
+    $compiler = newCompiler(parser: newParser());
+    expect(fn() => $compiler->compile('<div></div'))
+      ->toThrow(\ParseError::class, "Unexpected end of input, expected '>' for closing tag '</div>'");
+  });
+
+  it('throws ParseError for unclosed template literal', function () {
+    $compiler = newCompiler(parser: newParser());
+    expect(fn() => $compiler->compile('`hello'))
+      ->toThrow(\ParseError::class, "Unexpected end of input, expected closing template literal");
+  });
+
+  it('throws ParseError for unclosed parenthesis', function () {
+    $compiler = newCompiler(parser: newParser());
+    expect(fn() => $compiler->compile('(1 + 2'))
+      ->toThrow(\ParseError::class, "expected closing ')'");
+  });
+
+  it('throws ParseError for unclosed curly bracket', function () {
+    $compiler = newCompiler(parser: newParser());
+    expect(fn() => $compiler->compile('{$a'))
+      ->toThrow(\ParseError::class, "expected closing '}'");
+  });
+
+  it('throws ParseError for unclosed square bracket', function () {
+    $compiler = newCompiler(parser: newParser());
+    expect(fn() => $compiler->compile('[$a'))
+      ->toThrow(\ParseError::class, "expected closing ']'");
+  });
+});
