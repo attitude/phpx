@@ -15,9 +15,23 @@ export interface CompilationResult {
 export class PHPXCompiler {
 	private outputChannel: vscode.OutputChannel;
 	private compilationErrors: Map<string, string> = new Map();
+	/** Cache: workspace folder fsPath → resolved compiler script path (or null if not found) */
+	private compilerScriptCache: Map<string, string | null> = new Map();
+	/** Cache: workspace folder fsPath → resolved project root */
+	private projectRootCache: Map<string, string> = new Map();
 
 	constructor(outputChannel: vscode.OutputChannel) {
 		this.outputChannel = outputChannel;
+	}
+
+	/**
+	 * Clear cached compiler script and project root lookups.
+	 * Call when vendor directories may have changed (e.g. composer install/remove).
+	 */
+	clearCache(): void {
+		this.compilerScriptCache.clear();
+		this.projectRootCache.clear();
+		this.outputChannel.appendLine('[PHPX] Lookup caches cleared');
 	}
 
 	/**
@@ -36,9 +50,16 @@ export class PHPXCompiler {
 	 * Searches in the workspace (as the PHPX project itself, or as a dependency).
 	 * Walks up from the document's directory to handle cases where the workspace
 	 * root is not the Composer project root.
+	 * Results are cached per workspace folder.
 	 */
 	private findCompilerScript(documentUri: vscode.Uri): string | undefined {
 		const workspaceFolder = vscode.workspace.getWorkspaceFolder(documentUri);
+		const cacheKey = workspaceFolder?.uri.fsPath ?? documentUri.fsPath;
+
+		const cached = this.compilerScriptCache.get(cacheKey);
+		if (cached !== undefined) {
+			return cached ?? undefined;
+		}
 
 		this.outputChannel.appendLine(`[findCompilerScript] document: ${documentUri.fsPath}`);
 		this.outputChannel.appendLine(`[findCompilerScript] workspaceFolder: ${workspaceFolder?.uri.fsPath ?? '(none)'}`);
@@ -64,8 +85,6 @@ export class PHPXCompiler {
 			dir = parent;
 		}
 
-		this.outputChannel.appendLine(`[findCompilerScript] candidate roots: ${JSON.stringify(candidateRoots)}`);
-
 		for (const root of candidateRoots) {
 			const candidates = [
 				// This IS the PHPX project
@@ -74,14 +93,16 @@ export class PHPXCompiler {
 				path.join(root, 'vendor', 'attitude', 'phpx', 'scripts', 'compile-stdin.php'),
 			];
 			for (const p of candidates) {
-				const exists = fs.existsSync(p);
-				this.outputChannel.appendLine(`[findCompilerScript]   ${exists ? 'FOUND' : 'missing'}: ${p}`);
-				if (exists) {
+				if (fs.existsSync(p)) {
+					this.outputChannel.appendLine(`[findCompilerScript] found: ${p}`);
+					this.compilerScriptCache.set(cacheKey, p);
 					return p;
 				}
 			}
 		}
 
+		this.outputChannel.appendLine(`[findCompilerScript] not found for ${cacheKey}`);
+		this.compilerScriptCache.set(cacheKey, null);
 		return undefined;
 	}
 
@@ -91,9 +112,17 @@ export class PHPXCompiler {
 	 */
 	private findProjectRoot(documentUri: vscode.Uri): string {
 		const workspaceFolder = vscode.workspace.getWorkspaceFolder(documentUri);
+		const cacheKey = workspaceFolder?.uri.fsPath ?? documentUri.fsPath;
+
+		const cached = this.projectRootCache.get(cacheKey);
+		if (cached !== undefined) {
+			return cached;
+		}
+
 		let dir = path.dirname(documentUri.fsPath);
 		while (true) {
 			if (fs.existsSync(path.join(dir, 'vendor', 'autoload.php'))) {
+				this.projectRootCache.set(cacheKey, dir);
 				return dir;
 			}
 			const parent = path.dirname(dir);
@@ -102,7 +131,9 @@ export class PHPXCompiler {
 			}
 			dir = parent;
 		}
-		return workspaceFolder?.uri.fsPath || path.dirname(documentUri.fsPath);
+		const result = workspaceFolder?.uri.fsPath || path.dirname(documentUri.fsPath);
+		this.projectRootCache.set(cacheKey, result);
+		return result;
 	}
 
 	/**
@@ -126,19 +157,57 @@ export class PHPXCompiler {
 		const cwd = this.findProjectRoot(documentUri);
 
 		return new Promise((resolve) => {
-			const proc = cp.spawn(phpPath, [compilerScript], {
-				cwd,
-				stdio: ['pipe', 'pipe', 'pipe'],
-			});
+			const maxOutputBytes = 5 * 1024 * 1024; // 5 MB safety limit
+			let proc: cp.ChildProcess;
+
+			try {
+				proc = cp.spawn(phpPath, [compilerScript], {
+					cwd,
+					stdio: ['pipe', 'pipe', 'pipe'],
+				});
+			} catch (err) {
+				const errorMessage = err instanceof Error ? err.message : String(err);
+				this.outputChannel.appendLine(`[PHPX] spawn error — ${errorMessage}`);
+				resolve({
+					php: '',
+					error: `Failed to spawn PHP (${phpPath}): ${errorMessage}`,
+				});
+				return;
+			}
 
 			let stdout = '';
 			let stderr = '';
+			let truncated = false;
 
-			proc.stdout.on('data', (data: Buffer) => {
-				stdout += data.toString();
+			proc.stdout!.on('data', (data: Buffer) => {
+				try {
+					if (stdout.length < maxOutputBytes) {
+						stdout += data.toString();
+					} else if (!truncated) {
+						truncated = true;
+						this.outputChannel.appendLine(`[PHPX] stdout truncated — exceeded ${maxOutputBytes} bytes (buffer: ${stdout.length}, chunk: ${data.length})`);
+						proc.kill();
+					}
+				} catch (err) {
+					truncated = true;
+					this.outputChannel.appendLine(`[PHPX] stdout data handler error — ${err} (buffer: ${stdout.length}, chunk: ${data.length})`);
+					proc.kill();
+				}
 			});
-			proc.stderr.on('data', (data: Buffer) => {
-				stderr += data.toString();
+			let stderrOverflow = false;
+			proc.stderr!.on('data', (data: Buffer) => {
+				try {
+					if (stderr.length < maxOutputBytes) {
+						stderr += data.toString();
+					} else if (!stderrOverflow) {
+						stderrOverflow = true;
+						this.outputChannel.appendLine(`[PHPX] stderr truncated — exceeded ${maxOutputBytes} bytes (buffer: ${stderr.length}, chunk: ${data.length})`);
+						proc.kill();
+					}
+				} catch (err) {
+					this.outputChannel.appendLine(`[PHPX] stderr data handler error — ${err} (buffer: ${stderr.length}, chunk: ${data.length})`);
+					proc.kill();
+				}
 			});
 
 			proc.on('error', (err) => {
@@ -149,7 +218,12 @@ export class PHPXCompiler {
 			});
 
 			proc.on('close', (code) => {
-				if (code === 0) {
+				if (truncated) {
+					resolve({
+						php: '',
+						error: 'Compilation output exceeded size limit',
+					});
+				} else if (code === 0) {
 					this.compilationErrors.delete(documentUri.toString());
 					resolve({ php: stdout });
 				} else {
@@ -168,8 +242,18 @@ export class PHPXCompiler {
 				}
 			});
 
-			proc.stdin.write(phpxContent);
-			proc.stdin.end();
+			try {
+				proc.stdin!.write(phpxContent);
+				proc.stdin!.end();
+			} catch (err) {
+				const errorMessage = err instanceof Error ? err.message : String(err);
+				this.outputChannel.appendLine(`[PHPX] stdin write error — ${errorMessage}`);
+				proc.kill();
+				resolve({
+					php: '',
+					error: `stdin write failed: ${errorMessage}`,
+				});
+			}
 		});
 	}
 
@@ -203,29 +287,33 @@ export class PHPXCompiler {
 	async compileAndWrite(
 		document: vscode.TextDocument,
 	): Promise<{ phpUri: vscode.Uri; error?: string }> {
-		const result = await this.compile(document.getText(), document.uri);
 		const phpUri = PHPXCompiler.getCompiledUri(document.uri);
 
-		if (result.error) {
-			this.outputChannel.appendLine(
-				`PHPX compile error [${path.basename(document.uri.fsPath)}]: ${result.error}`,
-			);
-			return { phpUri, error: result.error };
-		}
-
 		try {
+			const result = await this.compile(document.getText(), document.uri);
+
+			if (result.error) {
+				this.outputChannel.appendLine(
+					`PHPX compile error [${path.basename(document.uri.fsPath)}]: ${result.error}`,
+				);
+				return { phpUri, error: result.error };
+			}
+
 			fs.writeFileSync(phpUri.fsPath, result.php, 'utf-8');
 			this.outputChannel.appendLine(
 				`Compiled: ${path.basename(document.uri.fsPath)} → ${path.basename(phpUri.fsPath)}`,
 			);
-		} catch (err: any) {
-			this.outputChannel.appendLine(
-				`Failed to write compiled file: ${err.message}`,
-			);
-			return { phpUri, error: err.message };
-		}
 
-		return { phpUri };
+			return { phpUri };
+		} catch (err) {
+			const error =
+				(err instanceof Error
+					? err.message || err.stack || String(err)
+					: String(err)) || 'Unknown compilation error';
+			const errorLog = err instanceof Error ? err.stack || error : error;
+			this.outputChannel.appendLine(`[PHPX] compileAndWrite error — ${errorLog}`);
+			return { phpUri, error };
+		}
 	}
 
 	/**

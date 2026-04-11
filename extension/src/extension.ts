@@ -43,15 +43,25 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 
-		const phpUri = PHPXCompiler.getCompiledUri(document.uri);
-		diagnosticsManager.registerMapping(document.uri, phpUri);
+		try {
+			const phpUri = PHPXCompiler.getCompiledUri(document.uri);
+			diagnosticsManager.registerMapping(document.uri, phpUri);
 
-		const result = await compiler.compileAndWrite(document);
+			const result = await compiler.compileAndWrite(document);
 
-		if (result.error) {
-			diagnosticsManager.setCompilationError(document.uri, result.error);
-		} else {
-			diagnosticsManager.clearCompilationError(document.uri);
+			if (result.error) {
+				diagnosticsManager.setCompilationError(document.uri, result.error);
+			} else {
+				diagnosticsManager.clearCompilationError(document.uri);
+			}
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : String(err);
+			const errorStack = err instanceof Error ? err.stack || err.message : String(err);
+			outputChannel.appendLine(`[PHPX] compileDocument error — ${errorStack}`);
+			diagnosticsManager.setCompilationError(
+				document.uri,
+				`Compilation failed: ${errorMessage}`,
+			);
 		}
 	}
 
@@ -122,6 +132,13 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		}),
 	);
+
+	// Invalidate caches when vendor/composer files change (e.g. composer install/remove)
+	const vendorWatcher = vscode.workspace.createFileSystemWatcher('**/vendor/autoload.php');
+	vendorWatcher.onDidCreate(() => compiler.clearCache());
+	vendorWatcher.onDidChange(() => compiler.clearCache());
+	vendorWatcher.onDidDelete(() => compiler.clearCache());
+	context.subscriptions.push(vendorWatcher);
 
 	// Clean up diagnostics when a PHPX file is closed
 	context.subscriptions.push(
