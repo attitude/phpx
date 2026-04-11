@@ -88,7 +88,16 @@ final class Parser {
 			$openingElementEnd = $this->tokens->tokenAtCursorAndForward();
 			assert($openingElementEnd->id === TX_ELEMENT_OPENING_CLOSE);
 
+			$elementNameText = is_array($elementName)
+				? implode('', array_map(fn(Token $t) => $t->text, $elementName))
+				: $elementName->text;
+			$elementLine = is_array($elementName) ? $elementName[0]->line : $elementName->line;
+
 			$children = $this->parseElementChildren();
+
+			if (!$this->tokens->exist()) {
+				throw new \ParseError("Unexpected end of input, expected closing tag for '<{$elementNameText}>' from line {$elementLine}");
+			}
 
 			$this->debugCurrentToken(__FUNCTION__);
 			$closingElementStart = $this->tokens->tokenAtCursorAndForward();
@@ -103,15 +112,15 @@ final class Parser {
 			$closingElementNameText = is_array($closingElementName)
 				? implode('', array_map(fn(Token $t) => $t->text, $closingElementName))
 				: $closingElementName->text;
-			$elementNameText = is_array($elementName)
-				? implode('', array_map(fn(Token $t) => $t->text, $elementName))
-				: $elementName->text;
 			assert($closingElementNameText === $elementNameText, new \ParseError(
-				"Expected closing tag to match opening tag name '{$elementNameText}' at line " . (is_array($elementName) ? $elementName[0]->line : $elementName->line)
+				"Expected closing tag to match opening tag name '{$elementNameText}' at line {$elementLine}"
 			));
 
 			$this->debugCurrentToken(__FUNCTION__);
 			$closingElementEnd = $this->tokens->tokenAtCursorAndForward();
+			if ($closingElementEnd === null) {
+				throw new \ParseError("Unexpected end of input, expected '>' for closing tag '</{$elementNameText}>' from line {$elementLine}");
+			}
 			assert($closingElementEnd->id === TX_ELEMENT_CLOSING_CLOSE);
 
 			return [
@@ -251,6 +260,10 @@ final class Parser {
 			};
 		}
 
+		if (!$this->tokens->exist()) {
+			throw new \ParseError("Unexpected end of input, expected closing template literal from line {$opener->line}");
+		}
+
 		$closer = $this->tokens->tokenAtCursorAndForward();
 		assert($closer->id === TX_TEMPLATE_LITERAL);
 
@@ -371,7 +384,7 @@ final class Parser {
 
 		$children = [];
 
-		while (!$this->tokens->tokenAtCursorMatches($closerId)) {
+		while ($this->tokens->exist() && !$this->tokens->tokenAtCursorMatches($closerId)) {
 			$this->debugCurrentToken(__FUNCTION__);
 
 			$children[] = match ($this->tokens->tokenAtCursor()->id) {
@@ -387,6 +400,11 @@ final class Parser {
 				TX_TEMPLATE_LITERAL => $this->parseTemplateLiteral(),
 				default => $this->tokens->tokenAtCursorAndForward(),
 			};
+		}
+
+		if (!$this->tokens->exist()) {
+			$closerText = chr($closerId);
+			throw new \ParseError("Unexpected end of input, expected closing '{$closerText}' for '{$opener->text}' from line {$opener->line}");
 		}
 
 		$this->debugCurrentToken(__FUNCTION__);
@@ -407,9 +425,20 @@ final class Parser {
 	}
 
 	protected function debugCurrentToken(string $method): void {
+		$token = $this->tokens->tokenAtCursor();
+
+		if ($token === null) {
+			$this->logger?->debug("Token#{$this->tokens->index()}", [
+				'text' => '(end of input)',
+				'name' => '(end of input)',
+				'method' => $method,
+			]);
+			return;
+		}
+
 		$this->logger?->debug("Token#{$this->tokens->index()}", [
-			'text' => $this->tokens->tokenAtCursor()->text,
-			'name' => $this->tokens->tokenAtCursor()->getTokenName(),
+			'text' => $token->text,
+			'name' => $token->getTokenName(),
 			'method' => $method,
 		]);
 	}
