@@ -1,0 +1,52 @@
+[
+    {
+        "$$type": "PHPXElement",
+        "openingElement": [
+            "L1:P0-1:<:60",
+            "L1:P1-3:li:262:<T_STRING"
+        ],
+        "selfClosing": true,
+        "attributes": [
+            "L1:P3-4: :396:<T_WHITESPACE",
+            {
+                "$$type": "PHPXAttribute",
+                "name": [
+                    "L1:P4-13:className:262:<T_STRING"
+                ],
+                "assignment": "L1:P13-14:=:61",
+                "value": "L1:P14-26:\"meals-item\":269:<T_CONSTANT_ENCAPSED_STRING"
+            },
+            "L1:P26-27: :396:<T_WHITESPACE",
+            {
+                "$$type": "PHPXAttribute",
+                "name": [
+                    "L1:P27-31:data:262:<T_STRING",
+                    "L1:P31-32:-:45",
+                    "L1:P32-34:as:301:<T_AS",
+                    "L1:P34-35:-:45",
+                    "L1:P35-40:table:262:<T_STRING"
+                ],
+                "assignment": "L1:P40-41:=:61",
+                "value": {
+                    "$$type": "Block",
+                    "opening": "L1:P41-42:{:123",
+                    "children": [
+                        "L1:P42-47:$meal:266:<T_VARIABLE",
+                        "L1:P47-49:->:388:<T_OBJECT_OPERATOR",
+                        "L1:P49-63:priceFormatted:262:<T_STRING",
+                        "L1:P63-64: :396:<T_WHITESPACE",
+                        "L1:P64-74:instanceof:283:<T_INSTANCEOF",
+                        "L1:P74-75: :396:<T_WHITESPACE",
+                        "L1:P75-85:StringList:262:<T_STRING"
+                    ],
+                    "closing": "L1:P85-86:}:125"
+                }
+            },
+            "L1:P86-87: :396:<T_WHITESPACE"
+        ],
+        "closingElement": [
+            "L1:P87-88:\/:47",
+            "L1:P88-89:>:62"
+        ]
+    }
+]
