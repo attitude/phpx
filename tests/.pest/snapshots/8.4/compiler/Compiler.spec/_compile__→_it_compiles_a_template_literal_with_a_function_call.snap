@@ -1,0 +1,31 @@
+[
+    {
+        "$$type": "TemplateLiteral",
+        "opening": "L1:P0-1:`:96",
+        "children": [
+            "L1:P1-8:Hello, :268:<T_ENCAPSED_AND_WHITESPACE",
+            {
+                "$$type": "Block",
+                "opening": "L1:P8-10:${:399:<T_DOLLAR_OPEN_CURLY_BRACES",
+                "children": [
+                    "L1:P10-17:ucfirst:262:<T_STRING",
+                    {
+                        "$$type": "Block",
+                        "opening": "L1:P17-18:(:40",
+                        "children": [
+                            "L1:P18-23:$name:266:<T_VARIABLE",
+                            "L1:P23-24: :396:<T_WHITESPACE",
+                            "L1:P24-26:??:404:<T_COALESCE",
+                            "L1:P26-27: :396:<T_WHITESPACE",
+                            "L1:P27-36:'unnamed':269:<T_CONSTANT_ENCAPSED_STRING"
+                        ],
+                        "closing": "L1:P36-37:):41"
+                    }
+                ],
+                "closing": "L1:P37-38:}:125"
+            },
+            "L1:P38-39:!:268:<T_ENCAPSED_AND_WHITESPACE"
+        ],
+        "closing": "L1:P39-40:`:96"
+    }
+]

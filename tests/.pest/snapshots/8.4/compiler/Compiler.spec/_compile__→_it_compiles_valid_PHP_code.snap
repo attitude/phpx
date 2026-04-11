@@ -1,0 +1,22 @@
+[
+    {
+        "$$type": "Expression",
+        "value": "L1:P0-6:<?php :393:<T_OPEN_TAG"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L1:P6-10:echo:291:<T_ECHO"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L1:P10-11: :396:<T_WHITESPACE"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L1:P11-26:\"Hello, World!\":269:<T_CONSTANT_ENCAPSED_STRING"
+    },
+    {
+        "$$type": "Expression",
+        "value": "L1:P26-27:;:59"
+    }
+]

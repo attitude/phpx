@@ -1,0 +1,78 @@
+[
+    {
+        "$$type": "PHPXFragment",
+        "openingElement": "L1:P0-2:<>:15932:<",
+        "children": [
+            {
+                "$$type": "PHPXExpressionContainer",
+                "expression": {
+                    "$$type": "Block",
+                    "opening": "L1:P2-3:{:123",
+                    "children": [
+                        "L1:P3-9:$count:266:<T_VARIABLE",
+                        "L1:P9-10: :396:<T_WHITESPACE",
+                        "L1:P10-11:<:60",
+                        "L1:P11-12: :396:<T_WHITESPACE",
+                        "L1:P12-13:0:260:<T_LNUMBER",
+                        "L1:P13-14: :396:<T_WHITESPACE",
+                        "L1:P14-15:?:63",
+                        "L1:P15-16: :396:<T_WHITESPACE",
+                        {
+                            "$$type": "PHPXElement",
+                            "openingElement": [
+                                "L1:P16-17:<:60",
+                                "L1:P17-18:p:262:<T_STRING",
+                                "L1:P18-19:>:62"
+                            ],
+                            "selfClosing": false,
+                            "attributes": [],
+                            "children": [
+                                {
+                                    "$$type": "PHPXText",
+                                    "tokens": [
+                                        "L1:P19-24:Hello:262:<T_STRING",
+                                        "L1:P24-25:,:44",
+                                        "L1:P25-26: :396:<T_WHITESPACE"
+                                    ]
+                                },
+                                {
+                                    "$$type": "PHPXExpressionContainer",
+                                    "expression": {
+                                        "$$type": "Block",
+                                        "opening": "L1:P26-27:{:123",
+                                        "children": [
+                                            "L1:P27-32:$name:266:<T_VARIABLE"
+                                        ],
+                                        "closing": "L1:P32-33:}:125"
+                                    }
+                                },
+                                {
+                                    "$$type": "PHPXText",
+                                    "tokens": [
+                                        "L1:P33-34:!:33"
+                                    ]
+                                }
+                            ],
+                            "closingElement": [
+                                "L1:P34-35:<:60",
+                                "L1:P35-36:\/:47",
+                                "L1:P36-37:p:262:<T_STRING",
+                                "L1:P37-38:>:62"
+                            ]
+                        },
+                        "L1:P38-39: :396:<T_WHITESPACE",
+                        "L1:P39-40:::58",
+                        "L1:P40-41: :396:<T_WHITESPACE",
+                        "L1:P41-45:null:262:<T_STRING"
+                    ],
+                    "closing": "L1:P45-46:}:125"
+                }
+            }
+        ],
+        "closingElement": [
+            "L1:P46-47:<:60",
+            "L1:P47-48:\/:47",
+            "L1:P48-49:>:62"
+        ]
+    }
+]

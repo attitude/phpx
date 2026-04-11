@@ -1,0 +1,32 @@
+[
+    {
+        "$$type": "PHPXElement",
+        "openingElement": [
+            "L1:P0-1:<:60",
+            [
+                "L1:P1-4:web:262:<T_STRING",
+                "L1:P4-5:-:45",
+                "L1:P5-14:component:262:<T_STRING"
+            ],
+            "L1:P14-15:>:62"
+        ],
+        "selfClosing": false,
+        "attributes": [],
+        "children": [
+            {
+                "$$type": "PHPXText",
+                "tokens": [
+                    "L1:P15-20:Hello:262:<T_STRING"
+                ]
+            }
+        ],
+        "closingElement": [
+            "L1:P20-21:<:60",
+            "L1:P21-22:\/:47",
+            "L1:P22-25:web:262:<T_STRING",
+            "L1:P25-26:-:45",
+            "L1:P26-35:component:262:<T_STRING",
+            "L1:P35-36:>:62"
+        ]
+    }
+]

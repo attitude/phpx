@@ -1,0 +1,68 @@
+<?php declare(strict_types = 1);
+
+function PageFooter(array $props): array {
+  $year = $props['year'] ?? date('Y');
+
+  return (
+    html('footer', null, [
+      html('p', null, ['© ', ($year), ' @martin_adamko']),
+    ])
+  );
+}
+
+function PageMain(array $items): array {
+  ['items' => $items, 'content' => $content] = $items ?? ['items' => [], 'content' => null ];
+
+  return (
+    html('main', null, [
+      html('ul', null, [
+        (array_map(fn($item) => (
+          html('li', null, [($item)])
+        ), $items)),
+      ]),
+      ($content),
+    ])
+  );
+}
+
+function PageHeader(array $props): array {
+  $title = $props['title'] ?? 'Untitled';
+  $tags = $props['tags'] ?? [];
+
+  return (
+    html('header', null, [
+      html('a', ['href'=>"/"], ['Home']),
+      html('h1', null, [($title)]),
+      html('ul', null, [
+        (array_map(fn($tag) => (
+          html('li', null, [($tag)])
+        ), $tags)),
+      ]),
+    ])
+  );
+}
+
+function Page(): array {
+  $title = 'Hello World';
+  $description = 'This is a test page';
+  $css = '/styles.css';
+
+  return (
+    html('html', ['lang'=>"en"], [
+      html('head', null, [
+        html('meta', ['charset'=>"UTF-8"]),
+        html('meta', ['name'=>"viewport", 'content'=>"width=device-width, initial-scale=1.0"]),
+        html('title', null, [($title ?? 'None'), ' by Attitude']),
+        html('meta', ['name'=>"description", 'content'=>($description)]),
+        html('link', ['rel'=>"stylesheet", 'href'=>($css)]),
+      ]),
+      html('body', null, [
+        (PageHeader(['title' => $title, 'tags' => ['test', 'example']])),
+        (PageMain(['items' => ['Item 1', 'Item 2', 'Item 3']])),
+        (PageFooter(['year' => 2021])),
+      ]),
+    ])
+  );
+}
+
+return Page();

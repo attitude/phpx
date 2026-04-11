@@ -1,0 +1,45 @@
+[
+    {
+        "$$type": "PHPXFragment",
+        "openingElement": "L1:P0-2:<>:15932:<",
+        "children": [
+            {
+                "$$type": "PHPXText",
+                "tokens": [
+                    "L1:P2-6:Your:262:<T_STRING",
+                    "L1:P6-7: :392:<T_WHITESPACE",
+                    "L1:P7-8:#:262:<T_STRING",
+                    "L1:P8-9: :392:<T_WHITESPACE",
+                    "L1:P9-11:is:262:<T_STRING",
+                    "L1:P11-12: :392:<T_WHITESPACE"
+                ]
+            },
+            {
+                "$$type": "PHPXExpressionContainer",
+                "expression": {
+                    "$$type": "Block",
+                    "opening": "L1:P12-13:{:123",
+                    "children": [
+                        "L1:P13-20:$number:266:<T_VARIABLE",
+                        "L1:P20-21: :392:<T_WHITESPACE",
+                        "L1:P21-23:??:400:<T_COALESCE",
+                        "L1:P23-24: :392:<T_WHITESPACE",
+                        "L1:P24-39:'not available':269:<T_CONSTANT_ENCAPSED_STRING"
+                    ],
+                    "closing": "L1:P39-40:}:125"
+                }
+            },
+            {
+                "$$type": "PHPXText",
+                "tokens": [
+                    "L1:P40-41:!:33"
+                ]
+            }
+        ],
+        "closingElement": [
+            "L1:P41-42:<:60",
+            "L1:P42-43:\/:47",
+            "L1:P43-44:>:62"
+        ]
+    }
+]

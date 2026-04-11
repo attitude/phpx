@@ -1,0 +1,41 @@
+[
+    {
+        "$$type": "PHPXElement",
+        "openingElement": [
+            "L1:P0-1:<:60",
+            "L1:P1-4:div:262:<T_STRING"
+        ],
+        "selfClosing": true,
+        "attributes": [
+            "L1:P4-5: :392:<T_WHITESPACE",
+            {
+                "$$type": "PHPXAttribute",
+                "name": [
+                    "L1:P5-9:data:262:<T_STRING",
+                    "L1:P9-10:-:45",
+                    "L1:P10-13:foo:262:<T_STRING",
+                    "L1:P13-14:-:45",
+                    "L1:P14-17:bar:262:<T_STRING"
+                ],
+                "assignment": "L1:P17-18:=:61",
+                "value": {
+                    "$$type": "Block",
+                    "opening": "L1:P18-19:{:123",
+                    "children": [
+                        "L1:P19-24:$data:266:<T_VARIABLE",
+                        "L1:P24-25: :392:<T_WHITESPACE",
+                        "L1:P25-35:instanceof:283:<T_INSTANCEOF",
+                        "L1:P35-36: :392:<T_WHITESPACE",
+                        "L1:P36-45:\\DateTime:263:<T_NAME_FULLY_QUALIFIED"
+                    ],
+                    "closing": "L1:P45-46:}:125"
+                }
+            },
+            "L1:P46-47: :392:<T_WHITESPACE"
+        ],
+        "closingElement": [
+            "L1:P47-48:\/:47",
+            "L1:P48-49:>:62"
+        ]
+    }
+]

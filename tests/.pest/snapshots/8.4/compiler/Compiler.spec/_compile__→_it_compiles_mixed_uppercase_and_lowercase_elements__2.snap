@@ -1,0 +1,63 @@
+[
+    {
+        "$$type": "PHPXElement",
+        "openingElement": [
+            "L1:P0-1:<:60",
+            "L1:P1-4:div:262:<T_STRING",
+            "L1:P4-5:>:62"
+        ],
+        "selfClosing": false,
+        "attributes": [],
+        "children": [
+            {
+                "$$type": "PHPXElement",
+                "openingElement": [
+                    "L1:P5-6:<:60",
+                    "L1:P6-12:Button:262:<T_STRING",
+                    "L1:P35-36:>:62"
+                ],
+                "selfClosing": false,
+                "attributes": [
+                    "L1:P12-13: :396:<T_WHITESPACE",
+                    {
+                        "$$type": "PHPXAttribute",
+                        "name": [
+                            "L1:P13-20:onClick:262:<T_STRING"
+                        ],
+                        "assignment": "L1:P20-21:=:61",
+                        "value": {
+                            "$$type": "Block",
+                            "opening": "L1:P21-22:{:123",
+                            "children": [
+                                "L1:P22-34:$handleClick:266:<T_VARIABLE"
+                            ],
+                            "closing": "L1:P34-35:}:125"
+                        }
+                    }
+                ],
+                "children": [
+                    {
+                        "$$type": "PHPXText",
+                        "tokens": [
+                            "L1:P36-41:Click:262:<T_STRING",
+                            "L1:P41-42: :396:<T_WHITESPACE",
+                            "L1:P42-44:me:262:<T_STRING"
+                        ]
+                    }
+                ],
+                "closingElement": [
+                    "L1:P44-45:<:60",
+                    "L1:P45-46:\/:47",
+                    "L1:P46-52:Button:262:<T_STRING",
+                    "L1:P52-53:>:62"
+                ]
+            }
+        ],
+        "closingElement": [
+            "L1:P53-54:<:60",
+            "L1:P54-55:\/:47",
+            "L1:P55-58:div:262:<T_STRING",
+            "L1:P58-59:>:62"
+        ]
+    }
+]
