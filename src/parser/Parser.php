@@ -121,7 +121,9 @@ final class Parser {
 			if ($closingElementEnd === null) {
 				throw new \ParseError("Unexpected end of input, expected '>' for closing tag '</{$elementNameText}>' from line {$elementLine}");
 			}
-			assert($closingElementEnd->id === TX_ELEMENT_CLOSING_CLOSE);
+			if ($closingElementEnd->id !== TX_ELEMENT_CLOSING_CLOSE) {
+				throw new \ParseError("Unexpected token '{$closingElementEnd->text}' in closing tag '</{$elementNameText}>', expected '>' at line {$closingElementEnd->line}");
+			}
 
 			return [
 				'$$type' => NodeType::PHPX_ELEMENT,
@@ -135,12 +137,23 @@ final class Parser {
 			];
 		}
 
+		if (!$this->tokens->exist()) {
+			$elementNameText = is_array($elementName)
+				? implode('', array_map(fn(Token $t) => $t->text, $elementName))
+				: $elementName->text;
+			$elementLine = is_array($elementName) ? $elementName[0]->line : $elementName->line;
+			throw new \ParseError("Unexpected end of input, expected '>' or '/>' for '<{$elementNameText}>' from line {$elementLine}");
+		}
+
 		throw new \ParseError("Not implemented");
 	}
 
 	protected function parseElementName(): Token|array {
 		$this->debugCurrentToken(__FUNCTION__);
 		$firstToken = $this->tokens->tokenAtCursorAndForward();
+		if ($firstToken === null) {
+			throw new \ParseError("Unexpected end of input, expected element name");
+		}
 		assert($firstToken->id === T_STRING);
 
 		if (!$this->tokens->tokenAtCursorMatches('-') || !$this->tokens->tokenAtCursorIsWord(1)) {
@@ -419,7 +432,11 @@ final class Parser {
 	}
 
 	protected function unexpectedTokenMessage(?string $expected = null): string {
-		return "Unexpected token #{$this->tokens->index()} => {$this->tokens->tokenAtCursor()} at line {$this->tokens->tokenAtCursor()->line}" . (
+		$token = $this->tokens->tokenAtCursor();
+		if ($token === null) {
+			return "Unexpected end of input" . ($expected ? ", expected {$expected}" : '');
+		}
+		return "Unexpected token #{$this->tokens->index()} => {$token} at line {$token->line}" . (
 			$expected ? ", expected {$expected} instead" : ''
 		);
 	}

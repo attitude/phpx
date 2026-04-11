@@ -1004,4 +1004,34 @@ describe('unexpected end of input', function () {
     expect(fn() => $compiler->compile('[$a'))
       ->toThrow(\ParseError::class, "expected closing ']'");
   });
+
+  it('throws ParseError for truncated opening tag with no element name', function () {
+    $compiler = newCompiler(parser: newParser());
+    expect(fn() => $compiler->compile('<'))
+      ->toThrow(\ParseError::class, "expected element name");
+  });
+
+  it('throws ParseError for truncated opening tag missing closing bracket', function () {
+    $compiler = newCompiler(parser: newParser());
+    expect(fn() => $compiler->compile('<div'))
+      ->toThrow(\ParseError::class, "expected '>' or '/>' for '<div>'");
+  });
+
+  it('throws ParseError for truncated attribute without value', function () {
+    $compiler = newCompiler(parser: newParser());
+    expect(fn() => $compiler->compile('<div attr'))
+      ->toThrow(\ParseError::class, 'expected "=" (attribute assignment)');
+  });
+
+  it('throws ParseError for truncated closing tag with no name', function () {
+    $compiler = newCompiler(parser: newParser());
+    expect(fn() => $compiler->compile('<div></'))
+      ->toThrow(\ParseError::class, "expected closing tag for '<div>'");
+  });
+
+  it('throws ParseError for unexpected token in closing tag', function () {
+    $compiler = newCompiler(parser: newParser());
+    expect(fn() => $compiler->compile('<div></div attr'))
+      ->toThrow(\ParseError::class, "expected '>'");
+  });
 });
