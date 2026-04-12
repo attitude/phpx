@@ -68,12 +68,23 @@ final class TextDocumentManager
         return substr($text, 0, $startOffset) . $newText . substr($text, $endOffset);
     }
 
+    /**
+     * Convert a (line, character) pair to a byte offset in the document string.
+     * Assumes lines are separated by "\n" (as produced by explode("\n", $text)).
+     * Documents using "\r\n" line endings are handled correctly because
+     * strlen($lines[$i]) includes the "\r", so adding +1 for "\n" gives the
+     * right total byte count per line.
+     *
+     * Note: this method is only reachable when a client sends an incremental
+     * change (range != null). Since the server advertises textDocumentSync.change = 1
+     * (full sync), no LSP-conformant client will send ranges in practice.
+     */
     private function lineCharToOffset(array $lines, int $line, int $char): int
     {
         $offset = 0;
 
         for ($i = 0; $i < $line && $i < count($lines); $i++) {
-            $offset += strlen($lines[$i]) + 1; // +1 for newline
+            $offset += strlen($lines[$i]) + 1; // +1 for \n separator
         }
 
         return $offset + $char;

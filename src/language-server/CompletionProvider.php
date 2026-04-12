@@ -198,6 +198,11 @@ final class CompletionProvider
      * expression container. Handles backslash-escaped quote characters.
      * Used to suppress tag-name and close-tag completions when the `<` is
      * inside attribute string content rather than markup.
+     *
+     * Note: operates on the current-line prefix only. Multi-line attribute values
+     * (a string literal spanning multiple lines) are not detected. In practice
+     * PHPX source files do not use multi-line quoted attribute values, so this
+     * is an acceptable limitation.
      */
     private function isInsideStringOrExpression(string $prefix): bool
     {
