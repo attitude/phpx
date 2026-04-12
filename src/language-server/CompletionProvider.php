@@ -109,10 +109,13 @@ final class CompletionProvider
 
     private function completeTagName(string $partial): array
     {
+        static $allElements = null;
+        if ($allElements === null) {
+            $allElements = array_unique(array_merge(self::HTML_ELEMENTS, self::VOID_ELEMENTS));
+            sort($allElements);
+        }
+
         $items = [];
-        $allElements = array_merge(self::HTML_ELEMENTS, self::VOID_ELEMENTS);
-        $allElements = array_unique($allElements);
-        sort($allElements);
 
         foreach ($allElements as $tag) {
             if ($partial === '' || str_starts_with($tag, strtolower($partial))) {
@@ -193,49 +196,9 @@ final class CompletionProvider
         return $items;
     }
 
-    /**
-     * Check if the cursor is inside a quoted string ("…" or '…') or a {…}
-     * expression container. Handles backslash-escaped quote characters.
-     * Used to suppress tag-name and close-tag completions when the `<` is
-     * inside attribute string content rather than markup.
-     *
-     * Note: operates on the current-line prefix only. Multi-line attribute values
-     * (a string literal spanning multiple lines) are not detected. In practice
-     * PHPX source files do not use multi-line quoted attribute values, so this
-     * is an acceptable limitation.
-     */
     private function isInsideStringOrExpression(string $prefix): bool
     {
-        $depth = 0;
-        $inDouble = false;
-        $inSingle = false;
-        $inBacktick = false;
-        $len = strlen($prefix);
-
-        for ($i = 0; $i < $len; $i++) {
-            $c = $prefix[$i];
-
-            if ($inDouble) {
-                if ($c === '\\') { $i++; continue; }
-                if ($c === '"') { $inDouble = false; }
-            } elseif ($inSingle) {
-                if ($c === '\\') { $i++; continue; }
-                if ($c === "'") { $inSingle = false; }
-            } elseif ($inBacktick) {
-                if ($c === '\\') { $i++; continue; }
-                if ($c === '`') { $inBacktick = false; }
-            } elseif ($depth === 0) {
-                if ($c === '"') { $inDouble = true; }
-                elseif ($c === "'") { $inSingle = true; }
-                elseif ($c === '`') { $inBacktick = true; }
-                elseif ($c === '{') { $depth++; }
-            } else {
-                if ($c === '{') { $depth++; }
-                elseif ($c === '}') { $depth = max(0, $depth - 1); }
-            }
-        }
-
-        return $depth > 0 || $inDouble || $inSingle || $inBacktick;
+        return TagScanner::isInsideStringOrExpression($prefix);
     }
 
     /**
