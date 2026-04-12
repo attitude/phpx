@@ -17,7 +17,7 @@ import * as vscode from 'vscode';
  * PHP identifier pattern: variable ($name) or identifier (name).
  * Matches the same tokens the PHP language server would consider "words".
  */
-const PHP_WORD_PATTERN = /\$?[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*/g;
+const PHP_WORD_PATTERN = /\$?[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*/;
 
 /**
  * File content cache with mtime validation.
@@ -85,8 +85,8 @@ function getFileContent(uri: vscode.Uri): string | null {
 
 	// 3. Read from disk and cache
 	try {
-		const content = fs.readFileSync(fsPath, 'utf-8');
 		const stat = fs.statSync(fsPath);
+		const content = fs.readFileSync(fsPath, 'utf-8');
 		fileCache.set(fsPath, { content, mtime: stat.mtimeMs });
 		return content;
 	} catch {
@@ -247,7 +247,7 @@ function getWordAt(
 	line: string,
 	charOffset: number,
 ): { text: string; start: number } | null {
-	const matches = [...line.matchAll(PHP_WORD_PATTERN)];
+	const matches = [...line.matchAll(new RegExp(PHP_WORD_PATTERN.source, 'g'))];
 	for (const match of matches) {
 		const start = match.index!;
 		const end = start + match[0].length;
