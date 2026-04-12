@@ -57,16 +57,14 @@ final class HoverProvider
             return $this->makeHover($content, $line, $startChar, $endChar);
         }
 
-        // Check if it's an HTML/custom element tag name inside < > or </ >
-        // Skip if the cursor is inside a {…} expression container — the < before
-        // the word is a comparison operator, not markup.
-        $tagStart = $this->isInsideExpression($lineText, $character)
-            ? -1
-            : $this->findTagNameStart($lineText, $startChar);
-        if ($tagStart >= 0) {
-            // Extract the full tag name including hyphens (e.g. my-component)
-            $tagName = $this->getTagNameAt($lineText, $tagStart);
-            $tagEnd = $tagStart + strlen($tagName);
+        // Check if it's an HTML/custom element tag name — delegate to TagScanner
+        // which tokenizes the full document and correctly ignores tags inside
+        // quoted attribute strings and {…} expression containers.
+        $tag = TagScanner::findTagAtPosition($document->text, $line, $character);
+        if ($tag !== null) {
+            $tagName = $tag['name'];
+            $tagStart = $tag['start'];
+            $tagEnd = $tag['end'];
 
             $isComponent = ctype_upper($tagName[0] ?? '');
             if ($isComponent) {
@@ -119,41 +117,6 @@ final class HoverProvider
     }
 
     /**
-     * Check if the word at $wordStart is part of a tag name.
-     * Walks backwards past hyphens and word chars to find `<` or `</`.
-     * Returns the start position of the full tag name, or -1 if not a tag.
-     */
-    private function findTagNameStart(string $line, int $wordStart): int
-    {
-        // Walk backwards past word chars and hyphens (for custom elements like my-component)
-        $pos = $wordStart;
-        while ($pos > 0 && ($this->isWordChar($line[$pos - 1]) || $line[$pos - 1] === '-')) {
-            $pos--;
-        }
-
-        // Now check what's immediately before: should be < or </
-        $before = rtrim(substr($line, 0, $pos));
-        if (str_ends_with($before, '<') || str_ends_with($before, '</')) {
-            return $pos;
-        }
-
-        return -1;
-    }
-
-    /**
-     * Extract the full tag name starting at a position, including hyphens.
-     */
-    private function getTagNameAt(string $line, int $start): string
-    {
-        $end = $start;
-        $len = strlen($line);
-        while ($end < $len && ($this->isWordChar($line[$end]) || $line[$end] === '-')) {
-            $end++;
-        }
-        return substr($line, $start, $end - $start);
-    }
-
-    /**
      * Check all <> and </> occurrences on the line and return a fragment hover
      * if the cursor falls within any of them.
      */
@@ -180,24 +143,6 @@ final class HoverProvider
         }
 
         return null;
-    }
-
-    /**
-     * Check if the cursor is inside a {…} expression container by counting
-     * unmatched opening braces in the line prefix up to the cursor.
-     */
-    private function isInsideExpression(string $lineText, int $character): bool
-    {
-        $depth = 0;
-        $len = min($character, strlen($lineText));
-        for ($i = 0; $i < $len; $i++) {
-            if ($lineText[$i] === '{') {
-                $depth++;
-            } elseif ($lineText[$i] === '}') {
-                $depth = max(0, $depth - 1);
-            }
-        }
-        return $depth > 0;
     }
 
     private function makeHover(string $content, int $line, int $startChar, int $endChar): array

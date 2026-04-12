@@ -3,6 +3,11 @@
 /**
  * Apply LSP TextEdit[] to source text, producing the resulting document.
  * Edits are sorted in reverse document order so earlier offsets stay valid.
+ *
+ * Limitation: each edit's newText must not introduce newlines. The splice
+ * logic treats every edit as a single-line replacement. This is sufficient
+ * for rename edits (which only replace tag names) but not for general LSP
+ * text edits that insert or remove line breaks.
  */
 function applyEdits(string $text, array $edits): string
 {

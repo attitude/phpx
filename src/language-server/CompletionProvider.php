@@ -77,8 +77,8 @@ final class CompletionProvider
         $prefix = substr($lineText, 0, $character);
         $items = [];
 
-        // Tag name completion after < — skip if inside a {…} expression container
-        if (!$this->isInsideExpression($prefix) && preg_match('/<([\w-]*)$/', $prefix, $matches)) {
+        // Tag name completion after < — skip if inside a quoted string or {…} expression
+        if (!$this->isInsideStringOrExpression($prefix) && preg_match('/<([\w-]*)$/', $prefix, $matches)) {
             $partial = $matches[1];
             $items = array_merge(
                 $items,
@@ -86,8 +86,8 @@ final class CompletionProvider
             );
         }
 
-        // Close tag completion after </
-        elseif (preg_match('/<\/([\w-]*)$/', $prefix, $matches)) {
+        // Close tag completion after </ — same guard
+        elseif (!$this->isInsideStringOrExpression($prefix) && preg_match('/<\/([\w-]*)$/', $prefix, $matches)) {
             $partial = $matches[1];
             $items = array_merge(
                 $items,
@@ -194,21 +194,38 @@ final class CompletionProvider
     }
 
     /**
-     * Check if the cursor is inside a {…} expression container by counting
-     * unmatched opening braces in the line prefix up to the cursor.
+     * Check if the cursor is inside a quoted string ("…" or '…') or a {…}
+     * expression container. Handles backslash-escaped quote characters.
+     * Used to suppress tag-name and close-tag completions when the `<` is
+     * inside attribute string content rather than markup.
      */
-    private function isInsideExpression(string $prefix): bool
+    private function isInsideStringOrExpression(string $prefix): bool
     {
         $depth = 0;
+        $inDouble = false;
+        $inSingle = false;
         $len = strlen($prefix);
+
         for ($i = 0; $i < $len; $i++) {
-            if ($prefix[$i] === '{') {
-                $depth++;
-            } elseif ($prefix[$i] === '}') {
-                $depth = max(0, $depth - 1);
+            $c = $prefix[$i];
+
+            if ($inDouble) {
+                if ($c === '\\') { $i++; continue; }
+                if ($c === '"') { $inDouble = false; }
+            } elseif ($inSingle) {
+                if ($c === '\\') { $i++; continue; }
+                if ($c === "'") { $inSingle = false; }
+            } elseif ($depth === 0) {
+                if ($c === '"') { $inDouble = true; }
+                elseif ($c === "'") { $inSingle = true; }
+                elseif ($c === '{') { $depth++; }
+            } else {
+                if ($c === '{') { $depth++; }
+                elseif ($c === '}') { $depth = max(0, $depth - 1); }
             }
         }
-        return $depth > 0;
+
+        return $depth > 0 || $inDouble || $inSingle;
     }
 
     /**
