@@ -2,6 +2,16 @@
 
 <?php
 
+ { <div>hello</div> }
+#^ punctuation.definition.begin.bracket.curly.php
+#  ^ punctuation.definition.tag.begin.phpx
+#   ^^^ entity.name.tag.phpx
+#      ^ punctuation.definition.tag.end.phpx
+#            ^^ punctuation.definition.tag.end.phpx
+#              ^^^ entity.name.tag.phpx
+#                 ^ punctuation.definition.tag.end.phpx
+#                   ^ punctuation.definition.end.bracket.curly.php
+
 function Foo(): array {
   return (
     <div>

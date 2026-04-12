@@ -4,6 +4,8 @@ import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
+const fixturesDir = path.join(__dirname, '../../src/test/fixtures');
+
 suite('PHPX Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
 
@@ -28,5 +30,26 @@ suite('PHPX Extension Test Suite', () => {
 		} finally {
 			fs.unlinkSync(tmpFile);
 		}
+	});
+
+	test('fixture: page.phpx is detected as phpx language', async () => {
+		const doc = await vscode.workspace.openTextDocument(
+			vscode.Uri.file(path.join(fixturesDir, 'page.phpx')),
+		);
+		assert.strictEqual(doc.languageId, 'phpx');
+	});
+
+	test('fixture: html-page-template.phpx is detected as phpx language', async () => {
+		const doc = await vscode.workspace.openTextDocument(
+			vscode.Uri.file(path.join(fixturesDir, 'html-page-template.phpx')),
+		);
+		assert.strictEqual(doc.languageId, 'phpx');
+	});
+
+	test('fixture: syntax-samples.phpx is detected as phpx language', async () => {
+		const doc = await vscode.workspace.openTextDocument(
+			vscode.Uri.file(path.join(fixturesDir, 'syntax-samples.phpx')),
+		);
+		assert.strictEqual(doc.languageId, 'phpx');
 	});
 });

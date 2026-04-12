@@ -21,8 +21,7 @@
 			"Attitude\\PHPX\\Compiler\\": "src/compiler/",
 			"Attitude\\PHPX\\Parser\\": "src/parser/",
 			"Attitude\\PHPX\\Renderer\\": "src/renderer/",
-			"Attitude\\PHPX\\React\\": "src/examples/react",
-			"Attitude\\PHPX\\LanguageServer\\": "src/language-server/"
+"Attitude\\PHPX\\LanguageServer\\": "src/language-server/"
 		}
 	},
 	"require": {
