@@ -143,6 +143,36 @@ describe('CompletionProvider', function () {
         });
     });
 
+    describe('string/expression context suppression', function () {
+        it('returns empty when < is inside a double-quoted attribute value', function () {
+            $doc = new TextDocumentItem('file:///test.phpx', 'phpx', 1, '<div data="<');
+            $items = $this->provider->complete($doc, 0, 12);
+
+            expect($items)->toBeEmpty();
+        });
+
+        it('returns empty when < is inside a single-quoted attribute value', function () {
+            $doc = new TextDocumentItem('file:///test.phpx', 'phpx', 1, "<div data='<");
+            $items = $this->provider->complete($doc, 0, 12);
+
+            expect($items)->toBeEmpty();
+        });
+
+        it('returns empty when < is inside a backtick template literal', function () {
+            $doc = new TextDocumentItem('file:///test.phpx', 'phpx', 1, '<div data={`<');
+            $items = $this->provider->complete($doc, 0, 13);
+
+            expect($items)->toBeEmpty();
+        });
+
+        it('returns empty when < is inside a {…} expression container', function () {
+            $doc = new TextDocumentItem('file:///test.phpx', 'phpx', 1, '<div>{$x<');
+            $items = $this->provider->complete($doc, 0, 9);
+
+            expect($items)->toBeEmpty();
+        });
+    });
+
     describe('edge cases', function () {
         it('returns empty for out-of-range line', function () {
             $doc = new TextDocumentItem('file:///test.phpx', 'phpx', 1, '<div>');

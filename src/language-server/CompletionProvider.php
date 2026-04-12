@@ -204,6 +204,7 @@ final class CompletionProvider
         $depth = 0;
         $inDouble = false;
         $inSingle = false;
+        $inBacktick = false;
         $len = strlen($prefix);
 
         for ($i = 0; $i < $len; $i++) {
@@ -215,9 +216,13 @@ final class CompletionProvider
             } elseif ($inSingle) {
                 if ($c === '\\') { $i++; continue; }
                 if ($c === "'") { $inSingle = false; }
+            } elseif ($inBacktick) {
+                if ($c === '\\') { $i++; continue; }
+                if ($c === '`') { $inBacktick = false; }
             } elseif ($depth === 0) {
                 if ($c === '"') { $inDouble = true; }
                 elseif ($c === "'") { $inSingle = true; }
+                elseif ($c === '`') { $inBacktick = true; }
                 elseif ($c === '{') { $depth++; }
             } else {
                 if ($c === '{') { $depth++; }
@@ -225,7 +230,7 @@ final class CompletionProvider
             }
         }
 
-        return $depth > 0 || $inDouble || $inSingle;
+        return $depth > 0 || $inDouble || $inSingle || $inBacktick;
     }
 
     /**
