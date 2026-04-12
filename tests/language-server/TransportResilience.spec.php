@@ -3,9 +3,15 @@
 /**
  * Transport robustness tests.
  *
- * Verifies that the Transport layer gracefully handles malformed input
- * without crashing, skipping bad messages and continuing to read valid
- * ones from the same stream.
+ * Two classes of error handling:
+ *
+ * - Fatal framing errors (missing, invalid, or zero Content-Length): the
+ *   stream is desynchronised and recovery is impossible, so read() returns
+ *   null and the server stops. The client is expected to restart the server.
+ *
+ * - Recoverable message errors (valid Content-Length but invalid JSON body):
+ *   the body has been fully consumed so the next frame boundary is known,
+ *   the bad message is logged to stderr, and read() loops to the next message.
  */
 
 use Attitude\PHPX\LanguageServer\Message;
