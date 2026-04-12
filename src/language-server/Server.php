@@ -127,6 +127,9 @@ final class Server
         // entirely (LSP default is utf-16, and for ASCII-only PHPX source files
         // byte offsets happen to equal UTF-16 code units).
         $clientEncodings = $params['capabilities']['general']['positionEncodings'] ?? [];
+        if (!is_array($clientEncodings)) {
+            $clientEncodings = [];
+        }
         $positionEncoding = in_array('utf-8', $clientEncodings, true) ? 'utf-8' : null;
 
         $capabilities = [
