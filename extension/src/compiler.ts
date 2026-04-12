@@ -14,7 +14,6 @@ export interface CompilationResult {
  */
 export class PHPXCompiler {
 	private outputChannel: vscode.OutputChannel;
-	private compilationErrors: Map<string, string> = new Map();
 	/** Cache: workspace folder fsPath → resolved compiler script path (or null if not found) */
 	private compilerScriptCache: Map<string, string | null> = new Map();
 	/** Cache: workspace folder fsPath → resolved project root */
@@ -178,6 +177,7 @@ export class PHPXCompiler {
 			let stdout = '';
 			let stderr = '';
 			let truncated = false;
+			let stderrOverflow = false;
 
 			proc.stdout!.on('data', (data: Buffer) => {
 				try {
@@ -194,7 +194,7 @@ export class PHPXCompiler {
 					proc.kill();
 				}
 			});
-			let stderrOverflow = false;
+
 			proc.stderr!.on('data', (data: Buffer) => {
 				try {
 					if (stderr.length < maxOutputBytes) {
@@ -218,13 +218,12 @@ export class PHPXCompiler {
 			});
 
 			proc.on('close', (code) => {
-				if (truncated) {
+				if (truncated || stderrOverflow) {
 					resolve({
 						php: '',
 						error: 'Compilation output exceeded size limit',
 					});
 				} else if (code === 0) {
-					this.compilationErrors.delete(documentUri.toString());
 					resolve({ php: stdout });
 				} else {
 					let errorMessage = stderr;
@@ -234,7 +233,6 @@ export class PHPXCompiler {
 					} catch {
 						// stderr is not JSON, use as-is
 					}
-					this.compilationErrors.set(documentUri.toString(), errorMessage);
 					resolve({
 						php: '',
 						error: errorMessage,
@@ -306,20 +304,11 @@ export class PHPXCompiler {
 
 			return { phpUri };
 		} catch (err) {
-			const error =
-				(err instanceof Error
-					? err.message || err.stack || String(err)
-					: String(err)) || 'Unknown compilation error';
-			const errorLog = err instanceof Error ? err.stack || error : error;
+			const message = err instanceof Error ? err.message || String(err) : String(err);
+			const errorLog = err instanceof Error ? err.stack || message : message;
 			this.outputChannel.appendLine(`[PHPX] compileAndWrite error — ${errorLog}`);
-			return { phpUri, error };
+			return { phpUri, error: message || 'Unknown compilation error' };
 		}
 	}
 
-	/**
-	 * Get the last compilation error for a document
-	 */
-	getCompilationError(documentUri: vscode.Uri): string | undefined {
-		return this.compilationErrors.get(documentUri.toString());
-	}
 }
