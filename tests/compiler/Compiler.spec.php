@@ -519,6 +519,22 @@ PHP
     expect($pragmaCompiler->getCompiled())->toMatchSnapshot();
   });
 
+  it('compiles the React-18 Title component fixture', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile(file_get_contents(__DIR__.'/../renderer/react-18/components/Title.phpx'));
+    expect($compiler->getCompiled())->toBe(
+      file_get_contents(__DIR__.'/../renderer/react-18/components/Title.php')
+    );
+  });
+
+  it('produces correct output with a logger attached', function () {
+    $compiler = newCompiler(withLogger: true, parser: newParser(withLogger: true));
+    ob_start();
+    $compiler->compile('<>Hello, {$name ?? \'unnamed\'}!</>');
+    ob_end_clean();
+    expect($compiler->getCompiled())->toBe("['Hello, ', (\$name ?? 'unnamed'), '!']");
+  });
+
   it('should ignore null children and null atribudes', function () {
     $defaultCompiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
     $defaultCompiler->compile('<div></div>');
