@@ -20,6 +20,9 @@ final class DiagnosticsProvider
         $source = $document->text;
 
         try {
+            // Ensure TokensList.php is loaded — its file-scope TX_* constants
+            // are needed by the tokenizer but won't autoload on their own.
+            class_exists(TokensList::class);
             $tokens = Token::tokenize($source);
             $tokensList = new TokensList($tokens);
             $this->parser->parse($tokensList);

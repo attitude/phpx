@@ -226,6 +226,9 @@ final class CompletionProvider
         $source = implode("\n", array_slice($lines, 0, $line)) . "\n" . substr($lines[$line] ?? '', 0, $character);
 
         try {
+            // Ensure TokensList.php is loaded — its file-scope TX_* constants
+            // are needed by the tokenizer but won't autoload on their own.
+            class_exists(\Attitude\PHPX\Parser\TokensList::class);
             $tokens = \Attitude\PHPX\Parser\Token::tokenize($source);
         } catch (\Throwable) {
             // Fallback: simple heuristic for mid-typing states
