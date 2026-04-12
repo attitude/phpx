@@ -2,7 +2,7 @@
   "name": "phpx-language-support",
   "displayName": "PHPX Language Support",
   "description": "Syntax highlighting and language support for PHPX - JSX-like syntax for PHP",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "publisher": "attitude",
   "license": "MIT",
   "engines": {
@@ -22,7 +22,7 @@
     "type": "git",
     "url": "https://github.com/attitude/phpx"
   },
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "activationEvents": [
     "onLanguage:phpx"
   ],
@@ -88,18 +88,33 @@
           "minimum": 100,
           "maximum": 5000,
           "description": "Debounce delay (ms) for compile-on-change. Lower values give faster feedback but use more CPU."
+        },
+        "phpx.languageServer.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable the PHPX Language Server for diagnostics, completion, and hover."
+        },
+        "phpx.languageServer.path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to language-server.php. Leave empty to auto-detect from vendor/attitude/phpx/. Supports absolute paths and paths relative to the workspace root."
         }
       }
     }
   },
   "scripts": {
-    "vscode:prepublish": "pnpm compile",
+    "vscode:prepublish": "pnpm bundle",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
+    "bundle": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --sourcemap --minify",
+    "bundle:watch": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --sourcemap --watch",
     "test": "pnpm compile && node ./out/test/runTest.js",
     "test:grammar": "vscode-tmgrammar-test -g ./syntaxes/phpx.tmLanguage.json './src/test/grammar/phpx.test.phpx' && vscode-tmgrammar-test -g ./syntaxes/phpx.tmLanguage.json -g '/Applications/Visual Studio Code.app/Contents/Resources/app/extensions/php/syntaxes/php.tmLanguage.json' './src/test/grammar/phpx-function.test.phpx'",
     "lint": "eslint src --ext ts",
-    "package": "vsce package --no-dependencies --allow-missing-repository"
+    "package": "pnpm bundle && vsce package --no-dependencies --allow-missing-repository"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.0"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
@@ -110,6 +125,7 @@
     "@typescript-eslint/parser": "^6.13.0",
     "@vscode/test-electron": "^2.3.8",
     "@vscode/vsce": "^3.7.1",
+    "esbuild": "^0.28.0",
     "eslint": "^8.54.0",
     "mocha": "^10.2.0",
     "typescript": "^5.3.2",
