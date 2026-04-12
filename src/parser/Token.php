@@ -8,28 +8,11 @@ final class Token extends \PhpToken implements \JsonSerializable {
 	}
 
 	public static function tokenize(string $source, int $flags = 0): array {
-		$startsWithOpenTag = preg_match('/^\s*<\?php/', $source);
+		$startsWithOpenTag = str_starts_with(ltrim($source), '<?php');
 		$offset = 0;
 
 		if (!$startsWithOpenTag) {
-			if ($startsWithOpenTag === false) {
-				$errorCode = preg_last_error();
-
-				if ($errorCode !== PREG_NO_ERROR) {
-					$errorMessages = [
-							PREG_INTERNAL_ERROR => 'Internal error',
-							PREG_BACKTRACK_LIMIT_ERROR => 'Backtrack limit was exhausted',
-							PREG_RECURSION_LIMIT_ERROR => 'Recursion limit was exhausted',
-							PREG_BAD_UTF8_ERROR => 'Malformed UTF-8 characters',
-							PREG_BAD_UTF8_OFFSET_ERROR => 'Offset into the string is not valid UTF-8 code point',
-					];
-
-					$errorMessage = $errorMessages[$errorCode] ?? 'Unknown error';
-					throw new \Exception("preg_match error: $errorMessage");
-				}
-			}
-
-			if (strstr($source, '<?php')) {
+			if (str_contains($source, '<?php')) {
 				throw new \ParseError("Expecting PHPX source to have a <?php tag at the beginning or not at all");
 			}
 
@@ -40,7 +23,7 @@ final class Token extends \PhpToken implements \JsonSerializable {
 		$tokens = parent::tokenize($source, $flags);
 
 		if ($offset) {
-			$source = mb_substr($source, $offset);
+			$source = substr($source, $offset);
 		}
 
 		if (!$startsWithOpenTag) {
@@ -53,11 +36,7 @@ final class Token extends \PhpToken implements \JsonSerializable {
 
 			if ($token->id === T_BAD_CHARACTER) {
 				$token->id = T_STRING;
-				$token->text = str_replace(
-					$source,
-					chr(0x1A), // (substitute)
-					'\\\''
-				);
+				$token->text = str_replace(chr(0x1A), "\\'", $token->text);
 			}
 
 			if ($token->id === T_IS_NOT_EQUAL && $token->text === '<>') {
@@ -73,13 +52,12 @@ final class Token extends \PhpToken implements \JsonSerializable {
 					$currentToken = $token;
 
 					$newSource =
-						mb_substr($source, 0, $previousToken->pos)
+						substr($source, 0, $previousToken->pos)
 						.chr(0x1A) // (substitute)
-						.mb_substr($source, $token->pos + 1);
+						.substr($source, $token->pos + 1);
 
 					return self::tokenize($newSource, $flags);
 				} else {
-					echo json_encode($tokens)."\n";
 					throw new \ParseError(
 						"Unexpected T_ENCAPSED_AND_WHITESPACE after '{$tokens[$i - 1]->text}'\n".
 						"Use &apos; for HTML5 or &#39; for HTML4 also to escape quotes in markup.\n"

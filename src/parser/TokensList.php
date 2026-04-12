@@ -36,15 +36,15 @@ const TX_ELEMENT_CLOSING_CLOSE = 62;
 const TX_TEMPLATE_LITERAL = 96; // ord('`');
 
 final class TokensList implements \JsonSerializable, \Iterator {
-	protected int $cursor = 0;
+	private int $cursor = 0;
 
-	public function __construct(protected array $tokens) {
+	public function __construct(private array $tokens) {
 		foreach ($this->tokens as $token) {
 			assert($token instanceof Token);
 		}
 	}
 
-	protected function tokenAtCursorMatchesSequence(array $sequence): Token|null {
+	private function tokenAtCursorMatchesSequence(array $sequence): Token|null {
 		foreach ($sequence as $i => $text) {
 			assert(is_string($text) || is_int($text));
 
@@ -133,7 +133,12 @@ final class TokensList implements \JsonSerializable, \Iterator {
 
 	public function replaceTokenAtCursor(array|Token $value): void {
 		if (is_array($value)) {
-			array_splice($this->tokens, $this->cursor, 1, array_map(fn(Token $it) => $it, $value));
+			foreach ($value as $t) {
+				if (!($t instanceof Token)) {
+					throw new \TypeError('replaceTokenAtCursor() expects an array of Token instances.');
+				}
+			}
+			array_splice($this->tokens, $this->cursor, 1, $value);
 		} else {
 			$this->tokens[$this->cursor] = $value;
 		}
