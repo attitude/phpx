@@ -60,9 +60,7 @@ export class PHPXDiagnosticsManager {
 			}
 
 			// Forward diagnostics to the PHPX file with remapped positions
-			const forwarded = phpDiagnostics
-				.filter((d) => this.shouldForwardDiagnostic(d))
-				.map((d) => {
+			const forwarded = phpDiagnostics.map((d) => {
 					const mappedRange = mapRangeToPhpx(uri, phpxUri, d.range);
 					const mapped = new vscode.Diagnostic(
 						mappedRange,
@@ -109,15 +107,6 @@ export class PHPXDiagnosticsManager {
 
 			this.diagnosticCollection.set(phpxUri, forwarded);
 		}
-	}
-
-	/**
-	 * Filter out diagnostics that are artifacts of the PHPX→PHP compilation.
-	 */
-	private shouldForwardDiagnostic(diagnostic: vscode.Diagnostic): boolean {
-		// Forward all diagnostics for now.
-		// Can be refined later to filter out compilation artifacts.
-		return true;
 	}
 
 	/**

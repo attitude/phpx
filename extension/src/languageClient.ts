@@ -38,8 +38,7 @@ export function startLanguageClient(
 
 	outputChannel.appendLine(`[PHPX LSP] Using server script: ${serverScript}`);
 
-	const cwd =
-		vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? undefined;
+	const cwd = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
 
 	const serverOptions: ServerOptions = {
 		command: phpPath,

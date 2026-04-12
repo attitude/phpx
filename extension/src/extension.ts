@@ -168,9 +168,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Invalidate caches when vendor/composer files change
 	const vendorWatcher = vscode.workspace.createFileSystemWatcher('**/vendor/autoload.php');
-	vendorWatcher.onDidCreate(() => compiler.clearCache());
-	vendorWatcher.onDidChange(() => compiler.clearCache());
-	vendorWatcher.onDidDelete(() => compiler.clearCache());
+	const clearCompilerCache = () => compiler.clearCache();
+	vendorWatcher.onDidCreate(clearCompilerCache);
+	vendorWatcher.onDidChange(clearCompilerCache);
+	vendorWatcher.onDidDelete(clearCompilerCache);
 	context.subscriptions.push(vendorWatcher);
 
 	// Clean up when a PHPX file is closed

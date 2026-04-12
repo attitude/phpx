@@ -46,69 +46,73 @@ function mapLocationLinkToSource(
 	phpxUri: vscode.Uri,
 	phpUri: vscode.Uri,
 ): vscode.LocationLink {
-	let targetUri = link.targetUri;
-	let targetRange = link.targetRange;
-	let targetSelectionRange = link.targetSelectionRange;
-
-	if (targetUri.fsPath === phpUri.fsPath) {
-		targetRange = mapRangeToPhpx(phpUri, phpxUri, link.targetRange);
-		targetSelectionRange = link.targetSelectionRange
-			? mapRangeToPhpx(phpUri, phpxUri, link.targetSelectionRange)
-			: undefined;
-		targetUri = phpxUri;
-	} else if (PHPXCompiler.hasPhpxSource(targetUri)) {
-		const sourceUri = PHPXCompiler.getSourceUri(targetUri);
-		targetRange = mapRangeToPhpx(targetUri, sourceUri, link.targetRange);
-		targetSelectionRange = link.targetSelectionRange
-			? mapRangeToPhpx(targetUri, sourceUri, link.targetSelectionRange)
-			: undefined;
-		targetUri = sourceUri;
+	let remapUri: vscode.Uri | undefined;
+	if (link.targetUri.fsPath === phpUri.fsPath) {
+		remapUri = phpxUri;
+	} else if (PHPXCompiler.hasPhpxSource(link.targetUri)) {
+		remapUri = PHPXCompiler.getSourceUri(link.targetUri);
 	}
+
 	return {
 		originSelectionRange: link.originSelectionRange
 			? mapRangeToPhpx(phpUri, phpxUri, link.originSelectionRange)
 			: undefined,
-		targetUri,
-		targetRange,
-		targetSelectionRange,
+		targetUri: remapUri ?? link.targetUri,
+		targetRange: remapUri
+			? mapRangeToPhpx(link.targetUri, remapUri, link.targetRange)
+			: link.targetRange,
+		targetSelectionRange: remapUri && link.targetSelectionRange
+			? mapRangeToPhpx(link.targetUri, remapUri, link.targetSelectionRange)
+			: link.targetSelectionRange,
 	};
 }
 
 // ─── Completion and Hover are handled by the PHPX Language Server (LSP) ─────
 
+/**
+ * Delegate a location-style command to the compiled PHP file and remap results back to PHPX.
+ * Shared by Definition, TypeDefinition, and Implementation providers.
+ */
+async function delegateLocationProvider(
+	document: vscode.TextDocument,
+	position: vscode.Position,
+	command: string,
+): Promise<vscode.Definition | vscode.LocationLink[] | null> {
+	const phpUri = PHPXCompiler.getCompiledUri(document.uri);
+	const phpxUri = document.uri;
+	const mappedPosition = mapPositionToPhp(document, position, phpUri);
+
+	try {
+		const result = await vscode.commands.executeCommand<
+			(vscode.Location | vscode.LocationLink)[]
+		>(command, phpUri, mappedPosition);
+
+		if (!result || result.length === 0) {
+			return null;
+		}
+
+		if ('targetUri' in result[0]) {
+			return (result as vscode.LocationLink[]).map((item) =>
+				mapLocationLinkToSource(item, phpxUri, phpUri),
+			);
+		}
+		return (result as vscode.Location[]).map((item) =>
+			mapLocationToSource(item, phpxUri, phpUri),
+		);
+	} catch {
+		return null;
+	}
+}
+
 // ─── Definition ──────────────────────────────────────────────────────────────
 
 export class PHPXDefinitionProvider implements vscode.DefinitionProvider {
-	async provideDefinition(
+	provideDefinition(
 		document: vscode.TextDocument,
 		position: vscode.Position,
 		_token: vscode.CancellationToken,
 	): Promise<vscode.Definition | vscode.LocationLink[] | null> {
-		const phpUri = PHPXCompiler.getCompiledUri(document.uri);
-		const phpxUri = document.uri;
-		const mappedPosition = mapPositionToPhp(document, position, phpUri);
-
-		try {
-			const result = await vscode.commands.executeCommand<
-				(vscode.Location | vscode.LocationLink)[]
-			>('vscode.executeDefinitionProvider', phpUri, mappedPosition);
-
-			if (!result || result.length === 0) {
-				return null;
-			}
-
-			// Separate into typed arrays to satisfy the union return type
-			if ('targetUri' in result[0]) {
-				return (result as vscode.LocationLink[]).map((item) =>
-					mapLocationLinkToSource(item, phpxUri, phpUri),
-				);
-			}
-			return (result as vscode.Location[]).map((item) =>
-				mapLocationToSource(item, phpxUri, phpUri),
-			);
-		} catch {
-			return null;
-		}
+		return delegateLocationProvider(document, position, 'vscode.executeDefinitionProvider');
 	}
 }
 
@@ -117,35 +121,12 @@ export class PHPXDefinitionProvider implements vscode.DefinitionProvider {
 export class PHPXTypeDefinitionProvider
 	implements vscode.TypeDefinitionProvider
 {
-	async provideTypeDefinition(
+	provideTypeDefinition(
 		document: vscode.TextDocument,
 		position: vscode.Position,
 		_token: vscode.CancellationToken,
 	): Promise<vscode.Definition | vscode.LocationLink[] | null> {
-		const phpUri = PHPXCompiler.getCompiledUri(document.uri);
-		const phpxUri = document.uri;
-		const mappedPosition = mapPositionToPhp(document, position, phpUri);
-
-		try {
-			const result = await vscode.commands.executeCommand<
-				(vscode.Location | vscode.LocationLink)[]
-			>('vscode.executeTypeDefinitionProvider', phpUri, mappedPosition);
-
-			if (!result || result.length === 0) {
-				return null;
-			}
-
-			if ('targetUri' in result[0]) {
-				return (result as vscode.LocationLink[]).map((item) =>
-					mapLocationLinkToSource(item, phpxUri, phpUri),
-				);
-			}
-			return (result as vscode.Location[]).map((item) =>
-				mapLocationToSource(item, phpxUri, phpUri),
-			);
-		} catch {
-			return null;
-		}
+		return delegateLocationProvider(document, position, 'vscode.executeTypeDefinitionProvider');
 	}
 }
 
@@ -249,44 +230,6 @@ export class PHPXDocumentSymbolProvider
 					sym.kind,
 					sym.containerName,
 					new vscode.Location(phpxUri, range),
-				);
-			});
-		} catch {
-			return null;
-		}
-	}
-}
-
-// ─── Workspace Symbols ──────────────────────────────────────────────────────
-
-export class PHPXWorkspaceSymbolProvider
-	implements vscode.WorkspaceSymbolProvider
-{
-	async provideWorkspaceSymbols(
-		query: string,
-		_token: vscode.CancellationToken,
-	): Promise<vscode.SymbolInformation[] | null> {
-		try {
-			const result = await vscode.commands.executeCommand<
-				vscode.SymbolInformation[]
-			>('vscode.executeWorkspaceSymbolProvider', query);
-
-			if (!result) {
-				return null;
-			}
-
-			return result.map((symbol) => {
-				const loc = symbol.location;
-				if (!PHPXCompiler.hasPhpxSource(loc.uri)) {
-					return symbol;
-				}
-				const sourceUri = PHPXCompiler.getSourceUri(loc.uri);
-				const range = mapRangeToPhpx(loc.uri, sourceUri, loc.range);
-				return new vscode.SymbolInformation(
-					symbol.name,
-					symbol.kind,
-					symbol.containerName ?? '',
-					new vscode.Location(sourceUri, range),
 				);
 			});
 		} catch {
@@ -455,34 +398,11 @@ export class PHPXRenameProvider implements vscode.RenameProvider {
 export class PHPXImplementationProvider
 	implements vscode.ImplementationProvider
 {
-	async provideImplementation(
+	provideImplementation(
 		document: vscode.TextDocument,
 		position: vscode.Position,
 		_token: vscode.CancellationToken,
 	): Promise<vscode.Definition | vscode.LocationLink[] | null> {
-		const phpUri = PHPXCompiler.getCompiledUri(document.uri);
-		const phpxUri = document.uri;
-		const mappedPosition = mapPositionToPhp(document, position, phpUri);
-
-		try {
-			const result = await vscode.commands.executeCommand<
-				(vscode.Location | vscode.LocationLink)[]
-			>('vscode.executeImplementationProvider', phpUri, mappedPosition);
-
-			if (!result || result.length === 0) {
-				return null;
-			}
-
-			if ('targetUri' in result[0]) {
-				return (result as vscode.LocationLink[]).map((item) =>
-					mapLocationLinkToSource(item, phpxUri, phpUri),
-				);
-			}
-			return (result as vscode.Location[]).map((item) =>
-				mapLocationToSource(item, phpxUri, phpUri),
-			);
-		} catch {
-			return null;
-		}
+		return delegateLocationProvider(document, position, 'vscode.executeImplementationProvider');
 	}
 }
