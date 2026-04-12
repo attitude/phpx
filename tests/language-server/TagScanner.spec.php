@@ -50,6 +50,16 @@ describe('TagScanner', function () {
             expect($names)->not->toContain('em');
         });
 
+        it('reads numeric hyphen segments in custom element names (e.g. x-2)', function () {
+            $tags = TagScanner::scan('<x-2>text</x-2>');
+
+            expect($tags)->toHaveCount(2);
+            expect($tags[0]['name'])->toBe('x-2');
+            expect($tags[0]['kind'])->toBe('open');
+            expect($tags[1]['name'])->toBe('x-2');
+            expect($tags[1]['kind'])->toBe('close');
+        });
+
         it('does NOT match tag-like text inside expression containers', function () {
             $tags = TagScanner::scan('<div>{$x < 5 ? "yes" : "no"}</div>');
 

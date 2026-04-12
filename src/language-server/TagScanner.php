@@ -118,10 +118,11 @@ final class TagScanner
         $name = $tokens[$start]->text;
         $j = $start + 1;
 
-        // Hyphenated segments: "-" must be followed by T_STRING (aligned with
-        // Parser::parseElementName which requires tokenAtCursorIsWord after "-")
+        // Hyphenated segments: "-" must be followed by a word token — aligned with
+        // Parser::parseElementName / tokenAtCursorIsWord: T_STRING OR any token
+        // whose text matches /^\w+$/ (covers numeric segments like "2" in x-2).
         while ($j < $count - 1 && $tokens[$j]->text === '-' && isset($tokens[$j + 1]) &&
-               $tokens[$j + 1]->id === T_STRING) {
+               ($tokens[$j + 1]->id === T_STRING || preg_match('/^\w+$/', $tokens[$j + 1]->text))) {
             $name .= '-' . $tokens[$j + 1]->text;
             $j += 2;
         }

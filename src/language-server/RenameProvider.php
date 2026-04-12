@@ -40,9 +40,11 @@ final class RenameProvider
     {
         // Validate newName matches the parser's element name grammar:
         // - First segment: T_STRING (letter or underscore start, then word chars)
-        // - Optional hyphenated segments: "-" followed by a word token
+        // - Optional hyphenated segments: "-" followed by any word token (\w+),
+        //   which includes numeric-only segments like "2" in "x-2" (matching
+        //   tokenAtCursorIsWord which accepts T_STRING or /^\w+$/)
         // This rejects: empty, leading digits, spaces, consecutive hyphens, trailing hyphen
-        if (!preg_match('/^[a-zA-Z_][\w]*(-[a-zA-Z_][\w]*)*$/', $newName)) {
+        if (!preg_match('/^[a-zA-Z_][\w]*(-[\w]+)*$/', $newName)) {
             return null;
         }
 

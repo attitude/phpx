@@ -307,6 +307,13 @@ describe('Rename Contracts', function () {
             expect($result)->not->toBeNull();
         });
 
+        it('accepts hyphenated newName with numeric segment (e.g. x-2)', function () {
+            $doc = new TextDocumentItem($this->uri, 'phpx', 1, '<div>text</div>');
+            $result = $this->provider->rename($doc, 0, 1, 'x-2');
+
+            expect($result)->not->toBeNull();
+        });
+
         it('accepts valid uppercase newName', function () {
             $doc = new TextDocumentItem($this->uri, 'phpx', 1, '<div>text</div>');
             $result = $this->provider->rename($doc, 0, 1, 'MyComponent');
