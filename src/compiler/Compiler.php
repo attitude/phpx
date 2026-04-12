@@ -2,34 +2,32 @@
 
 namespace Attitude\PHPX\Compiler;
 
-include_once __DIR__ . '/../arrayMap.php';
-
 use Attitude\PHPX\Compiler\Formatter;
 use Attitude\PHPX\Parser\NodeType;
 use Attitude\PHPX\Parser\Parser;
 use Attitude\PHPX\Parser\Token;
 use Attitude\PHPX\Parser\TokensList;
 use Psr\Log\LoggerInterface;
-use function Attitude\PHPX\arrayMap;
 
 final class Compiler {
-	public ?LoggerInterface $logger = null;
-	protected TokensList $tokens;
-	protected Parser $parser;
-	protected FormatterInterface $formatter;
-	protected string $source;
-	protected array $ast;
-	protected string $compiled;
+	private TokensList $tokens;
+	private Parser $parser;
+	private FormatterInterface $formatter;
+	private string $source;
+	private array $ast;
+	private string $compiled;
 
 	public function __construct(
 		?Parser $parser = null,
 		?FormatterInterface $formatter = null,
+		private ?LoggerInterface $logger = null,
 	) {
-		$this->parser = $parser ?? new Parser();
+		$this->parser = $parser ?? new Parser(logger: $this->logger);
 		$this->formatter = $formatter ?? new Formatter();
 	}
 
 	public function compile(string $source): string {
+		$this->source = $source;
 		$this->tokens = new TokensList(Token::tokenize($source));
 		$this->ast = $this->parser->parse($this->tokens);
 		$this->compiled = '';
@@ -48,7 +46,7 @@ final class Compiler {
 		return $this->compiled;
 	}
 
-	protected function compileExpression(array $node): string {
+	private function compileExpression(array $node): string {
 		$this->logger?->debug('compileExpression', $node);
 
 		['value' => $value] = $node;
@@ -56,7 +54,7 @@ final class Compiler {
 		return $value->text;
 	}
 
-	protected static function trimChildren(string $string): string {
+	private static function trimChildren(string $string): string {
 		if (strstr($string, "\n")) {
 			return strtr($string, [", \n" => ",\n"]);
 		} else {
@@ -64,24 +62,29 @@ final class Compiler {
 		}
 	}
 
-	protected function compilePHPXChildrenArray(array $children): string {
+	private function compilePHPXChildrenArray(array $children): string {
 		$this->logger?->debug('compilePHPXChildrenArray', $children);
 
 		$childrenCount = count($children);
+		$parts = [];
 
-		return '[' . self::trimChildren(implode('', arrayMap($children, fn(array $child, int $index) => match ($child['$$type']) {
-			NodeType::BLOCK => $this->compileBlock($child) . ', ',
-			NodeType::TEMPLATE_LITERAL => $this->compileTemplateLiteral($child) . ', ',
-			NodeType::PHPX_ELEMENT => $this->compilePHPXElement($child) . ', ',
-			NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($child) . ', ',
-			NodeType::PHPX_TEXT => $this->compilePHPXText($child, $index, $childrenCount),
-			NodeType::PHPX_EXPRESSION_CONTAINER => $this->compilePHPXExpressionContainer($child) . ', ',
-			NodeType::PHPX_COMMENT => $this->compilePHPXComment($child),
-			default => throw new \RuntimeException("Unknown child type: {$child['$$type']->value}"),
-		}))) . ']';
+		foreach ($children as $index => $child) {
+			$parts[] = match ($child['$$type']) {
+				NodeType::BLOCK => $this->compileBlock($child) . ', ',
+				NodeType::TEMPLATE_LITERAL => $this->compileTemplateLiteral($child) . ', ',
+				NodeType::PHPX_ELEMENT => $this->compilePHPXElement($child) . ', ',
+				NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($child) . ', ',
+				NodeType::PHPX_TEXT => $this->compilePHPXText($child, $index, $childrenCount),
+				NodeType::PHPX_EXPRESSION_CONTAINER => $this->compilePHPXExpressionContainer($child) . ', ',
+				NodeType::PHPX_COMMENT => $this->compilePHPXComment($child),
+				default => throw new \RuntimeException("Unknown child type: {$child['$$type']->value}"),
+			};
+		}
+
+		return '[' . self::trimChildren(implode('', $parts)) . ']';
 	}
 
-	protected function compilePHPXFragmentElement(array $node): string {
+	private function compilePHPXFragmentElement(array $node): string {
 		$this->logger?->debug('compilePHPXFragmentElement', $node);
 		assert($node['$$type'] === NodeType::PHPX_FRAGMENT);
 
@@ -90,7 +93,7 @@ final class Compiler {
 		);
 	}
 
-	protected function compilePHPXAttribute(array $node): string {
+	private function compilePHPXAttribute(array $node): string {
 		$this->logger?->debug('compilePHPXAttribute', $node);
 
 		[
@@ -120,7 +123,7 @@ final class Compiler {
 		}
 	}
 
-	protected function compilePHPXAttributesPropsExpression(array $node): string {
+	private function compilePHPXAttributesPropsExpression(array $node): string {
 		$this->logger?->debug('compilePHPXAttributesPropsExpression', $node);
 		assert($node['$$type'] === NodeType::BLOCK);
 
@@ -146,7 +149,7 @@ final class Compiler {
 		}
 	}
 
-	protected function compilePHPXAttributes(array $attributes): string {
+	private function compilePHPXAttributes(array $attributes): string {
 		$this->logger?->debug('compilePHPXAttributes', $attributes);
 
 		$attributes = implode('', array_map(fn(array|Token $value) => match ($value instanceof Token) {
@@ -165,7 +168,7 @@ final class Compiler {
 		}
 	}
 
-	protected function compilePHPXElement(array $node): string {
+	private function compilePHPXElement(array $node): string {
 		$this->logger?->debug('compilePHPXElement', $node);
 
 		[
@@ -188,7 +191,7 @@ final class Compiler {
 		);
 	}
 
-	protected static function concatenateStringMembers(array $array): array {
+	private static function concatenateStringMembers(array $array): array {
 		$combinedArray = [];
 		$currentString = '';
 
@@ -211,7 +214,7 @@ final class Compiler {
 		return $combinedArray;
 	}
 
-	protected function compilePHPXExpressionContainer(array $node): string {
+	private function compilePHPXExpressionContainer(array $node): string {
 		$this->logger?->debug('compilePHPXExpressionContainer', $node);
 
 		['expression' => $expression] = $node;
@@ -241,7 +244,7 @@ final class Compiler {
 		return "({$code})";
 	}
 
-	protected function compileBlock(array $node, ?string $replaceOpening = null, ?string $replaceClosing = null): string {
+	private function compileBlock(array $node, ?string $replaceOpening = null, ?string $replaceClosing = null): string {
 		$this->logger?->debug('compileBlock', $node);
 		assert($node['$$type'] === NodeType::BLOCK);
 
@@ -266,7 +269,7 @@ final class Compiler {
 			. ($replaceClosing !== null ? $replaceClosing : $closing->text);
 	}
 
-	protected function compileTemplateLiteral(array $node): string {
+	private function compileTemplateLiteral(array $node): string {
 		$this->logger?->debug('compileTemplateLiteral', $node);
 
 		['children' => $children] = $node;
@@ -282,7 +285,7 @@ final class Compiler {
 		return implode('.', $children);
 	}
 
-	protected function compilePHPXComment(array $node): string {
+	private function compilePHPXComment(array $node): string {
 		$this->logger?->debug('compilePHPXComment', $node);
 
 		['comment' => $comment] = $node;
@@ -290,7 +293,7 @@ final class Compiler {
 		return $comment->text;
 	}
 
-	protected function compilePHPXText(array $node, int $index, int $count): string {
+	private function compilePHPXText(array $node, int $index, int $count): string {
 		$this->logger?->debug('compilePHPXText', [$node]);
 
 		['tokens' => $tokens] = $node;
@@ -298,29 +301,19 @@ final class Compiler {
 		$isFirst = $index === 0;
 		$isLast = $index === $count - 1;
 
-		if (count($tokens) === 1) {
-			$token = $tokens[0];
-
-			if ($token->id === T_WHITESPACE && ($isFirst || $isLast || strstr($token->text, "\n"))) {
-				return $token->text;
-			} else {
-				if ($isFirst) {
-					return '\'' . ltrim($token->text, ' ') . '\', ';
-				} else if ($isLast) {
-					return '\'' . rtrim($token->text, ' ') . '\', ';
-				} else {
-					return '\'' . $token->text . '\', ';
-				}
-			}
-		} else {
-			if ($isFirst) {
-				return '\'' . ltrim(implode('', array_map(fn($token) => $token->text, $tokens)), ' ') . '\', ';
-			} else if ($isLast) {
-				return '\'' . rtrim(implode('', array_map(fn($token) => $token->text, $tokens)), ' ') . '\', ';
-			} else {
-				return '\'' . implode('', array_map(fn($token) => $token->text, $tokens)) . '\', ';
-			}
+		if (count($tokens) === 1 && $tokens[0]->id === T_WHITESPACE && ($isFirst || $isLast || strstr($tokens[0]->text, "\n"))) {
+			return $tokens[0]->text;
 		}
+
+		$text = implode('', array_map(fn($t) => $t->text, $tokens));
+
+		if ($isFirst) {
+			$text = ltrim($text, ' ');
+		} elseif ($isLast) {
+			$text = rtrim($text, ' ');
+		}
+
+		return '\'' . $text . '\', ';
 	}
 
 	public function __toString(): string {

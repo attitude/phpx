@@ -9,13 +9,7 @@ use Attitude\PHPX\Parser\Parser;
 require_once __DIR__.'/../../src/index.php';
 
 function newParser(bool $withLogger = false): Parser {
-  $parser = new Parser();
-
-  if ($withLogger) {
-    $parser->logger = new Logger();
-  }
-
-  return $parser;
+  return new Parser(logger: $withLogger ? new Logger() : null);
 }
 
 function newPragmaFormatter(): PragmaFormatter {
@@ -23,13 +17,7 @@ function newPragmaFormatter(): PragmaFormatter {
 }
 
 function newCompiler(?Parser $parser = null, ?FormatterInterface $formatter = null, bool $withLogger = false): Compiler {
-  $compiler = new Compiler(parser: $parser, formatter: $formatter);
-
-  if ($withLogger) {
-    $compiler->logger = new Logger();
-  }
-
-  return $compiler;
+  return new Compiler(parser: $parser, formatter: $formatter, logger: $withLogger ? new Logger() : null);
 }
 
 

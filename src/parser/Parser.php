@@ -7,10 +7,11 @@ namespace Attitude\PHPX\Parser;
 use Psr\Log\LoggerInterface;
 
 final class Parser {
-	public ?LoggerInterface $logger = null;
-	protected TokensList $tokens;
-	protected array $ast;
-	public function __construct() {
+	private TokensList $tokens;
+	private array $ast;
+	public function __construct(
+		private ?LoggerInterface $logger = null,
+	) {
 	}
 
 	public function parse(TokensList $tokens): array {
@@ -41,7 +42,7 @@ final class Parser {
 		return $this->ast;
 	}
 
-	protected function parseFragmentElement(): array {
+	private function parseFragmentElement(): array {
 		return [
 			'$$type' => NodeType::PHPX_FRAGMENT,
 			'openingElement' => $this->tokens->tokenAtCursorAndForward(),
@@ -57,7 +58,7 @@ final class Parser {
 		];
 	}
 
-	protected function parseElement(): array {
+	private function parseElement(): array {
 		$this->debugCurrentToken(__FUNCTION__);
 		$openingElementStart = $this->tokens->tokenAtCursorAndForward();
 		assert($openingElementStart->id === TX_ELEMENT_OPENING_OPEN);
@@ -148,7 +149,7 @@ final class Parser {
 		throw new \ParseError("Not implemented");
 	}
 
-	protected function parseElementName(): Token|array {
+	private function parseElementName(): Token|array {
 		$this->debugCurrentToken(__FUNCTION__);
 		$firstToken = $this->tokens->tokenAtCursorAndForward();
 		if ($firstToken === null) {
@@ -168,7 +169,7 @@ final class Parser {
 		return $name;
 	}
 
-	protected function parseExpressionContainer(): array {
+	private function parseExpressionContainer(): array {
 		$this->debugCurrentToken(__FUNCTION__);
 		assert($this->tokens->tokenAtCursorMatches(TX_CURLY_BRACKET_OPEN));
 
@@ -193,7 +194,7 @@ final class Parser {
 		];
 	}
 
-	protected function parseTextNode(): array {
+	private function parseTextNode(): array {
 		if ($this->tokens->tokenAtCursorMatches(T_WHITESPACE) && strstr($this->tokens->tokenAtCursor()->text, "\n")) {
 			$this->debugCurrentToken(__FUNCTION__);
 			return ['$$type' => NodeType::PHPX_TEXT, 'tokens' => [$this->tokens->tokenAtCursorAndForward()]];
@@ -241,7 +242,6 @@ final class Parser {
 
 					$this->tokens->replaceTokenAtCursor($tokensToInsert);
 				} else {
-					print_r($this->tokens->tokenAtCursor());
 					throw new \ParseError("Unescaped PHP comment found at line {$this->tokens->tokenAtCursor()->line}");
 				}
 			}
@@ -257,7 +257,7 @@ final class Parser {
 		return ['$$type' => NodeType::PHPX_TEXT, 'tokens' => $value];
 	}
 
-	protected function parseTemplateLiteral(): array {
+	private function parseTemplateLiteral(): array {
 		$opener = $this->tokens->tokenAtCursorAndForward();
 		$children = [];
 
@@ -288,7 +288,7 @@ final class Parser {
 		];
 	}
 
-	protected function parseElementChildren(): array {
+	private function parseElementChildren(): array {
 		$children = [];
 
 		while (
@@ -312,7 +312,7 @@ final class Parser {
 		return $children;
 	}
 
-	protected function parseElementAttributes(): array {
+	private function parseElementAttributes(): array {
 		$attributes = [];
 
 		while (
@@ -336,7 +336,7 @@ final class Parser {
 		return $attributes;
 	}
 
-	protected function parseElementAttribute(): array {
+	private function parseElementAttribute(): array {
 		$this->debugCurrentToken(__FUNCTION__);
 
 		$name = [$this->tokens->tokenAtCursorAndForward()];
@@ -382,7 +382,7 @@ final class Parser {
 		];
 	}
 
-	protected function parseParentheses(): array {
+	private function parseParentheses(): array {
 		$this->debugCurrentToken(__FUNCTION__);
 		$opener = $this->tokens->tokenAtCursorAndForward();
 
@@ -431,7 +431,7 @@ final class Parser {
 		];
 	}
 
-	protected function unexpectedTokenMessage(?string $expected = null): string {
+	private function unexpectedTokenMessage(?string $expected = null): string {
 		$token = $this->tokens->tokenAtCursor();
 		if ($token === null) {
 			return "Unexpected end of input" . ($expected ? ", expected {$expected}" : '');
@@ -441,7 +441,7 @@ final class Parser {
 		);
 	}
 
-	protected function debugCurrentToken(string $method): void {
+	private function debugCurrentToken(string $method): void {
 		$token = $this->tokens->tokenAtCursor();
 
 		if ($token === null) {

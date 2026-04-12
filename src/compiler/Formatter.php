@@ -2,8 +2,6 @@
 
 namespace Attitude\PHPX\Compiler;
 
-require_once 'FormatterInterface.php';
-
 final class Formatter implements FormatterInterface {
   public function formatElement(string $type, string|null $config, string|null $children): string {
     $compiled = [
