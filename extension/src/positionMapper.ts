@@ -247,7 +247,7 @@ function getWordAt(
 	line: string,
 	charOffset: number,
 ): { text: string; start: number } | null {
-	const matches = [...line.matchAll(PHP_WORD_PATTERN)];
+	const matches = [...line.matchAll(new RegExp(PHP_WORD_PATTERN.source, 'g'))];
 	for (const match of matches) {
 		const start = match.index!;
 		const end = start + match[0].length;
