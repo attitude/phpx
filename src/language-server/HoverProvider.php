@@ -118,7 +118,7 @@ final class HoverProvider
 
     private function isWordChar(string $char): bool
     {
-        return preg_match('/[\w]/', $char) === 1;
+        return ctype_alnum($char) || $char === '_';
     }
 
     /**
@@ -157,48 +157,9 @@ final class HoverProvider
         return null;
     }
 
-    /**
-     * Check if the given line prefix ends inside a quoted string ("…", '…', `…`)
-     * or a {…} expression container. Used to suppress hover results when the
-     * cursor is inside attribute string content rather than markup.
-     *
-     * Note: operates on the current-line prefix only. Multi-line attribute values
-     * (a string literal spanning multiple lines) are not detected. In practice
-     * PHPX source files do not use multi-line quoted attribute values, so this
-     * is an acceptable limitation.
-     */
     private function isInsideStringOrExpression(string $prefix): bool
     {
-        $depth = 0;
-        $inDouble = false;
-        $inSingle = false;
-        $inBacktick = false;
-        $len = strlen($prefix);
-
-        for ($i = 0; $i < $len; $i++) {
-            $c = $prefix[$i];
-
-            if ($inDouble) {
-                if ($c === '\\') { $i++; continue; }
-                if ($c === '"') { $inDouble = false; }
-            } elseif ($inSingle) {
-                if ($c === '\\') { $i++; continue; }
-                if ($c === "'") { $inSingle = false; }
-            } elseif ($inBacktick) {
-                if ($c === '\\') { $i++; continue; }
-                if ($c === '`') { $inBacktick = false; }
-            } elseif ($depth === 0) {
-                if ($c === '"') { $inDouble = true; }
-                elseif ($c === "'") { $inSingle = true; }
-                elseif ($c === '`') { $inBacktick = true; }
-                elseif ($c === '{') { $depth++; }
-            } else {
-                if ($c === '{') { $depth++; }
-                elseif ($c === '}') { $depth = max(0, $depth - 1); }
-            }
-        }
-
-        return $depth > 0 || $inDouble || $inSingle || $inBacktick;
+        return TagScanner::isInsideStringOrExpression($prefix);
     }
 
     private function makeHover(string $content, int $line, int $startChar, int $endChar): array

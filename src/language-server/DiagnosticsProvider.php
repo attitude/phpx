@@ -28,8 +28,6 @@ final class DiagnosticsProvider
             $this->parser->parse($tokensList);
 
             return [];
-        } catch (\ParseError $e) {
-            return [$this->parseErrorToDiagnostic($e, $source)];
         } catch (\Throwable $e) {
             // Catches \Exception, \AssertionError, and any other \Error.
             // The parser uses assert() extensively — when parsing incomplete
@@ -37,23 +35,6 @@ final class DiagnosticsProvider
             // extends \Error, not \Exception.
             return [$this->throwableToDiagnostic($e, $source)];
         }
-    }
-
-    private function parseErrorToDiagnostic(\ParseError $e, string $source): array
-    {
-        $line = max(0, $this->extractLine($e->getMessage()) - 1);
-        $lines = explode("\n", $source);
-        $lineText = $lines[$line] ?? '';
-
-        return [
-            'range' => [
-                'start' => ['line' => $line, 'character' => 0],
-                'end' => ['line' => $line, 'character' => strlen($lineText)],
-            ],
-            'severity' => 1, // DiagnosticSeverity.Error
-            'source' => 'phpx',
-            'message' => $e->getMessage(),
-        ];
     }
 
     private function throwableToDiagnostic(\Throwable $e, string $source): array

@@ -48,13 +48,14 @@ final class RenameProvider
             return null;
         }
 
-        $tag = TagScanner::findTagAtPosition($document->text, $line, $character);
+        $tags = TagScanner::scan($document->text);
+        $tag = TagScanner::findTagAtPositionFromTags($tags, $line, $character);
 
         if ($tag === null) {
             return null;
         }
 
-        $pairs = TagScanner::findPairs($document->text);
+        $pairs = TagScanner::findPairsFromTags($tags);
         $edits = [];
 
         // Find the pair containing the cursor

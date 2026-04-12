@@ -191,7 +191,17 @@ final class TagScanner
      */
     public static function findPairs(string $source): array
     {
-        $tags = self::scan($source);
+        return self::findPairsFromTags(self::scan($source));
+    }
+
+    /**
+     * Find matched open/close pairs from a pre-scanned tag list.
+     *
+     * @param  array<int, array{name: string, line: int, start: int, end: int, kind: string}> $tags
+     * @return array<int, array{open: array, close: array|null}>
+     */
+    public static function findPairsFromTags(array $tags): array
+    {
         $stack = [];
         $pairs = [];
 
@@ -249,8 +259,17 @@ final class TagScanner
      */
     public static function findTagAtPosition(string $source, int $line, int $character): ?array
     {
-        $tags = self::scan($source);
+        return self::findTagAtPositionFromTags(self::scan($source), $line, $character);
+    }
 
+    /**
+     * Find the tag at a specific cursor position from a pre-scanned tag list.
+     *
+     * @param  array<int, array{name: string, line: int, start: int, end: int, kind: string}> $tags
+     * @return array{name: string, line: int, start: int, end: int, kind: string}|null
+     */
+    public static function findTagAtPositionFromTags(array $tags, int $line, int $character): ?array
+    {
         foreach ($tags as $tag) {
             if ($tag['line'] === $line && $character >= $tag['start'] && $character < $tag['end']) {
                 return $tag;
@@ -258,5 +277,48 @@ final class TagScanner
         }
 
         return null;
+    }
+
+    /**
+     * Check if the given line prefix ends inside a quoted string ("…", '…', `…`)
+     * or a {…} expression container. Used to suppress completions and hover
+     * results when the cursor is inside attribute string content rather than markup.
+     *
+     * Note: operates on the current-line prefix only. Multi-line attribute values
+     * are not detected. In practice PHPX files do not use multi-line quoted
+     * attribute values, so this is an acceptable limitation.
+     */
+    public static function isInsideStringOrExpression(string $prefix): bool
+    {
+        $depth = 0;
+        $inDouble = false;
+        $inSingle = false;
+        $inBacktick = false;
+        $len = strlen($prefix);
+
+        for ($i = 0; $i < $len; $i++) {
+            $c = $prefix[$i];
+
+            if ($inDouble) {
+                if ($c === '\\') { $i++; continue; }
+                if ($c === '"') { $inDouble = false; }
+            } elseif ($inSingle) {
+                if ($c === '\\') { $i++; continue; }
+                if ($c === "'") { $inSingle = false; }
+            } elseif ($inBacktick) {
+                if ($c === '\\') { $i++; continue; }
+                if ($c === '`') { $inBacktick = false; }
+            } elseif ($depth === 0) {
+                if ($c === '"') { $inDouble = true; }
+                elseif ($c === "'") { $inSingle = true; }
+                elseif ($c === '`') { $inBacktick = true; }
+                elseif ($c === '{') { $depth++; }
+            } else {
+                if ($c === '{') { $depth++; }
+                elseif ($c === '}') { $depth = max(0, $depth - 1); }
+            }
+        }
+
+        return $depth > 0 || $inDouble || $inSingle || $inBacktick;
     }
 }
