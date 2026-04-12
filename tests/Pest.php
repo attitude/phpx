@@ -3,6 +3,8 @@
 use Pest\Repositories\SnapshotRepository;
 use Pest\TestSuite;
 
+require_once __DIR__ . '/language-server/helpers.php';
+
 $suite = TestSuite::getInstance();
 
 $phpVersion = PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;

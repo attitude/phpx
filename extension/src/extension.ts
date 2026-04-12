@@ -1,10 +1,9 @@
 import * as vscode from 'vscode';
 import { PHPXCompiler } from './compiler';
 import { PHPXDiagnosticsManager } from './diagnostics';
+import { startLanguageClient, stopLanguageClient } from './languageClient';
 import { initFileCache } from './positionMapper';
 import {
-	PHPXCompletionProvider,
-	PHPXHoverProvider,
 	PHPXDefinitionProvider,
 	PHPXTypeDefinitionProvider,
 	PHPXReferenceProvider,
@@ -27,16 +26,50 @@ export function activate(context: vscode.ExtensionContext) {
 	const outputChannel = vscode.window.createOutputChannel('PHPX');
 	outputChannel.appendLine('PHPX Language Support extension is now active');
 
+	// ─── PHPX Language Server (LSP) ─────────────────────────────────────────
+	//
+	// The PHP-based language server handles:
+	//   • PHPX parse diagnostics (syntax errors, unclosed tags, etc.)
+	//   • PHPX-specific completion (HTML tags, attributes, close tags)
+	//   • PHPX-specific hover (attribute docs, component info, fragments)
+	//
+	// It communicates over stdio using JSON-RPC (Language Server Protocol).
+	// ─────────────────────────────────────────────────────────────────────────
+
+	const lspEnabled = vscode.workspace
+		.getConfiguration('phpx')
+		.get<boolean>('languageServer.enabled', true);
+
+	if (lspEnabled) {
+		const langClient = startLanguageClient(context, outputChannel);
+		if (langClient) {
+			context.subscriptions.push({ dispose: () => stopLanguageClient() });
+			outputChannel.appendLine('[PHPX] Language Server client started');
+		}
+	}
+
+	// ─── Compilation pipeline ────────────────────────────────────────────────
+	//
+	// The compiler creates a shadow .php file for each .phpx file. This is
+	// needed so the PHP language server (Intelephense, DEVSENSE, etc.) can
+	// provide PHP-level intelligence: go-to-definition, references, rename,
+	// signature help, document symbols, code actions.
+	//
+	// The providers below delegate to the PHP language server using position
+	// mapping between .phpx and .php files.
+	// ─────────────────────────────────────────────────────────────────────────
+
 	const compiler = new PHPXCompiler(outputChannel);
 	const diagnosticsManager = new PHPXDiagnosticsManager();
 
 	// Initialize file caching for position mapping
 	context.subscriptions.push(initFileCache());
 
-	// ─── Compile on open / change / save ─────────────────────────────────────
-
 	/**
-	 * Compile a PHPX document and update diagnostics.
+	 * Compile a PHPX document to its shadow .php file.
+	 * This only writes the .php file — diagnostics are NOT managed here.
+	 * PHPX parse diagnostics come from the LSP server.
+	 * PHP-level diagnostics are forwarded by PHPXDiagnosticsManager.
 	 */
 	async function compileDocument(document: vscode.TextDocument) {
 		if (document.languageId !== 'phpx') {
@@ -50,18 +83,18 @@ export function activate(context: vscode.ExtensionContext) {
 			const result = await compiler.compileAndWrite(document);
 
 			if (result.error) {
-				diagnosticsManager.setCompilationError(document.uri, result.error);
+				outputChannel.appendLine(
+					`[PHPX] compile error: ${result.error}`,
+				);
+				diagnosticsManager.setCompilerError(document.uri, result.error);
 			} else {
-				diagnosticsManager.clearCompilationError(document.uri);
+				diagnosticsManager.clearCompilerError(document.uri);
 			}
 		} catch (err) {
 			const errorMessage = err instanceof Error ? err.message : String(err);
 			const errorStack = err instanceof Error ? err.stack || err.message : String(err);
 			outputChannel.appendLine(`[PHPX] compileDocument error — ${errorStack}`);
-			diagnosticsManager.setCompilationError(
-				document.uri,
-				`Compilation failed: ${errorMessage}`,
-			);
+			diagnosticsManager.setCompilerError(document.uri, errorMessage);
 		}
 	}
 
@@ -133,14 +166,14 @@ export function activate(context: vscode.ExtensionContext) {
 		}),
 	);
 
-	// Invalidate caches when vendor/composer files change (e.g. composer install/remove)
+	// Invalidate caches when vendor/composer files change
 	const vendorWatcher = vscode.workspace.createFileSystemWatcher('**/vendor/autoload.php');
 	vendorWatcher.onDidCreate(() => compiler.clearCache());
 	vendorWatcher.onDidChange(() => compiler.clearCache());
 	vendorWatcher.onDidDelete(() => compiler.clearCache());
 	context.subscriptions.push(vendorWatcher);
 
-	// Clean up diagnostics when a PHPX file is closed
+	// Clean up when a PHPX file is closed
 	context.subscriptions.push(
 		vscode.workspace.onDidCloseTextDocument((document) => {
 			if (document.languageId === 'phpx') {
@@ -151,30 +184,13 @@ export function activate(context: vscode.ExtensionContext) {
 		}),
 	);
 
-	// ─── Register Language Feature Providers ─────────────────────────────────
-
-	// Completion
-	context.subscriptions.push(
-		vscode.languages.registerCompletionItemProvider(
-			PHPX_SELECTOR,
-			new PHPXCompletionProvider(),
-			// Trigger characters for PHP completions
-			'.',
-			'>',
-			'$',
-			'\\',
-			':',
-			'<',
-		),
-	);
-
-	// Hover (includes PHPX-specific hovers + delegated PHP hovers)
-	context.subscriptions.push(
-		vscode.languages.registerHoverProvider(
-			PHPX_SELECTOR,
-			new PHPXHoverProvider(),
-		),
-	);
+	// ─── PHP Intelligence Providers (position-mapped delegation) ─────────────
+	//
+	// These providers delegate to the PHP language server for PHP-level
+	// intelligence, translating positions between .phpx and compiled .php.
+	// Completion and hover are NOT registered here — the LSP server handles
+	// those natively without needing position mapping.
+	// ─────────────────────────────────────────────────────────────────────────
 
 	// Go to Definition
 	context.subscriptions.push(
@@ -241,33 +257,6 @@ export function activate(context: vscode.ExtensionContext) {
 		),
 	);
 
-	// ─── PHPX-specific Hover (Fragments, etc.) ───────────────────────────────
-
-	context.subscriptions.push(
-		vscode.languages.registerHoverProvider(PHPX_SELECTOR, {
-			provideHover(document, position, _token) {
-				const range = document.getWordRangeAtPosition(position);
-				if (!range) {
-					return null;
-				}
-
-				const word = document.getText(range);
-				const linePrefix = document.getText(
-					new vscode.Range(position.line, 0, position.line, position.character),
-				);
-
-				// PHPX Fragment hover
-				if (word === 'fragment' || linePrefix.includes('<>')) {
-					return new vscode.Hover(
-						'**PHPX Fragment** — A wrapper for multiple elements without adding extra nodes to the DOM',
-					);
-				}
-
-				return null;
-			},
-		}),
-	);
-
 	// ─── Commands ────────────────────────────────────────────────────────────
 
 	context.subscriptions.push(
@@ -304,16 +293,19 @@ export function activate(context: vscode.ExtensionContext) {
 		}),
 	);
 
-	// ─── Diagnostics & Output ────────────────────────────────────────────────
+	// ─── Cleanup ─────────────────────────────────────────────────────────────
 
 	context.subscriptions.push(outputChannel);
 	context.subscriptions.push(diagnosticsManager);
 }
 
-export function deactivate() {
+export async function deactivate() {
 	// Clear all pending compilation timers
 	for (const timer of compilationTimers.values()) {
 		clearTimeout(timer);
 	}
 	compilationTimers.clear();
+
+	// Stop the PHPX Language Server
+	await stopLanguageClient();
 }

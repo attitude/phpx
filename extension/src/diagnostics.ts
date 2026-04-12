@@ -3,18 +3,18 @@ import { PHPXCompiler } from './compiler';
 import { mapRangeToPhpx } from './positionMapper';
 
 /**
- * Manages diagnostics for PHPX files.
+ * Forwards PHP language-server diagnostics from compiled .php files
+ * back to the original .phpx source files.
  *
- * Two sources of diagnostics:
- * 1. Compilation errors from the PHPX→PHP compiler
- * 2. PHP diagnostics forwarded from the compiled .php file
- *
- * Similar to how Vue's language tools forward TypeScript diagnostics
- * from generated virtual files back to the .vue source.
+ * PHPX parse diagnostics (syntax errors, unclosed tags, etc.) are handled
+ * by the PHPX Language Server via the LSP client — this manager only deals
+ * with PHP-level diagnostics (type errors, undefined functions, etc.) that
+ * come from whichever PHP language server the user has installed
+ * (Intelephense, DEVSENSE, etc.).
  */
 export class PHPXDiagnosticsManager {
 	private diagnosticCollection: vscode.DiagnosticCollection;
-	private compilationDiagnostics: vscode.DiagnosticCollection;
+	private compilerDiagnostics: vscode.DiagnosticCollection;
 	private disposables: vscode.Disposable[] = [];
 
 	/** Tracks which .php URIs map to which .phpx URIs */
@@ -23,8 +23,8 @@ export class PHPXDiagnosticsManager {
 	constructor() {
 		this.diagnosticCollection =
 			vscode.languages.createDiagnosticCollection('phpx-php');
-		this.compilationDiagnostics =
-			vscode.languages.createDiagnosticCollection('phpx-compile');
+		this.compilerDiagnostics =
+			vscode.languages.createDiagnosticCollection('phpx-compiler');
 
 		// Watch for diagnostic changes from the PHP language server
 		this.disposables.push(
@@ -39,26 +39,6 @@ export class PHPXDiagnosticsManager {
 	 */
 	registerMapping(phpxUri: vscode.Uri, phpUri: vscode.Uri) {
 		this.phpToPhpxMap.set(phpUri.toString(), phpxUri);
-	}
-
-	/**
-	 * Set a compilation error diagnostic on a PHPX file
-	 */
-	setCompilationError(phpxUri: vscode.Uri, message: string) {
-		const diagnostic = new vscode.Diagnostic(
-			new vscode.Range(0, 0, 0, 0),
-			`PHPX compilation error: ${message}`,
-			vscode.DiagnosticSeverity.Error,
-		);
-		diagnostic.source = 'phpx';
-		this.compilationDiagnostics.set(phpxUri, [diagnostic]);
-	}
-
-	/**
-	 * Clear compilation error diagnostics for a PHPX file
-	 */
-	clearCompilationError(phpxUri: vscode.Uri) {
-		this.compilationDiagnostics.delete(phpxUri);
 	}
 
 	/**
@@ -79,8 +59,7 @@ export class PHPXDiagnosticsManager {
 				continue;
 			}
 
-			// Forward diagnostics to the PHPX file
-			// Filter out diagnostics that are artifacts of compilation
+			// Forward diagnostics to the PHPX file with remapped positions
 			const forwarded = phpDiagnostics
 				.filter((d) => this.shouldForwardDiagnostic(d))
 				.map((d) => {
@@ -134,8 +113,6 @@ export class PHPXDiagnosticsManager {
 
 	/**
 	 * Filter out diagnostics that are artifacts of the PHPX→PHP compilation.
-	 * For example, the compiled PHP uses array syntax ['$', 'tag', ...] which
-	 * might trigger some PHP linting rules that aren't relevant.
 	 */
 	private shouldForwardDiagnostic(diagnostic: vscode.Diagnostic): boolean {
 		// Forward all diagnostics for now.
@@ -144,11 +121,33 @@ export class PHPXDiagnosticsManager {
 	}
 
 	/**
+	 * Show a compiler failure as a diagnostic on the PHPX file.
+	 * This is separate from LSP parse diagnostics — it indicates the
+	 * compilation subprocess failed, so the shadow .php is stale.
+	 */
+	setCompilerError(phpxUri: vscode.Uri, message: string) {
+		const diagnostic = new vscode.Diagnostic(
+			new vscode.Range(0, 0, 0, 0),
+			`PHPX compilation failed: ${message}`,
+			vscode.DiagnosticSeverity.Error,
+		);
+		diagnostic.source = 'phpx-compiler';
+		this.compilerDiagnostics.set(phpxUri, [diagnostic]);
+	}
+
+	/**
+	 * Clear compiler error when compilation succeeds.
+	 */
+	clearCompilerError(phpxUri: vscode.Uri) {
+		this.compilerDiagnostics.delete(phpxUri);
+	}
+
+	/**
 	 * Remove all diagnostics for a PHPX file
 	 */
 	clearDiagnostics(phpxUri: vscode.Uri) {
 		this.diagnosticCollection.delete(phpxUri);
-		this.compilationDiagnostics.delete(phpxUri);
+		this.compilerDiagnostics.delete(phpxUri);
 	}
 
 	/**
@@ -160,7 +159,7 @@ export class PHPXDiagnosticsManager {
 
 	dispose() {
 		this.diagnosticCollection.dispose();
-		this.compilationDiagnostics.dispose();
+		this.compilerDiagnostics.dispose();
 		for (const d of this.disposables) {
 			d.dispose();
 		}
