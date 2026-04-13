@@ -27,20 +27,17 @@ final class HoverProvider
             return null;
         }
 
-        // Check if this is a fragment — must happen before getWordAt() because
-        // <> and </> consist of non-word characters that getWordAt() would reject.
-        // Scan all occurrences on the line (not just the first) so that later
-        // fragments on the same line are detected correctly.
+        // Fragment check must happen before findTagAtPosition: TagScanner skips
+        // TX_FRAGMENT_ELEMENT_OPEN entirely, so <> and </> are invisible to it.
+        // Also before getWordAt(), since <> and </> consist of non-word characters
+        // that getWordAt() would reject.
         $fragmentHover = $this->checkFragmentHover($lineText, $line, $character);
         if ($fragmentHover !== null) {
             return $fragmentHover;
         }
 
-        // Check if it's an HTML/custom element tag name — delegate to TagScanner
-        // which tokenizes the full document and correctly ignores tags inside
-        // quoted attribute strings and {…} expression containers. This must happen
-        // before getWordAt() so that hovering on a hyphen in "my-component" still
-        // resolves to the full tag name rather than returning null early.
+        // Check element tag names before getWordAt() so that hovering on a hyphen
+        // in "my-component" resolves to the full tag name rather than returning null.
         $tag = TagScanner::findTagAtPosition($document->text, $line, $character);
         if ($tag !== null) {
             $tagName = $tag['name'];
@@ -70,8 +67,6 @@ final class HoverProvider
 
         [$wordText, $startChar, $endChar] = $word;
 
-        // Check if it's an attribute name — guard against cursor being inside a string
-        // or expression context (e.g. data="className" must not trigger attribute hover).
         if (isset(self::ATTRIBUTE_DOCS[$wordText])
             && !$this->isInsideStringOrExpression(substr($lineText, 0, $startChar))
         ) {
@@ -130,7 +125,8 @@ final class HoverProvider
     {
         $fragmentMsg = "**PHPX Fragment** `<>...</>`\n\nA wrapper for grouping multiple elements without adding an extra node to the DOM.";
 
-        // Check all </> first (longer match prevents <> matching the < of </>)
+        // Check </> before <> — "</>" contains "<>" as a substring, so checking
+        // the longer token first prevents a false <> match inside </>.
         $offset = 0;
         while (($pos = strpos($lineText, '</>', $offset)) !== false) {
             if ($character >= $pos && $character < $pos + 3) {

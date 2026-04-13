@@ -29,8 +29,10 @@ final class TagScanner
      */
     public static function scan(string $source): array
     {
-        // Ensure TokensList.php is loaded — its file-scope constants (TX_*)
-        // are needed below but aren't autoloaded until the class is referenced.
+        // Force-load TokensList so its file-scope TX_* constants are defined.
+        // Autoloaders map class names to files, not bare constants — without this
+        // the TX_FRAGMENT_ELEMENT_OPEN / TX_ELEMENT_OPENING_OPEN references below
+        // would throw "Undefined constant".
         class_exists(\Attitude\PHPX\Parser\TokensList::class);
 
         try {
@@ -56,21 +58,22 @@ final class TagScanner
                 continue;
             }
 
-            // Skip any < that appears inside an expression container
+            // Skip any token inside an expression container
             if ($depth > 0) {
                 continue;
             }
 
-            // Skip fragments (<> / </>)
+            // Fragments (<>) carry no name — skip. TX_FRAGMENT_ELEMENT_OPEN is a
+            // synthetic id assigned by Token::tokenize() when PHP emits T_IS_NOT_EQUAL
+            // for the <> digraph. The closing </> never forms a named tag entry either.
             if ($token->id === \Attitude\PHPX\Parser\TX_FRAGMENT_ELEMENT_OPEN) {
                 continue;
             }
 
-            // Opening tag: < followed by T_STRING (aligned with Parser::parseElementName())
             if ($token->id === \Attitude\PHPX\Parser\TX_ELEMENT_OPENING_OPEN) {
                 $next = $tokens[$i + 1] ?? null;
 
-                // Check for closing tag: < / name
+                // Closing tag: < / name
                 if ($next !== null && $next->text === '/') {
                     $nameToken = $tokens[$i + 2] ?? null;
                     if ($nameToken !== null && $nameToken->id === T_STRING) {
@@ -78,7 +81,7 @@ final class TagScanner
                         $nameStart = self::toCharOffset($source, $nameToken->pos);
                         $tags[] = [
                             'name' => $name,
-                            'line' => $nameToken->line - 1, // tokens are 1-based
+                            'line' => $nameToken->line - 1, // PHP tokenizer is 1-based; LSP is 0-based
                             'start' => $nameStart,
                             'end' => $nameStart + strlen($name),
                             'kind' => 'close',
@@ -110,17 +113,20 @@ final class TagScanner
     }
 
     /**
-     * Read a potentially hyphenated tag name starting at token index $start.
-     * Returns "my-component" for tokens [my, -, component].
+     * Read a potentially hyphenated tag name starting at $tokens[$start].
+     * Returns "my-component" for the token sequence [my, -, component].
+     *
+     * PHP tokenizes "my-component" as three separate tokens, so the name must be
+     * reassembled. A hyphen is consumed only when followed by a word token —
+     * T_STRING or any token whose text matches /^\w+$/ (covers numeric segments
+     * like "2" in "x-2"). Aligned with Parser::parseElementName().
      */
     private static function readTagName(array $tokens, int $start, int $count): string
     {
         $name = $tokens[$start]->text;
         $j = $start + 1;
 
-        // Hyphenated segments: "-" must be followed by a word token — aligned with
-        // Parser::parseElementName / tokenAtCursorIsWord: T_STRING OR any token
-        // whose text matches /^\w+$/ (covers numeric segments like "2" in x-2).
+        // The bound $j < $count - 1 ensures $tokens[$j + 1] exists before peeking.
         while ($j < $count - 1 && $tokens[$j]->text === '-' && isset($tokens[$j + 1]) &&
                ($tokens[$j + 1]->id === T_STRING || preg_match('/^\w+$/', $tokens[$j + 1]->text))) {
             $name .= '-' . $tokens[$j + 1]->text;
@@ -132,16 +138,17 @@ final class TagScanner
 
     /**
      * Check if the tag starting at $nameIndex is self-closing.
-     * Scans forward past attributes until finding > or />.
+     * Scans forward past attributes until finding /> or >.
      */
     private static function isSelfClosing(array $tokens, int $nameIndex, int $count, string $name): bool
     {
-        // Skip past the tag name tokens
+        // Skip past the tag name tokens.
+        // A simple name ("div") is 1 token; each hyphenated segment adds 2 ('-' + word).
         $j = $nameIndex;
-        $nameLen = substr_count($name, '-') * 2 + 1; // each hyphenated segment = 2 tokens, plus the first
+        $nameLen = substr_count($name, '-') * 2 + 1; // e.g. "my-foo" → 1*2+1 = 3 tokens
         $j += $nameLen;
 
-        // Nesting depth for { } and ( ) — skip over attribute expressions
+        // Nesting depth for { } ( ) [ ] — skip over attribute expressions
         $depth = 0;
 
         while ($j < $count) {
@@ -170,13 +177,17 @@ final class TagScanner
     }
 
     /**
-     * Convert a byte offset (from Token::$pos) to the byte offset within
-     * the token's line. Since the server negotiates positionEncoding: utf-8,
-     * byte offsets equal UTF-8 code unit offsets, which is what LSP expects.
+     * Convert a byte offset (from Token::$pos) to the character offset within
+     * the token's line, suitable for use as an LSP character value.
+     *
+     * Finds the start of the line containing $bytePos by searching backwards
+     * for the last newline. The negative third argument to strrpos() is an
+     * offset from the end of the string: ($bytePos - strlen($source)) is
+     * negative, so strrpos() starts its backward search at byte $bytePos.
+     * When no newline is found the byte is on the first line (line start = 0).
      */
     private static function toCharOffset(string $source, int $bytePos): int
     {
-        // Find the start of the line containing this byte position
         $lineStart = strrpos($source, "\n", $bytePos - strlen($source));
         $lineStart = $lineStart === false ? 0 : $lineStart + 1;
 
