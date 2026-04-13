@@ -125,7 +125,7 @@ final class CompletionProvider
                     'kind' => self::KIND_KEYWORD,
                     'detail' => $isVoid ? 'HTML void element' : 'HTML element',
                     'insertText' => $isVoid ? "{$tag} />" : "{$tag}>$1</{$tag}>",
-                    'insertTextFormat' => 2,
+                    'insertTextFormat' => 2, // Snippet
                 ];
             }
         }
