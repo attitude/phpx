@@ -146,8 +146,12 @@ final class Server
 
         $triggerCharacters = ['<', '/', ' '];
         foreach ($this->completionExtensions as $ext) {
-            $extChars = $ext->getCapabilities()['triggerCharacters'] ?? [];
-            $triggerCharacters = array_values(array_unique(array_merge($triggerCharacters, $extChars)));
+            try {
+                $extChars = $ext->getCapabilities()['triggerCharacters'] ?? [];
+                $triggerCharacters = array_values(array_unique(array_merge($triggerCharacters, $extChars)));
+            } catch (\Throwable $e) {
+                $this->logger?->error('CompletionExtension::getCapabilities() failed', ['exception' => $e]);
+            }
         }
 
         $capabilities = [
@@ -292,7 +296,11 @@ final class Server
         $items = $this->completion->complete($document, $line, $character);
 
         foreach ($this->completionExtensions as $ext) {
-            $items = array_merge($items, $ext->complete($document, $line, $character));
+            try {
+                $items = array_merge($items, $ext->complete($document, $line, $character));
+            } catch (\Throwable $e) {
+                $this->logger?->error('CompletionExtension::complete() failed', ['exception' => $e]);
+            }
         }
 
         return $items;
@@ -313,9 +321,13 @@ final class Server
         }
 
         foreach ($this->hoverExtensions as $ext) {
-            $result = $ext->hover($document, $line, $character);
-            if ($result !== null) {
-                return $result;
+            try {
+                $result = $ext->hover($document, $line, $character);
+                if ($result !== null) {
+                    return $result;
+                }
+            } catch (\Throwable $e) {
+                $this->logger?->error('HoverExtension::hover() failed', ['exception' => $e]);
             }
         }
 
@@ -370,7 +382,11 @@ final class Server
         $diagnostics = $this->diagnostics->diagnose($document);
 
         foreach ($this->diagnosticsExtensions as $ext) {
-            $diagnostics = array_merge($diagnostics, $ext->diagnose($document));
+            try {
+                $diagnostics = array_merge($diagnostics, $ext->diagnose($document));
+            } catch (\Throwable $e) {
+                $this->logger?->error('DiagnosticsExtension::diagnose() failed', ['exception' => $e]);
+            }
         }
 
         $this->transport->write(Message::notification('textDocument/publishDiagnostics', [

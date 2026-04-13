@@ -136,6 +136,35 @@ describe('CompletionExtension', function () {
         readOutputMessages($output);
         expect($calls)->toBe(['ext-a', 'ext-b']);
     });
+
+    it('survives a throwing extension and still returns built-in items', function () {
+        $throwing = new class implements CompletionExtension {
+            public function complete(TextDocumentItem $document, int $line, int $character): array {
+                throw new \RuntimeException('extension crash');
+            }
+            public function getCapabilities(): array { return []; }
+        };
+
+        [$server, $output] = createServerWithExtensions(completionExtensions: [$throwing]);
+        initializeExtServer($server, $output);
+
+        $server->handleMessage(Message::notification('textDocument/didOpen', [
+            'textDocument' => ['uri' => 'file:///test.phpx', 'languageId' => 'phpx', 'version' => 1, 'text' => '<d'],
+        ]));
+        rewind($output);
+        ftruncate($output, 0);
+
+        $server->handleMessage(Message::request(1, 'textDocument/completion', [
+            'textDocument' => ['uri' => 'file:///test.phpx'],
+            'position' => ['line' => 0, 'character' => 2],
+        ]));
+
+        $messages = readOutputMessages($output);
+        expect($messages)->toHaveCount(1);
+        // Built-in completions still returned despite extension crash
+        $labels = array_column($messages[0]->result, 'label');
+        expect($labels)->toContain('div');
+    });
 });
 
 // ── HoverExtension ────────────────────────────────────────────────────────────
@@ -232,6 +261,34 @@ describe('HoverExtension', function () {
         expect($messages[0]->result)->not->toBeNull();
         expect($messages[0]->result['contents']['value'])->toContain('className');
     });
+
+    it('survives a throwing extension and falls back to built-in hover', function () {
+        $throwing = new class implements HoverExtension {
+            public function hover(TextDocumentItem $document, int $line, int $character): ?array {
+                throw new \RuntimeException('extension crash');
+            }
+        };
+
+        [$server, $output] = createServerWithExtensions(hoverExtensions: [$throwing]);
+        initializeExtServer($server, $output);
+
+        $server->handleMessage(Message::notification('textDocument/didOpen', [
+            'textDocument' => ['uri' => 'file:///test.phpx', 'languageId' => 'phpx', 'version' => 1, 'text' => '<div className="x">'],
+        ]));
+        rewind($output);
+        ftruncate($output, 0);
+
+        $server->handleMessage(Message::request(1, 'textDocument/hover', [
+            'textDocument' => ['uri' => 'file:///test.phpx'],
+            'position' => ['line' => 0, 'character' => 7],
+        ]));
+
+        $messages = readOutputMessages($output);
+        expect($messages)->toHaveCount(1);
+        // Built-in hover still works despite extension crash
+        expect($messages[0]->result)->not->toBeNull();
+        expect($messages[0]->result['contents']['value'])->toContain('className');
+    });
 });
 
 // ── DiagnosticsExtension ──────────────────────────────────────────────────────
@@ -311,5 +368,27 @@ describe('DiagnosticsExtension', function () {
 
         // Called once for open, once for change
         expect($count)->toBe(2);
+    });
+
+    it('survives a throwing extension and still publishes built-in diagnostics', function () {
+        $throwing = new class implements DiagnosticsExtension {
+            public function diagnose(TextDocumentItem $document): array {
+                throw new \RuntimeException('extension crash');
+            }
+        };
+
+        [$server, $output] = createServerWithExtensions(diagnosticsExtensions: [$throwing]);
+
+        // Open an invalid document — built-in diagnostics should still report the error
+        $server->handleMessage(Message::notification('textDocument/didOpen', [
+            'textDocument' => ['uri' => 'file:///test.phpx', 'languageId' => 'phpx', 'version' => 1, 'text' => '<div>unclosed'],
+        ]));
+
+        $messages = readOutputMessages($output);
+        expect($messages)->toHaveCount(1);
+        expect($messages[0]->method)->toBe('textDocument/publishDiagnostics');
+        // Built-in parse error diagnostics still published despite extension crash
+        expect($messages[0]->params['diagnostics'])->not->toBeEmpty();
+        expect($messages[0]->params['diagnostics'][0]['source'])->toBe('phpx');
     });
 });

@@ -2,7 +2,7 @@
   "name": "phpx-language-support",
   "displayName": "PHPX Language Support",
   "description": "Syntax highlighting and language support for PHPX - JSX-like syntax for PHP",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "attitude",
   "license": "MIT",
   "engines": {

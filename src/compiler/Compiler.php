@@ -23,8 +23,8 @@ final class Compiler {
 	public function __construct(
 		?Parser $parser = null,
 		?FormatterInterface $formatter = null,
-		array $plugins = [],
 		private ?LoggerInterface $logger = null,
+		array $plugins = [],
 	) {
 		$this->parser = $parser ?? new Parser(logger: $this->logger);
 		$this->formatter = $formatter ?? new Formatter();

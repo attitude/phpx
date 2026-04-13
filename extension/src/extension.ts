@@ -13,6 +13,14 @@ import {
 	PHPXRenameProvider,
 	PHPXImplementationProvider,
 } from './providers';
+import {
+	initTsxQuery,
+	disposeTsxQuery,
+	getTsxAttributeCompletions,
+	getTsxAttributeHover,
+	detectTagAtCursor,
+	detectTagAndAttributeAtCursor,
+} from './tsxQuery';
 
 const PHPX_SELECTOR: vscode.DocumentSelector = {
 	language: 'phpx',
@@ -47,6 +55,83 @@ export function activate(context: vscode.ExtensionContext) {
 			outputChannel.appendLine('[PHPX] Language Server client started');
 		}
 	}
+
+	// ─── TypeScript JSX attribute query ──────────────────────────────────────
+	//
+	// Initialises a small virtual TypeScript project using phpx-intrinsics.d.ts
+	// (the PHPX JSX type declarations, no React) in the extension's global
+	// storage directory.  This lets us query VS Code's built-in TypeScript
+	// language service for per-element HTML attribute completions and types.
+	//
+	// The query is purely additive — if the TypeScript server is unavailable
+	// the PHPX LSP's own completions continue to work unchanged.
+	// ─────────────────────────────────────────────────────────────────────────
+
+	// Fire-and-forget: initialisation happens async so activation stays fast
+	initTsxQuery(context).catch((err) => {
+		outputChannel.appendLine(`[PHPX] TSX query init error: ${err}`);
+	});
+
+	// Supplementary completion provider: queries TypeScript for per-element
+	// HTML attribute types and merges them with the PHPX LSP's own suggestions.
+	context.subscriptions.push(
+		vscode.languages.registerCompletionItemProvider(
+			PHPX_SELECTOR,
+			{
+				async provideCompletionItems(
+					document: vscode.TextDocument,
+					position: vscode.Position,
+				): Promise<vscode.CompletionItem[] | undefined> {
+					const tagName = detectTagAtCursor(document, position);
+					if (!tagName) {
+						return undefined;
+					}
+
+					// Only trigger for HTML intrinsic elements (lowercase first char)
+					if (tagName[0] !== tagName[0].toLowerCase() || tagName[0] === tagName[0].toUpperCase()) {
+						return undefined;
+					}
+
+					return getTsxAttributeCompletions(tagName);
+				},
+			},
+			' ',  // trigger on space (same as PHPX LSP)
+			'\n', // and newline (for multi-line attribute lists)
+		),
+	);
+
+	// Supplementary hover provider: queries TypeScript for attribute type info
+	// when hovering over an HTML attribute name inside a PHPX tag.
+	context.subscriptions.push(
+		vscode.languages.registerHoverProvider(
+			PHPX_SELECTOR,
+			{
+				async provideHover(
+					document: vscode.TextDocument,
+					position: vscode.Position,
+				): Promise<vscode.Hover | undefined> {
+					const hit = detectTagAndAttributeAtCursor(document, position);
+					if (!hit) {
+						return undefined;
+					}
+
+					const markdown = await getTsxAttributeHover(hit.tagName, hit.attrName);
+					if (!markdown) {
+						return undefined;
+					}
+
+					const range = new vscode.Range(
+						position.line, hit.attrStart,
+						position.line, hit.attrEnd,
+					);
+					return new vscode.Hover(
+						new vscode.MarkdownString(markdown),
+						range,
+					);
+				},
+			},
+		),
+	);
 
 	// ─── Compilation pipeline ────────────────────────────────────────────────
 	//
@@ -306,6 +391,9 @@ export async function deactivate() {
 		clearTimeout(timer);
 	}
 	compilationTimers.clear();
+
+	// Clean up the TypeScript JSX attribute query environment
+	disposeTsxQuery();
 
 	// Stop the PHPX Language Server
 	await stopLanguageClient();

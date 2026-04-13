@@ -12,5 +12,6 @@ vsc-extension-quickstart.md
 **/.eslintrc.json
 **/*.map
 **/*.ts
+!types/**/*.d.ts
 RESEARCH.md
 package-lock.json
