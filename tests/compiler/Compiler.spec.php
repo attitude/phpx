@@ -531,8 +531,11 @@ PHP
   it('produces correct output with a logger attached', function () {
     $compiler = newCompiler(withLogger: true, parser: newParser(withLogger: true));
     ob_start();
-    $compiler->compile('<>Hello, {$name ?? \'unnamed\'}!</>');
-    ob_end_clean();
+    try {
+      $compiler->compile('<>Hello, {$name ?? \'unnamed\'}!</>');
+    } finally {
+      ob_end_clean();
+    }
     expect($compiler->getCompiled())->toBe("['Hello, ', (\$name ?? 'unnamed'), '!']");
   });
 

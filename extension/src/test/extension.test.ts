@@ -31,25 +31,25 @@ suite('PHPX Extension Test Suite', () => {
 			fs.unlinkSync(tmpFile);
 		}
 	});
- 
- 	test('fixture: page.phpx is detected as phpx language', async () => {
- 		const doc = await vscode.workspace.openTextDocument(
- 			vscode.Uri.file(path.join(fixturesDir, 'page.phpx')),
- 		);
- 		assert.strictEqual(doc.languageId, 'phpx');
- 	});
- 
- 	test('fixture: html-page-template.phpx is detected as phpx language', async () => {
- 		const doc = await vscode.workspace.openTextDocument(
- 			vscode.Uri.file(path.join(fixturesDir, 'html-page-template.phpx')),
- 		);
- 		assert.strictEqual(doc.languageId, 'phpx');
- 	});
- 
- 	test('fixture: syntax-samples.phpx is detected as phpx language', async () => {
- 		const doc = await vscode.workspace.openTextDocument(
- 			vscode.Uri.file(path.join(fixturesDir, 'syntax-samples.phpx')),
- 		);
- 		assert.strictEqual(doc.languageId, 'phpx');
- 	});
+
+	test('fixture: page.phpx is detected as phpx language', async () => {
+		const doc = await vscode.workspace.openTextDocument(
+			vscode.Uri.file(path.join(fixturesDir, 'page.phpx')),
+		);
+		assert.strictEqual(doc.languageId, 'phpx');
+	});
+
+	test('fixture: html-page-template.phpx is detected as phpx language', async () => {
+		const doc = await vscode.workspace.openTextDocument(
+			vscode.Uri.file(path.join(fixturesDir, 'html-page-template.phpx')),
+		);
+		assert.strictEqual(doc.languageId, 'phpx');
+	});
+
+	test('fixture: syntax-samples.phpx is detected as phpx language', async () => {
+		const doc = await vscode.workspace.openTextDocument(
+			vscode.Uri.file(path.join(fixturesDir, 'syntax-samples.phpx')),
+		);
+		assert.strictEqual(doc.languageId, 'phpx');
+	});
 });
