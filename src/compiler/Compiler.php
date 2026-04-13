@@ -3,6 +3,7 @@
 namespace Attitude\PHPX\Compiler;
 
 use Attitude\PHPX\Compiler\Formatter;
+use Attitude\PHPX\Compiler\CompilerPlugin;
 use Attitude\PHPX\Parser\NodeType;
 use Attitude\PHPX\Parser\Parser;
 use Attitude\PHPX\Parser\Token;
@@ -13,6 +14,8 @@ final class Compiler {
 	private TokensList $tokens;
 	private Parser $parser;
 	private FormatterInterface $formatter;
+	/** @var CompilerPlugin[] */
+	private array $plugins;
 	private string $source;
 	private array $ast;
 	private string $compiled;
@@ -20,10 +23,12 @@ final class Compiler {
 	public function __construct(
 		?Parser $parser = null,
 		?FormatterInterface $formatter = null,
+		array $plugins = [],
 		private ?LoggerInterface $logger = null,
 	) {
 		$this->parser = $parser ?? new Parser(logger: $this->logger);
 		$this->formatter = $formatter ?? new Formatter();
+		$this->plugins = $plugins;
 	}
 
 	public function compile(string $source): string {
@@ -88,9 +93,16 @@ final class Compiler {
 		$this->logger?->debug('compilePHPXFragmentElement', $node);
 		assert($node['$$type'] === NodeType::PHPX_FRAGMENT);
 
-		return $this->formatter->formatFragment(
-			$this->compilePHPXChildrenArray($node['children'])
-		);
+		$compiledChildren = $this->compilePHPXChildrenArray($node['children']);
+
+		foreach ($this->plugins as $plugin) {
+			$result = $plugin->visitFragment($compiledChildren, $this->formatter);
+			if ($result !== null) {
+				return $result;
+			}
+		}
+
+		return $this->formatter->formatFragment($compiledChildren);
 	}
 
 	private function compilePHPXAttribute(array $node): string {
@@ -109,18 +121,25 @@ final class Compiler {
 
 		if (!$assignment) {
 			assert($value === true);
-			return $this->formatter->formatAttributeExpression($nameText, 'true');
+			$compiledValue = 'true';
 		} else if ($assignment->text === '=') {
 			if ($value instanceof Token) {
-				return $this->formatter->formatAttributeExpression($nameText, $value->text);
+				$compiledValue = $value->text;
 			} else {
-				$expression = $this->compileBlock($value, '(', ')');
-
-				return $this->formatter->formatAttributeExpression($nameText, $expression);
+				$compiledValue = $this->compileBlock($value, '(', ')');
 			}
 		} else {
 			throw new \RuntimeException("Unknown assignment type: {$assignment->text}");
 		}
+
+		foreach ($this->plugins as $plugin) {
+			$result = $plugin->visitAttribute($nameText, $compiledValue, $this->formatter);
+			if ($result !== null) {
+				return $result;
+			}
+		}
+
+		return $this->formatter->formatAttributeExpression($nameText, $compiledValue);
 	}
 
 	private function compilePHPXAttributesPropsExpression(array $node): string {
@@ -136,6 +155,13 @@ final class Compiler {
 				// Prop punning:
 				if ($child->id === T_VARIABLE) {
 					$attribute = strtolower(substr($child->text, 1));
+
+					foreach ($this->plugins as $plugin) {
+						$result = $plugin->visitAttribute($attribute, $child->text, $this->formatter);
+						if ($result !== null) {
+							return $result;
+						}
+					}
 
 					return $this->formatter->formatAttributeExpression($attribute, $child->text);
 				} else {
@@ -184,11 +210,26 @@ final class Compiler {
 			? implode('', array_map(fn(Token $t) => $t->text, $name))
 			: $name->text;
 
-		return $this->formatter->formatElement(
-			$nameText,
-			(!empty($attributes) ? $this->compilePHPXAttributes($attributes) : null),
-			(!empty($children) ? $this->compilePHPXChildrenArray($children) : null),
-		);
+		$compiledAttributes = !empty($attributes) ? $this->compilePHPXAttributes($attributes) : null;
+		$compiledChildren = !empty($children) ? $this->compilePHPXChildrenArray($children) : null;
+
+		// Normalise '[]' (whitespace-only attributes/children) to null — the
+		// formatter already treats these as empty; plugins should see the same.
+		if ($compiledAttributes === '[]') {
+			$compiledAttributes = null;
+		}
+		if ($compiledChildren === '[]') {
+			$compiledChildren = null;
+		}
+
+		foreach ($this->plugins as $plugin) {
+			$result = $plugin->visitElement($nameText, $compiledAttributes, $compiledChildren, $this->formatter);
+			if ($result !== null) {
+				return $result;
+			}
+		}
+
+		return $this->formatter->formatElement($nameText, $compiledAttributes, $compiledChildren);
 	}
 
 	private static function concatenateStringMembers(array $array): array {

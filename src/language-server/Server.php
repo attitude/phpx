@@ -16,10 +16,19 @@ final class Server
     private bool $running = false;
     private bool $shutdownRequested = false;
     private ?LoggerInterface $logger;
+    /** @var CompletionExtension[] */
+    private array $completionExtensions;
+    /** @var HoverExtension[] */
+    private array $hoverExtensions;
+    /** @var DiagnosticsExtension[] */
+    private array $diagnosticsExtensions;
 
     public function __construct(
         ?Transport $transport = null,
         ?LoggerInterface $logger = null,
+        array $completionExtensions = [],
+        array $hoverExtensions = [],
+        array $diagnosticsExtensions = [],
     ) {
         $this->transport = $transport ?? new Transport();
         $this->logger = $logger;
@@ -28,6 +37,9 @@ final class Server
         $this->completion = new CompletionProvider();
         $this->hover = new HoverProvider();
         $this->rename = new RenameProvider();
+        $this->completionExtensions = $completionExtensions;
+        $this->hoverExtensions = $hoverExtensions;
+        $this->diagnosticsExtensions = $diagnosticsExtensions;
     }
 
     public function run(): void
@@ -132,6 +144,12 @@ final class Server
         }
         $positionEncoding = in_array('utf-8', $clientEncodings, true) ? 'utf-8' : null;
 
+        $triggerCharacters = ['<', '/', ' '];
+        foreach ($this->completionExtensions as $ext) {
+            $extChars = $ext->getCapabilities()['triggerCharacters'] ?? [];
+            $triggerCharacters = array_values(array_unique(array_merge($triggerCharacters, $extChars)));
+        }
+
         $capabilities = [
             'textDocumentSync' => [
                 'openClose' => true,
@@ -139,7 +157,7 @@ final class Server
                 'save' => ['includeText' => true],
             ],
             'completionProvider' => [
-                'triggerCharacters' => ['<', '/', ' '],
+                'triggerCharacters' => $triggerCharacters,
                 'resolveProvider' => false,
             ],
             'hoverProvider' => true,
@@ -271,7 +289,13 @@ final class Server
             return [];
         }
 
-        return $this->completion->complete($document, $line, $character);
+        $items = $this->completion->complete($document, $line, $character);
+
+        foreach ($this->completionExtensions as $ext) {
+            $items = array_merge($items, $ext->complete($document, $line, $character));
+        }
+
+        return $items;
     }
 
     private function handleHover(array $params): ?array
@@ -286,6 +310,13 @@ final class Server
 
         if ($document === null) {
             return null;
+        }
+
+        foreach ($this->hoverExtensions as $ext) {
+            $result = $ext->hover($document, $line, $character);
+            if ($result !== null) {
+                return $result;
+            }
         }
 
         return $this->hover->hover($document, $line, $character);
@@ -337,6 +368,10 @@ final class Server
         }
 
         $diagnostics = $this->diagnostics->diagnose($document);
+
+        foreach ($this->diagnosticsExtensions as $ext) {
+            $diagnostics = array_merge($diagnostics, $ext->diagnose($document));
+        }
 
         $this->transport->write(Message::notification('textDocument/publishDiagnostics', [
             'uri' => $uri,

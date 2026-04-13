@@ -18,24 +18,6 @@ function createTestServer(): array {
     return [$server, $output, $transport];
 }
 
-/**
- * Reads all messages written to the output stream.
- *
- * @param resource $output
- * @return Message[]
- */
-function readOutputMessages($output): array {
-    rewind($output);
-    $readTransport = new Transport($output, fopen('php://memory', 'r+'));
-    $messages = [];
-
-    while (($msg = $readTransport->read()) !== null) {
-        $messages[] = $msg;
-    }
-
-    return $messages;
-}
-
 describe('Server', function () {
     describe('initialize', function () {
         it('responds to initialize with capabilities', function () {

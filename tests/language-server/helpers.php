@@ -1,5 +1,26 @@
 <?php declare(strict_types=1);
 
+use Attitude\PHPX\LanguageServer\Message;
+use Attitude\PHPX\LanguageServer\Transport;
+
+/**
+ * Reads all messages written to the output stream.
+ *
+ * @param resource $output
+ * @return Message[]
+ */
+function readOutputMessages($output): array {
+    rewind($output);
+    $readTransport = new Transport($output, fopen('php://memory', 'r+'));
+    $messages = [];
+
+    while (($msg = $readTransport->read()) !== null) {
+        $messages[] = $msg;
+    }
+
+    return $messages;
+}
+
 /**
  * Apply LSP TextEdit[] to source text, producing the resulting document.
  * Edits are sorted in reverse document order so earlier offsets stay valid.
