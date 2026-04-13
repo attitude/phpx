@@ -2,8 +2,6 @@
 
 namespace Attitude\PHPX\Compiler;
 
-require_once 'FormatterInterface.php';
-
 final class PragmaFormatter implements FormatterInterface {
   public function __construct(
     private string $pragma = 'html',

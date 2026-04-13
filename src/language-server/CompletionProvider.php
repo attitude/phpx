@@ -211,7 +211,6 @@ final class CompletionProvider
      */
     private function isInsideTag(TextDocumentItem $document, int $line, int $character): bool
     {
-        // Build source from document start up to the cursor
         $lines = $document->getLines();
         $source = implode("\n", array_slice($lines, 0, $line)) . "\n" . substr($lines[$line] ?? '', 0, $character);
 
@@ -221,7 +220,9 @@ final class CompletionProvider
             class_exists(\Attitude\PHPX\Parser\TokensList::class);
             $tokens = \Attitude\PHPX\Parser\Token::tokenize($source);
         } catch (\Throwable) {
-            // Fallback: simple heuristic for mid-typing states
+            // Fallback: simple heuristic for mid-typing states where incomplete
+            // source cannot be tokenized. Cursor is inside a tag when the last
+            // '<' appears after the last '>'.
             $lastOpen = strrpos($source, '<');
             $lastClose = strrpos($source, '>');
             return $lastOpen !== false && ($lastClose === false || $lastOpen > $lastClose);

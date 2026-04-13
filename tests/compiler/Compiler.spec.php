@@ -5,6 +5,7 @@ use Attitude\PHPX\Compiler\Compiler;
 use Attitude\PHPX\Compiler\FormatterInterface;
 use Attitude\PHPX\Compiler\PragmaFormatter;
 use Attitude\PHPX\Parser\Parser;
+use Attitude\PHPX\Parser\TokensList;
 
 require_once __DIR__.'/../../src/index.php';
 
@@ -517,6 +518,42 @@ PHP
     $pragmaCompiler->compile(file_get_contents(__DIR__.'/fixtures/page.phpx'));
     expect($pragmaCompiler->getAST())->toMatchSnapshot();
     expect($pragmaCompiler->getCompiled())->toMatchSnapshot();
+  });
+
+  it('compiles the React-18 Title component fixture', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile(file_get_contents(__DIR__.'/../renderer/react-18/components/Title.phpx'));
+    expect($compiler->getCompiled())->toBe(
+      file_get_contents(__DIR__.'/../renderer/react-18/components/Title.php')
+    );
+  });
+
+  it('produces correct output with a logger attached', function () {
+    $compiler = newCompiler(withLogger: true, parser: newParser(withLogger: true));
+    ob_start();
+    $compiler->compile('<>Hello, {$name ?? \'unnamed\'}!</>');
+    ob_end_clean();
+    expect($compiler->getCompiled())->toBe("['Hello, ', (\$name ?? 'unnamed'), '!']");
+  });
+
+  it('__toString returns the compiled output', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile('<p>Hello, {$name}!</p>');
+    expect((string) $compiler)->toBe($compiler->getCompiled());
+  });
+
+  it('getSource returns the original source passed to compile()', function () {
+    $source = '<p>Hello, {$name}!</p>';
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile($source);
+    expect($compiler->getSource())->toBe($source);
+  });
+
+  it('getTokens returns the TokensList for the compiled source', function () {
+    $compiler = newCompiler(withLogger: false, parser: newParser(withLogger: false));
+    $compiler->compile('<p>Hello</p>');
+    expect($compiler->getTokens())->toBeInstanceOf(TokensList::class);
+    expect((string) $compiler->getTokens())->toBe('<p>Hello</p>');
   });
 
   it('should ignore null children and null atribudes', function () {

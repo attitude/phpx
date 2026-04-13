@@ -3,6 +3,10 @@
 use Pest\Repositories\SnapshotRepository;
 use Pest\TestSuite;
 
+require_once __DIR__ . '/helpers/warnings.php';
+if (!class_exists(\Attitude\PHPX\Logger::class)) {
+    require_once __DIR__ . '/helpers/Logger.php';
+}
 require_once __DIR__ . '/language-server/helpers.php';
 
 $suite = TestSuite::getInstance();
