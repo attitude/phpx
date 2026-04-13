@@ -110,6 +110,7 @@
     "bundle:watch": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --sourcemap --watch",
     "test": "pnpm compile && node ./out/test/runTest.js",
     "test:grammar": "vscode-tmgrammar-test -g ./syntaxes/phpx.tmLanguage.json './src/test/grammar/phpx.test.phpx' && vscode-tmgrammar-test -g ./syntaxes/phpx.tmLanguage.json './src/test/grammar/phpx-function.test.phpx'",
+    "generate:attributes": "tsx scripts/generate-html-attributes.ts",
     "lint": "eslint src --ext ts",
     "package": "pnpm bundle && vsce package --no-dependencies --allow-missing-repository"
   },
@@ -128,6 +129,7 @@
     "esbuild": "^0.28.0",
     "eslint": "^8.54.0",
     "mocha": "^10.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.3.2",
     "vscode-tmgrammar-test": "^0.1.2"
   }

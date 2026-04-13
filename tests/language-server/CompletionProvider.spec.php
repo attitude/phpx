@@ -117,9 +117,9 @@ describe('CompletionProvider', function () {
             $labels = array_column($items, 'label');
 
             expect($labels)->toContain('className');
-            expect($labels)->toContain('htmlFor');
             expect($labels)->toContain('style');
             expect($labels)->toContain('id');
+            expect($labels)->toContain('onClick');
         });
 
         it('provides property kind for attribute items', function () {
@@ -131,14 +131,21 @@ describe('CompletionProvider', function () {
             }
         });
 
-        it('inserts valid PHPX attribute syntax (quoted string or expression)', function () {
+        it('inserts valid PHPX attribute syntax (quoted string, expression, or bare boolean)', function () {
             $doc = new TextDocumentItem('file:///test.phpx', 'phpx', 1, '<div ');
             $items = $this->provider->complete($doc, 0, 5);
 
             foreach ($items as $item) {
                 $insert = $item['insertText'];
-                // Every attribute snippet must use ="…" or ={…} — never bare =value
-                expect($insert)->toMatch('/="\$1"$|=\{\$1\}$/');
+                $isSnippet = isset($item['insertTextFormat']) && $item['insertTextFormat'] === 2;
+
+                if ($isSnippet) {
+                    // Snippet attributes must use ="…" or ={…}
+                    expect($insert)->toMatch('/="\$1"$|=\{\$1\}$/');
+                } else {
+                    // Boolean attributes: bare name, no value
+                    expect($insert)->toMatch('/^[a-zA-Z]+$/');
+                }
             }
         });
     });

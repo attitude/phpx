@@ -183,7 +183,7 @@ describe('CompletionProvider validity', function () {
         });
 
         it('uses quoted string syntax for string attributes', function () {
-            $stringAttributes = ['className', 'htmlFor', 'id', 'placeholder', 'type', 'value', 'name', 'href', 'src', 'alt', 'role'];
+            $stringAttributes = ['className', 'id', 'role', 'title', 'lang', 'slot'];
             $doc = new TextDocumentItem('file:///test.phpx', 'phpx', 1, '<div ');
             $items = $this->provider->complete($doc, 0, 5);
 
@@ -227,8 +227,15 @@ describe('CompletionProvider validity', function () {
 
             foreach ($items as $item) {
                 $insert = $item['insertText'];
-                // Must use ="..." or ={...}, never bare =value
-                expect($insert)->toMatch('/="\$1"$|=\{\$1\}$/');
+                $isSnippet = isset($item['insertTextFormat']) && $item['insertTextFormat'] === 2;
+
+                if ($isSnippet) {
+                    // Snippet attributes must use ="..." or ={...}, never bare =value
+                    expect($insert)->toMatch('/="\$1"$|=\{\$1\}$/');
+                } else {
+                    // Boolean attributes: bare name, no = sign
+                    expect($insert)->not->toContain('=');
+                }
             }
         });
     });
