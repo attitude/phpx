@@ -267,7 +267,9 @@ final class CompletionProvider
             }
         }
 
-        return $insideTag ? strtolower($currentTag ?? '') : null;
+        // Only a real tag name gives context; inside `</…` or right after `<`
+        // there is none, so return null rather than an empty-tag lookup.
+        return ($insideTag && $currentTag !== null) ? strtolower($currentTag) : null;
     }
 
     /**

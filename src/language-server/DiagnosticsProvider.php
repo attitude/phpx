@@ -2,6 +2,9 @@
 
 namespace Attitude\PHPX\LanguageServer;
 
+use Attitude\PHPX\Compiler\AbstractNodeVisitor;
+use Attitude\PHPX\Compiler\NodeTraverser;
+use Attitude\PHPX\Parser\NodeType;
 use Attitude\PHPX\Parser\Parser;
 use Attitude\PHPX\Parser\Token;
 use Attitude\PHPX\Parser\TokensList;
@@ -20,129 +23,109 @@ final class DiagnosticsProvider
         $source = $document->text;
 
         try {
-            // Ensure TokensList.php is loaded — its file-scope TX_* constants
-            // are needed by the tokenizer but won't autoload on their own.
-            class_exists(TokensList::class);
             $tokens = Token::tokenize($source);
-            $tokensList = new TokensList($tokens);
-            $this->parser->parse($tokensList);
+            $ast = $this->parser->parse(new TokensList($tokens));
         } catch (\Throwable $e) {
             // Catches \Exception, \AssertionError, and any other \Error.
-            // The parser uses assert() extensively — when parsing incomplete
-            // code (user is mid-keystroke), these fire as AssertionError which
-            // extends \Error, not \Exception.
+            // When parsing incomplete code (user mid-keystroke) the parser may
+            // throw \ParseError (extends \Error, not \Exception).
             return [$this->throwableToDiagnostic($e, $source)];
         }
 
-        // Parse succeeded — check attribute names for typos / HTML-vs-JSX mismatches
-        return $this->checkAttributes($tokens, $source);
+        // Parse succeeded — check attribute names for typos / HTML-vs-JSX mismatches.
+        return $this->checkAttributes($ast, $source);
     }
 
     /**
-     * Scan tokens for attribute names inside opening tags and report
-     * diagnostics for unknown attributes that look like typos or
-     * HTML-vs-JSX naming mistakes (e.g. tabindex → tabIndex).
+     * Walk the parsed AST and report unknown attributes that closely match a
+     * known one (typos / HTML-vs-JSX casing). Working from the AST — rather than
+     * a raw token scan — means hyphenated names (`data-foo`) and attribute
+     * expressions (`{$a > $b}`) are handled correctly by the parser.
      *
-     * @param Token[] $tokens
+     * @param array $ast Parsed top-level nodes.
      * @return array[]
      */
-    private function checkAttributes(array $tokens, string $source): array
+    private function checkAttributes(array $ast, string $source): array
     {
-        $diagnostics = [];
-        $count = count($tokens);
-        $insideTag = false;
-        $currentTag = '';
-        $currentTagIsComponent = false;
+        $collector = new class extends AbstractNodeVisitor {
+            /** @var array[] */
+            public array $elements = [];
 
-        for ($i = 0; $i < $count; $i++) {
-            $token = $tokens[$i];
-
-            if ($token->id === \Attitude\PHPX\Parser\TX_ELEMENT_OPENING_OPEN) {
-                // Next T_STRING is the tag name
-                $next = $tokens[$i + 1] ?? null;
-                if ($next !== null && $next->id === T_STRING) {
-                    // Uppercase-first tags are PHPX components — check case before
-                    // lowercasing, otherwise the component skip below never fires.
-                    $currentTagIsComponent = ctype_upper($next->text[0] ?? '');
-                    $currentTag = strtolower($next->text);
-                    $insideTag = true;
-                    $i++; // skip the tag name token
-                } else {
-                    $insideTag = false;
+            public function enterNode(array $node): array|int|null
+            {
+                if ($node['$$type'] === NodeType::PHPX_ELEMENT) {
+                    $this->elements[] = $node;
                 }
-                continue;
+                return null;
             }
+        };
+        (new NodeTraverser($collector))->traverse($ast);
 
-            if ($token->id === \Attitude\PHPX\Parser\TX_ELEMENT_OPENING_CLOSE) {
-                $insideTag = false;
-                continue;
-            }
+        $diagnostics = [];
 
-            // Self-closing: `/` followed by `>`
-            if ($insideTag && $token->text === '/' && ($tokens[$i + 1] ?? null)?->text === '>') {
-                $insideTag = false;
-                continue;
-            }
-
-            // Only check T_STRING tokens inside an opening tag that look like attribute names
-            // (preceded by whitespace, not part of `attr-name` hyphenated chains)
-            if (!$insideTag || $token->id !== T_STRING) {
-                continue;
-            }
-
-            // Skip if this is the first word after `<` (that's the tag name, already consumed)
-            // Check that the previous non-whitespace token is not `<`
-            $prev = $this->findPreviousNonWhitespace($tokens, $i);
-            if ($prev !== null && $prev->id === \Attitude\PHPX\Parser\TX_ELEMENT_OPENING_OPEN) {
-                continue;
-            }
-
-            // Skip namespaced attributes like xmlns:cc (colon follows)
-            if (($tokens[$i + 1] ?? null)?->text === ':') {
-                continue;
-            }
-
-            // Build the full attribute name (handles hyphenated like data-foo)
-            $attrName = $token->text;
+        foreach ($collector->elements as $element) {
+            [$tagText] = self::nameParts($element['openingElement'][1]);
 
             // Skip PHPX components (uppercase-first tags) — we don't know their props.
-            if ($currentTagIsComponent) {
+            if ($tagText === '' || ctype_upper($tagText[0])) {
                 continue;
             }
+            $tag = strtolower($tagText);
 
-            // Skip the open-ended data-* / aria-* namespaces (name is exactly
-            // `data`/`aria` followed by a `-`; `data-foo` tokenizes as data,-,foo).
-            if (($attrName === 'data' || $attrName === 'aria')
-                && ($tokens[$i + 1] ?? null)?->text === '-') {
-                continue;
-            }
+            foreach ($element['attributes'] as $attribute) {
+                if (!is_array($attribute) || ($attribute['$$type'] ?? null) !== NodeType::PHPX_ATTRIBUTE) {
+                    continue; // whitespace tokens, `{...spread}` expressions, etc.
+                }
 
-            $known = HTMLAttributes::lookup($currentTag, $attrName);
-            if ($known !== null) {
-                continue; // Valid attribute
-            }
+                [$attrName, $firstToken] = self::nameParts($attribute['name']);
 
-            // Unknown attribute — check for close matches
-            $suggestion = $this->findClosestAttribute($currentTag, $attrName);
+                // Skip namespaced names (xmlns:xlink) and the open-ended data-*/aria-* namespaces.
+                if (str_contains($attrName, ':')
+                    || str_starts_with($attrName, 'data-')
+                    || str_starts_with($attrName, 'aria-')) {
+                    continue;
+                }
 
-            if ($suggestion !== null) {
-                // Convert byte offset → (line, col) for LSP
-                $line = $token->line - 1; // tokens are 1-based, LSP is 0-based
-                $col = $this->byteOffsetToColumn($source, $token->pos);
+                if (HTMLAttributes::lookup($tag, $attrName) !== null) {
+                    continue; // known attribute
+                }
 
+                $suggestion = $this->findClosestAttribute($tag, $attrName);
+                if ($suggestion === null) {
+                    continue;
+                }
+
+                $col = $this->byteOffsetToColumn($source, $firstToken->pos);
                 $diagnostics[] = [
                     'range' => [
-                        'start' => ['line' => $line, 'character' => $col],
-                        'end' => ['line' => $line, 'character' => $col + strlen($attrName)],
+                        'start' => ['line' => $firstToken->line - 1, 'character' => $col],
+                        'end' => ['line' => $firstToken->line - 1, 'character' => $col + strlen($attrName)],
                     ],
                     'severity' => 2, // DiagnosticSeverity.Warning
                     'source' => 'phpx',
-                    'message' => "Unknown attribute `{$attrName}` on <{$currentTag}>. Did you mean `{$suggestion}`?",
+                    'message' => "Unknown attribute `{$attrName}` on <{$tag}>. Did you mean `{$suggestion}`?",
                 ];
             }
         }
 
         return $diagnostics;
+    }
+
+    /**
+     * Reassemble an element/attribute name — a single Token, or a run of Tokens
+     * for hyphenated/namespaced names — into [text, firstToken].
+     *
+     * @param Token|Token[] $name
+     * @return array{string, Token}
+     */
+    private static function nameParts(Token|array $name): array
+    {
+        if ($name instanceof Token) {
+            return [$name->text, $name];
+        }
+
+        $text = implode('', array_map(fn(Token $t) => $t->text, $name));
+        return [$text, $name[0]];
     }
 
     /**
@@ -183,16 +166,6 @@ final class DiagnosticsProvider
     {
         $lineStart = strrpos($source, "\n", $byteOffset - strlen($source));
         return $byteOffset - ($lineStart === false ? 0 : $lineStart + 1);
-    }
-
-    private function findPreviousNonWhitespace(array $tokens, int $index): ?Token
-    {
-        for ($j = $index - 1; $j >= 0; $j--) {
-            if ($tokens[$j]->id !== T_WHITESPACE) {
-                return $tokens[$j];
-            }
-        }
-        return null;
     }
 
     private function throwableToDiagnostic(\Throwable $e, string $source): array

@@ -63,12 +63,12 @@ try {
     }
 
     if (!intrinsicType || !intrinsicType.getProperties().length) {
-        console.error('Could not resolve JSX.IntrinsicElements from @types/react');
         console.error('Diagnostics:');
         for (const d of ts.getPreEmitDiagnostics(program)) {
             console.error(' ', ts.flattenDiagnosticMessageText(d.messageText, '\n'));
         }
-        process.exit(1);
+        // Throw (not process.exit) so the finally block cleans up the temp file.
+        throw new Error('Could not resolve JSX.IntrinsicElements from @types/react');
     }
 
     // ─── Extract properties from a type ───────────────────────────────────────
@@ -116,8 +116,8 @@ try {
     // Get div props as the common baseline
     const divSymbol = intrinsicType.getProperty('div');
     if (!divSymbol) {
-        console.error('"div" not found in IntrinsicElements');
-        process.exit(1);
+        // Throw (not process.exit) so the finally block cleans up the temp file.
+        throw new Error('"div" not found in IntrinsicElements');
     }
     const divDecl = divSymbol.valueDeclaration ?? divSymbol.declarations?.[0];
     const divType = checker.getTypeOfSymbolAtLocation(divSymbol, divDecl!);

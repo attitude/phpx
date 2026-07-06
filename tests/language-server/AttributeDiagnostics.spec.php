@@ -54,6 +54,23 @@ describe('attribute-typo diagnostics', function () {
         expect(diagnose('<div><Card titel="x" /></div>'))->toBe([]);
     });
 
+    it('does not misread the trailing segment of a hyphenated name', function () {
+        // `data-foo` must be one attribute, not `data` + a stray `foo` attribute.
+        expect(diagnose('<input data-foo="x" />'))->toBe([]);
+        expect(diagnose('<div aria-lable="x"></div>'))->toBe([]); // open-ended, not flagged
+    });
+
+    it('ignores identifiers inside attribute expressions', function () {
+        expect(diagnose('<div title={strtoupper($x)}>y</div>'))->toBe([]);
+    });
+
+    it('still checks attributes after an expression containing >', function () {
+        // A `>` inside {$a > $b} must not end tag scanning early.
+        $d = diagnose('<div id={$a > $b} classnam="y">z</div>');
+        expect($d)->toHaveCount(1);
+        expect($d[0]['message'])->toContain('className');
+    });
+
     it('does not warn when the document has a parse error (only after a clean parse)', function () {
         // Broken input yields a parse diagnostic, not an attribute one.
         $d = diagnose('<div classname="x">');
