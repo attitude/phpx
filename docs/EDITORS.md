@@ -30,7 +30,7 @@ php -r '
   $repo = getcwd();
   $body = json_encode(["jsonrpc"=>"2.0","id"=>1,"method"=>"initialize","params"=>["capabilities"=>[]]]);
   $msg = "Content-Length: ".strlen($body)."\r\n\r\n".$body;
-  $p = proc_open(PHP_BINARY." scripts/language-server.php", [0=>["pipe","r"],1=>["pipe","w"],2=>["pipe","w"]], $pipes, $repo);
+  $p = proc_open([PHP_BINARY, "scripts/language-server.php"], [0=>["pipe","r"],1=>["pipe","w"],2=>["pipe","w"]], $pipes, $repo);
   fwrite($pipes[0], $msg); fclose($pipes[0]);
   echo stream_get_contents($pipes[1]); proc_close($p);
 '
