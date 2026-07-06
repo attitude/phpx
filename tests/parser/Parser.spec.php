@@ -120,8 +120,9 @@ describe('Parser accepts PHP keyword names', function () {
             ->toBe('[\'$\', \'div\', null, [[\'$\', \'list\']]]');
     });
 
-    it('still treats < followed by a space as text inside children', function () {
-        expect(phpxCompile('<p>a &lt; b</p>'))->toBe('[\'$\', \'p\', null, [\'a &lt; b\']]');
+    it('still treats a literal < followed by a space as text inside children', function () {
+        // A real `<` token (not the &lt; entity), so the disambiguation actually runs.
+        expect(phpxCompile('<p>a < b</p>'))->toBe('[\'$\', \'p\', null, [\'a < b\']]');
     });
 });
 
