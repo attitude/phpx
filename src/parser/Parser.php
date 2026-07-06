@@ -334,7 +334,7 @@ final class Parser {
 				T_CURLY_OPEN,
 				TX_CURLY_BRACKET_OPEN => $this->parseParentheses(),
 				T_CLASS => throw new \ParseError("Use `className` instead of `class`"),
-				default => $this->tokens->tokenAtCursorIsWord()
+				default => $this->tokens->tokenAtCursorIsNameStart()
 				? $this->parseElementAttribute()
 				: throw new \ParseError($this->unexpectedTokenMessage()),
 			};

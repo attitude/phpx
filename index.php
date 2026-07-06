@@ -2,4 +2,4 @@
 
 namespace Attitude\PHPX;
 
-require_once 'src/index.php';
+require_once __DIR__ . '/src/index.php';

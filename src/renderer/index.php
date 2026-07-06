@@ -1,3 +1,3 @@
 <?php
 
-require_once 'Renderer.php';
+require_once __DIR__ . '/Renderer.php';

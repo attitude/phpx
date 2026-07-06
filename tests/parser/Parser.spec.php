@@ -135,6 +135,7 @@ describe('Parser error handling', function () {
         'unterminated template literal' => ['`hello', 'template literal'],
         'class instead of className' => ['<div class="x">hi</div>', 'className'],
         'malformed namespaced attribute' => ['<div a:="x" />', 'namespaced attribute name'],
+        'digit-start attribute name' => ['<div 1="x" />', 'Unexpected token'],
     ];
 
     foreach ($invalid as $label => [$source, $needle]) {
