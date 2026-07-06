@@ -204,6 +204,12 @@ All text and attribute values are escaped via `htmlspecialchars` (`ENT_QUOTES | 
 
 ---
 
+## Editor support
+
+PHPX ships a standard [LSP](https://microsoft.github.io/language-server-protocol/) server (`scripts/language-server.php`, stdio) providing diagnostics, completion, hover, and rename for `.phpx` files. It is editor-agnostic — see [docs/EDITORS.md](docs/EDITORS.md) for Neovim, Helix, Sublime Text, JetBrains (LSP4IJ), and Zed setup. A VS Code extension lives in [`extension/`](extension).
+
+---
+
 ## CLI compilation
 
 Compile `.phpx` files to `.php` from the command line:
