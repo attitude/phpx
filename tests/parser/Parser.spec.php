@@ -102,6 +102,28 @@ describe('Parser accepts PHP keyword names', function () {
     it('accepts a namespaced attribute name', function () {
         expect(phpxCompile('<use xmlns:xlink="ns" />'))->toBe('[\'$\', \'use\', [\'xmlns:xlink\'=>"ns"]]');
     });
+
+    // Regression for #32: keyword tag names must parse as elements in CHILD
+    // position too, not just at the top level (SVG <use> sprites break otherwise).
+    it('parses a self-closing keyword child as an element', function () {
+        expect(phpxCompile('<div><use href="#x" /></div>'))
+            ->toBe('[\'$\', \'div\', null, [[\'$\', \'use\', [\'href\'=>"#x"]]]]');
+    });
+
+    it('parses a paired keyword child as an element', function () {
+        expect(phpxCompile('<svg><use href="#x"></use></svg>'))
+            ->toBe('[\'$\', \'svg\', null, [[\'$\', \'use\', [\'href\'=>"#x"]]]]');
+    });
+
+    it('parses another keyword child (<list>) as an element', function () {
+        expect(phpxCompile('<div><list></list></div>'))
+            ->toBe('[\'$\', \'div\', null, [[\'$\', \'list\']]]');
+    });
+
+    it('still treats a literal < followed by a space as text inside children', function () {
+        // A real `<` token (not the &lt; entity), so the disambiguation actually runs.
+        expect(phpxCompile('<p>a < b</p>'))->toBe('[\'$\', \'p\', null, [\'a < b\']]');
+    });
 });
 
 describe('Parser disambiguates < as less-than', function () {
