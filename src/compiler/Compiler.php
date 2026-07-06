@@ -13,6 +13,8 @@ final class Compiler {
 	private TokensList $tokens;
 	private Parser $parser;
 	private FormatterInterface $formatter;
+	/** @var NodeVisitor[] */
+	private array $visitors;
 	private string $source;
 	private array $ast;
 	private string $compiled;
@@ -21,15 +23,22 @@ final class Compiler {
 		?Parser $parser = null,
 		?FormatterInterface $formatter = null,
 		private ?LoggerInterface $logger = null,
+		array $visitors = [],
 	) {
 		$this->parser = $parser ?? new Parser(logger: $this->logger);
 		$this->formatter = $formatter ?? new Formatter();
+		$this->visitors = $visitors;
 	}
 
 	public function compile(string $source): string {
 		$this->source = $source;
 		$this->tokens = new TokensList(Token::tokenize($source));
 		$this->ast = $this->parser->parse($this->tokens);
+
+		if ($this->visitors !== []) {
+			$this->ast = (new NodeTraverser(...$this->visitors))->traverse($this->ast);
+		}
+
 		$this->compiled = '';
 
 		foreach ($this->ast as $node) {
