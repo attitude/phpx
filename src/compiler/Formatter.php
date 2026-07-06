@@ -1,34 +1,15 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Attitude\PHPX\Compiler;
 
-final class Formatter implements FormatterInterface {
-  public function formatElement(string $type, string|null $config, string|null $children): string {
-    $compiled = [
-      "'$'",
-      ctype_upper($type[0]) ? "\${$type}" : "'{$type}'",
-      $config,
-      $children,
-    ];
+final class Formatter extends AbstractFormatter {
+  public function formatElement(string $type, ?string $config, ?string $children): string {
+    $parts = self::normalizeParts(["'$'", self::formatElementType($type), $config, $children]);
 
-    if (empty($compiled[3]) || $compiled[3] === 'null' || $compiled[3] === '[]') {
-      array_pop($compiled);
-
-      if (empty($compiled[2]) || $compiled[2] === 'null' || $compiled[2] === '[]') {
-        array_pop($compiled);
-      }
-    } else if (empty($compiled[2]) || $compiled[2] === 'null' || $compiled[2] === '[]') {
-      $compiled[2] = 'null';
-    }
-
-    return '[' . implode(', ', $compiled) . ']';
+    return '[' . implode(', ', $parts) . ']';
   }
 
   public function formatFragment(string $children): string {
     return $children;
-  }
-
-  public function formatAttributeExpression(string $name, string $value): string {
-    return "'{$name}'=>{$value}";
   }
 }

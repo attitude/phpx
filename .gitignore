@@ -1,3 +1,4 @@
 vendor
 temp
 .claude/
+.DS_Store

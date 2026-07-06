@@ -113,9 +113,11 @@ final class Parser {
 			$closingElementNameText = is_array($closingElementName)
 				? implode('', array_map(fn(Token $t) => $t->text, $closingElementName))
 				: $closingElementName->text;
-			assert($closingElementNameText === $elementNameText, new \ParseError(
-				"Expected closing tag to match opening tag name '{$elementNameText}' at line {$elementLine}"
-			));
+			if ($closingElementNameText !== $elementNameText) {
+				throw new \ParseError(
+					"Expected closing tag to match opening tag name '{$elementNameText}' at line {$elementLine}"
+				);
+			}
 
 			$this->debugCurrentToken(__FUNCTION__);
 			$closingElementEnd = $this->tokens->tokenAtCursorAndForward();
@@ -151,11 +153,16 @@ final class Parser {
 
 	private function parseElementName(): Token|array {
 		$this->debugCurrentToken(__FUNCTION__);
-		$firstToken = $this->tokens->tokenAtCursorAndForward();
-		if ($firstToken === null) {
+		if (!$this->tokens->exist()) {
 			throw new \ParseError("Unexpected end of input, expected element name");
 		}
-		assert($firstToken->id === T_STRING);
+		// Tag names may be PHP keyword tokens (e.g. <use>, <var>, <list>), not just
+		// T_STRING, but must start with a letter or underscore — reject anything else.
+		if ($this->tokens->tokenAtCursorIsNameStart() === null) {
+			$token = $this->tokens->tokenAtCursor();
+			throw new \ParseError("Unexpected token '{$token->text}', expected element name at line {$token->line}");
+		}
+		$firstToken = $this->tokens->tokenAtCursorAndForward();
 
 		if (!$this->tokens->tokenAtCursorMatches('-') || !$this->tokens->tokenAtCursorIsWord(1)) {
 			return $firstToken;
@@ -327,7 +334,7 @@ final class Parser {
 				T_CURLY_OPEN,
 				TX_CURLY_BRACKET_OPEN => $this->parseParentheses(),
 				T_CLASS => throw new \ParseError("Use `className` instead of `class`"),
-				default => $this->tokens->tokenAtCursorIsWord()
+				default => $this->tokens->tokenAtCursorIsNameStart()
 				? $this->parseElementAttribute()
 				: throw new \ParseError($this->unexpectedTokenMessage()),
 			};
@@ -339,12 +346,15 @@ final class Parser {
 	private function parseElementAttribute(): array {
 		$this->debugCurrentToken(__FUNCTION__);
 
+		// Attribute names may be PHP keyword tokens (e.g. for, readonly), not just
+		// T_STRING — the caller already guarantees a word token here.
 		$name = [$this->tokens->tokenAtCursorAndForward()];
-		assert($name[0]->id === T_STRING);
 
 		if ($this->tokens->tokenAtCursorMatches(':')) {
 			$name[] = $this->tokens->tokenAtCursorAndForward();
-			assert($this->tokens->tokenAtCursorIsWord());
+			if ($this->tokens->tokenAtCursorIsWord() === null) {
+				throw new \ParseError($this->unexpectedTokenMessage('namespaced attribute name'));
+			}
 			$name[] = $this->tokens->tokenAtCursorAndForward();
 		}
 
@@ -407,7 +417,7 @@ final class Parser {
 				TX_PARENTHESIS_OPEN,
 				TX_SQUARE_BRACKET_OPEN => $this->parseParentheses(),
 				TX_FRAGMENT_ELEMENT_OPEN => $this->parseFragmentElement(),
-				TX_ELEMENT_OPENING_OPEN => $this->tokens->tokenAtCursorIsWord(1)
+				TX_ELEMENT_OPENING_OPEN => $this->tokens->tokenAtCursorIsNameStart(1)
 				? $this->parseElement()
 				: $this->tokens->tokenAtCursorAndForward(),
 				TX_TEMPLATE_LITERAL => $this->parseTemplateLiteral(),
