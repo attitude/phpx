@@ -26,8 +26,6 @@ final class DiagnosticsProvider
             $tokens = Token::tokenize($source);
             $tokensList = new TokensList($tokens);
             $this->parser->parse($tokensList);
-
-            return [];
         } catch (\Throwable $e) {
             // Catches \Exception, \AssertionError, and any other \Error.
             // The parser uses assert() extensively — when parsing incomplete
@@ -35,6 +33,165 @@ final class DiagnosticsProvider
             // extends \Error, not \Exception.
             return [$this->throwableToDiagnostic($e, $source)];
         }
+
+        // Parse succeeded — check attribute names for typos / HTML-vs-JSX mismatches
+        return $this->checkAttributes($tokens, $source);
+    }
+
+    /**
+     * Scan tokens for attribute names inside opening tags and report
+     * diagnostics for unknown attributes that look like typos or
+     * HTML-vs-JSX naming mistakes (e.g. tabindex → tabIndex).
+     *
+     * @param Token[] $tokens
+     * @return array[]
+     */
+    private function checkAttributes(array $tokens, string $source): array
+    {
+        $diagnostics = [];
+        $count = count($tokens);
+        $insideTag = false;
+        $currentTag = '';
+
+        for ($i = 0; $i < $count; $i++) {
+            $token = $tokens[$i];
+
+            if ($token->id === \Attitude\PHPX\Parser\TX_ELEMENT_OPENING_OPEN) {
+                // Next T_STRING is the tag name
+                $next = $tokens[$i + 1] ?? null;
+                if ($next !== null && $next->id === T_STRING) {
+                    $currentTag = strtolower($next->text);
+                    $insideTag = true;
+                    $i++; // skip the tag name token
+                } else {
+                    $insideTag = false;
+                }
+                continue;
+            }
+
+            if ($token->id === \Attitude\PHPX\Parser\TX_ELEMENT_OPENING_CLOSE) {
+                $insideTag = false;
+                continue;
+            }
+
+            // Self-closing: `/` followed by `>`
+            if ($insideTag && $token->text === '/' && ($tokens[$i + 1] ?? null)?->text === '>') {
+                $insideTag = false;
+                continue;
+            }
+
+            // Only check T_STRING tokens inside an opening tag that look like attribute names
+            // (preceded by whitespace, not part of `attr-name` hyphenated chains)
+            if (!$insideTag || $token->id !== T_STRING) {
+                continue;
+            }
+
+            // Skip if this is the first word after `<` (that's the tag name, already consumed)
+            // Check that the previous non-whitespace token is not `<`
+            $prev = $this->findPreviousNonWhitespace($tokens, $i);
+            if ($prev !== null && $prev->id === \Attitude\PHPX\Parser\TX_ELEMENT_OPENING_OPEN) {
+                continue;
+            }
+
+            // Skip namespaced attributes like xmlns:cc (colon follows)
+            if (($tokens[$i + 1] ?? null)?->text === ':') {
+                continue;
+            }
+
+            // Build the full attribute name (handles hyphenated like data-foo)
+            $attrName = $token->text;
+
+            // Check against known attributes for this element
+            // Skip uppercase-first tags (PHPX components — we don't know their props)
+            if (ctype_upper($currentTag[0] ?? '')) {
+                continue;
+            }
+
+            // Skip data-* and aria-* attributes
+            if (str_starts_with($attrName, 'data') || str_starts_with($attrName, 'aria')) {
+                // Check if next token is `-` (hyphenated data-* / aria-*)
+                $nextToken = $tokens[$i + 1] ?? null;
+                if ($nextToken !== null && $nextToken->text === '-') {
+                    continue;
+                }
+            }
+
+            $known = HTMLAttributes::lookup($currentTag, $attrName);
+            if ($known !== null) {
+                continue; // Valid attribute
+            }
+
+            // Unknown attribute — check for close matches
+            $suggestion = $this->findClosestAttribute($currentTag, $attrName);
+
+            if ($suggestion !== null) {
+                // Convert byte offset → (line, col) for LSP
+                $line = $token->line - 1; // tokens are 1-based, LSP is 0-based
+                $col = $this->byteOffsetToColumn($source, $token->pos);
+
+                $diagnostics[] = [
+                    'range' => [
+                        'start' => ['line' => $line, 'character' => $col],
+                        'end' => ['line' => $line, 'character' => $col + strlen($attrName)],
+                    ],
+                    'severity' => 2, // DiagnosticSeverity.Warning
+                    'source' => 'phpx',
+                    'message' => "Unknown attribute `{$attrName}` on <{$currentTag}>. Did you mean `{$suggestion}`?",
+                ];
+            }
+        }
+
+        return $diagnostics;
+    }
+
+    /**
+     * Find the closest matching attribute name (case-insensitive match
+     * or small edit distance).
+     */
+    private function findClosestAttribute(string $tagName, string $attrName): ?string
+    {
+        $all = HTMLAttributes::forElement($tagName);
+        $lower = strtolower($attrName);
+
+        // First: exact case-insensitive match (e.g. tabindex → tabIndex)
+        foreach ($all as $name => $_) {
+            if (strtolower($name) === $lower) {
+                return $name;
+            }
+        }
+
+        // Second: small Levenshtein distance (≤ 2)
+        $bestDist = PHP_INT_MAX;
+        $bestName = null;
+
+        foreach ($all as $name => $_) {
+            $dist = levenshtein($lower, strtolower($name));
+            if ($dist < $bestDist && $dist <= 2) {
+                $bestDist = $dist;
+                $bestName = $name;
+            }
+        }
+
+        return $bestName;
+    }
+
+    /**
+     * Convert a byte offset in the source to a column number on its line.
+     */
+    private function byteOffsetToColumn(string $source, int $byteOffset): int
+    {
+        $lineStart = strrpos($source, "\n", $byteOffset - strlen($source));
+        return $byteOffset - ($lineStart === false ? 0 : $lineStart + 1);
+    }
+
+    private function findPreviousNonWhitespace(array $tokens, int $index): ?Token
+    {
+        for ($j = $index - 1; $j >= 0; $j--) {
+            if ($tokens[$j]->id !== T_WHITESPACE) {
+                return $tokens[$j];
+            }
+        }
+        return null;
     }
 
     private function throwableToDiagnostic(\Throwable $e, string $source): array

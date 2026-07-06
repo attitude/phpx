@@ -96,11 +96,15 @@ final class HoverProvider
             return null;
         }
 
-        // Determine the tag context for element-specific attribute lookup
+        // Only show attribute hover when cursor is inside an opening tag's attribute area
         $tagContext = $this->findTagContextForAttribute($document, $line, $startChar);
 
+        if ($tagContext === null) {
+            return null;
+        }
+
         // Try to find the attribute in the per-element data
-        $attrInfo = HTMLAttributes::lookup($tagContext ?? '', $wordText);
+        $attrInfo = HTMLAttributes::lookup($tagContext, $wordText);
 
         if ($attrInfo !== null) {
             [$type, $description] = $attrInfo;
