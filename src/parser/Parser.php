@@ -201,6 +201,19 @@ final class Parser {
 		];
 	}
 
+	/** True when the cursor is at the start of a child element: `<` + a name-start token (incl. keyword names like <use>). */
+	private function isElementStart(): bool {
+		return $this->tokens->tokenAtCursor()?->text === '<'
+			&& $this->tokens->tokenAtCursorIsNameStart(1) !== null;
+	}
+
+	/** True when the cursor is at the start of a closing tag: `<` `/` + a name-start token. */
+	private function isClosingElementStart(): bool {
+		return $this->tokens->tokenAtCursor()?->text === '<'
+			&& $this->tokens->tokenAtCursor(1)?->text === '/'
+			&& $this->tokens->tokenAtCursorIsNameStart(2) !== null;
+	}
+
 	private function parseTextNode(): array {
 		if ($this->tokens->tokenAtCursorMatches(T_WHITESPACE) && strstr($this->tokens->tokenAtCursor()->text, "\n")) {
 			$this->debugCurrentToken(__FUNCTION__);
@@ -213,8 +226,8 @@ final class Parser {
 			$this->tokens->exist()
 			&& !$this->tokens->tokenAtCursorMatches(TX_FRAGMENT_ELEMENT_OPEN)
 			&& !$this->tokens->tokenAtCursorMatches(TX_FRAGMENT_ELEMENT_CLOSING_SEQUENCE)
-			&& !$this->tokens->tokenAtCursorMatches(TX_ELEMENT_OPENING_OPEN_SEQUENCE)
-			&& !$this->tokens->tokenAtCursorMatches(TX_ELEMENT_CLOSING_OPEN_SEQUENCE)
+			&& !$this->isElementStart()
+			&& !$this->isClosingElementStart()
 			&& !$this->tokens->tokenAtCursorMatches(TX_CURLY_BRACKET_OPEN)
 		) {
 			$this->debugCurrentToken(__FUNCTION__);
@@ -301,7 +314,7 @@ final class Parser {
 		while (
 			$this->tokens->exist()
 			&& !$this->tokens->tokenAtCursorMatches(TX_FRAGMENT_ELEMENT_CLOSING_SEQUENCE)
-			&& !$this->tokens->tokenAtCursorMatches(TX_ELEMENT_CLOSING_OPEN_SEQUENCE)
+			&& !$this->isClosingElementStart()
 		) {
 			$this->debugCurrentToken(__FUNCTION__);
 
@@ -309,10 +322,9 @@ final class Parser {
 				TX_CURLY_BRACKET_OPEN => $this->parseExpressionContainer(),
 				TX_PARENTHESIS_OPEN => $this->parseParentheses(),
 				TX_FRAGMENT_ELEMENT_OPEN => $this->parseFragmentElement(),
-				default => match (!!$this->tokens->tokenAtCursorMatches(TX_ELEMENT_OPENING_OPEN_SEQUENCE)) {
-						true => $this->parseElement(),
-						false => $this->parseTextNode(),
-					},
+				default => $this->isElementStart()
+					? $this->parseElement()
+					: $this->parseTextNode(),
 			};
 		}
 
