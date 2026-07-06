@@ -45,10 +45,10 @@ jobs:
       - uses: actions/checkout@v4
 
       # pnpm must be set up before setup-node so its built-in cache can find it.
-      # Pin to the major version that matches extension/pnpm-lock.yaml (9.0).
+      # Pin to pnpm 10 — extension/pnpm-workspace.yaml uses v10 settings syntax.
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 10
           run_install: false
 
       - uses: actions/setup-node@v4
