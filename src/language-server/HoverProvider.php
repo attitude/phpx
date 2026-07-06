@@ -4,19 +4,43 @@ namespace Attitude\PHPX\LanguageServer;
 
 final class HoverProvider
 {
-    /** PHPX attribute docs: JSX-name => [HTML equivalent, description] */
-    private const ATTRIBUTE_DOCS = [
-        'className' => ['class', 'CSS class name. In PHPX, use `className` instead of `class` (which is a reserved PHP keyword).'],
-        'htmlFor' => ['for', 'Associates a `<label>` with a form element. Use `htmlFor` instead of `for` (reserved PHP keyword).'],
-        'tabIndex' => ['tabindex', 'Specifies the tab order of an element.'],
-        'autoFocus' => ['autofocus', 'Automatically focus the element on page load.'],
-        'autoPlay' => ['autoplay', 'Automatically start media playback.'],
-        'crossOrigin' => ['crossorigin', 'Configures CORS for the element.'],
-        'dangerouslySetInnerHTML' => [null, 'Injects raw HTML. Use with caution — no escaping is applied.'],
-        'style' => [null, 'Inline styles as a PHP array. Keys are camelCase CSS properties, e.g. `[\'backgroundColor\' => \'red\']`.'],
-        'data' => [null, 'Data attribute namespace. Pass an array, e.g. `data={[\'id\' => 123]}` becomes `data-id="123"`.'],
-        'aria' => [null, 'ARIA attribute namespace. Pass an array, e.g. `aria={[\'label\' => \'Close\']}` becomes `aria-label="Close"`.'],
-        'key' => [null, 'Unique key for list rendering. Used to track element identity across re-renders.'],
+    /** JSX-to-HTML attribute name mapping for the "→ HTML" hover note */
+    private const JSX_TO_HTML = [
+        'className'      => 'class',
+        'htmlFor'        => 'for',
+        'tabIndex'       => 'tabindex',
+        'autoFocus'      => 'autofocus',
+        'autoPlay'       => 'autoplay',
+        'autoComplete'   => 'autocomplete',
+        'crossOrigin'    => 'crossorigin',
+        'readOnly'       => 'readonly',
+        'noValidate'     => 'novalidate',
+        'noModule'       => 'nomodule',
+        'formAction'     => 'formaction',
+        'formMethod'     => 'formmethod',
+        'formNoValidate' => 'formnovalidate',
+        'formTarget'     => 'formtarget',
+        'formEncType'    => 'formenctype',
+        'encType'        => 'enctype',
+        'colSpan'        => 'colspan',
+        'rowSpan'        => 'rowspan',
+        'srcDoc'         => 'srcdoc',
+        'srcSet'         => 'srcset',
+        'useMap'         => 'usemap',
+        'isMap'          => 'ismap',
+        'hrefLang'       => 'hreflang',
+        'dateTime'       => 'datetime',
+        'httpEquiv'      => 'http-equiv',
+        'allowFullScreen'=> 'allowfullscreen',
+        'playsInline'    => 'playsinline',
+        'fetchPriority'  => 'fetchpriority',
+        'enterKeyHint'   => 'enterkeyhint',
+        'inputMode'      => 'inputmode',
+        'minLength'      => 'minlength',
+        'maxLength'      => 'maxlength',
+        'acceptCharset'  => 'accept-charset',
+        'spellCheck'     => 'spellcheck',
+        'contentEditable'=> 'contenteditable',
     ];
 
     public function hover(TextDocumentItem $document, int $line, int $character): ?array
@@ -67,20 +91,84 @@ final class HoverProvider
 
         [$wordText, $startChar, $endChar] = $word;
 
-        if (isset(self::ATTRIBUTE_DOCS[$wordText])
-            && !$this->isInsideStringOrExpression(substr($lineText, 0, $startChar))
-        ) {
-            [$htmlEquiv, $description] = self::ATTRIBUTE_DOCS[$wordText];
-            $content = "**`{$wordText}`**";
-            if ($htmlEquiv !== null) {
-                $content .= " → HTML `{$htmlEquiv}`";
-            }
-            $content .= "\n\n{$description}";
+        // Don't show hover inside string/expression contexts
+        if ($this->isInsideStringOrExpression(substr($lineText, 0, $startChar))) {
+            return null;
+        }
 
-            return $this->makeHover($content, $line, $startChar, $endChar);
+        // Only show attribute hover when cursor is inside an opening tag's attribute area
+        $tagContext = $this->findTagContextForAttribute($document, $line, $startChar);
+
+        if ($tagContext === null) {
+            return null;
+        }
+
+        // Try to find the attribute in the per-element data
+        $attrInfo = HTMLAttributes::lookup($tagContext, $wordText);
+
+        if ($attrInfo !== null) {
+            [$type, $description] = $attrInfo;
+            return $this->makeAttributeHover($wordText, $type, $description, $line, $startChar, $endChar);
         }
 
         return null;
+    }
+
+    /**
+     * Build attribute hover content with type and HTML mapping info.
+     */
+    private function makeAttributeHover(string $attr, string $type, string $description, int $line, int $startChar, int $endChar): array
+    {
+        $htmlEquiv = self::JSX_TO_HTML[$attr] ?? null;
+
+        $content = "**`{$attr}`**";
+        if ($htmlEquiv !== null) {
+            $content .= " → HTML `{$htmlEquiv}`";
+        }
+        $content .= ": `{$type}`";
+        $content .= "\n\n{$description}";
+
+        return $this->makeHover($content, $line, $startChar, $endChar);
+    }
+
+    /**
+     * Find the tag name for the attribute at the given position.
+     *
+     * Scans the text before the attribute position (including preceding lines)
+     * to find the opening `<tagName`.
+     */
+    private function findTagContextForAttribute(TextDocumentItem $document, int $line, int $attrStart): ?string
+    {
+        $lines = $document->getLines();
+
+        // Build text from document start up to the attribute position
+        $source = implode("\n", array_slice($lines, 0, $line)) . "\n" . substr($lines[$line] ?? '', 0, $attrStart);
+
+        try {
+            class_exists(\Attitude\PHPX\Parser\TokensList::class);
+            $tokens = \Attitude\PHPX\Parser\Token::tokenize($source);
+        } catch (\Throwable) {
+            // Fallback: find the last `<tagName` in the source before this position
+            if (preg_match('/<([a-zA-Z][a-zA-Z0-9-]*)(?:\s[^>]*)?$/', $source, $m)) {
+                return strtolower($m[1]);
+            }
+            return null;
+        }
+
+        // Walk tokens to find the currently-open tag
+        $currentTag = null;
+        foreach ($tokens as $i => $token) {
+            if ($token->id === \Attitude\PHPX\Parser\TX_ELEMENT_OPENING_OPEN) {
+                $next = $tokens[$i + 1] ?? null;
+                if ($next !== null && $next->id === T_STRING) {
+                    $currentTag = $next->text;
+                }
+            } elseif ($token->id === \Attitude\PHPX\Parser\TX_ELEMENT_OPENING_CLOSE) {
+                $currentTag = null;
+            }
+        }
+
+        return $currentTag !== null ? strtolower($currentTag) : null;
     }
 
     /**

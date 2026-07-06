@@ -39,31 +39,26 @@ final class CompletionProvider
         'var', 'video',
     ];
 
-    /** PHPX/JSX-style attribute names mapped to descriptions */
-    private const COMMON_ATTRIBUTES = [
-        'className' => 'CSS class name (maps to HTML class)',
-        'htmlFor' => 'Label association (maps to HTML for)',
-        'style' => 'Inline styles as array',
-        'id' => 'Element identifier',
-        'key' => 'Unique key for list rendering',
-        'dangerouslySetInnerHTML' => 'Raw HTML injection',
-        'onClick' => 'Click event handler',
-        'onChange' => 'Change event handler',
-        'onSubmit' => 'Form submit handler',
-        'disabled' => 'Disable element',
-        'hidden' => 'Hide element',
-        'tabIndex' => 'Tab order (maps to tabindex)',
-        'autoFocus' => 'Auto-focus on mount (maps to autofocus)',
-        'placeholder' => 'Placeholder text',
-        'type' => 'Input type',
-        'value' => 'Input value',
-        'name' => 'Form element name',
-        'href' => 'Link URL',
-        'src' => 'Source URL',
-        'alt' => 'Alternative text',
-        'role' => 'ARIA role',
-        'data' => 'Data attribute namespace',
-        'aria' => 'ARIA attribute namespace',
+    /** Attributes that typically take expression values {…} rather than string "…" */
+    private const EXPRESSION_ATTRIBUTES = [
+        'style', 'data', 'aria', 'key', 'dangerouslySetInnerHTML',
+        'onClick', 'onDoubleClick', 'onChange', 'onInput', 'onSubmit',
+        'onReset', 'onFocus', 'onBlur', 'onKeyDown', 'onKeyUp',
+        'onMouseEnter', 'onMouseLeave', 'onMouseOver', 'onMouseOut',
+        'onMouseDown', 'onMouseUp', 'onScroll', 'onWheel',
+        'onDrag', 'onDragStart', 'onDragEnd', 'onDragOver', 'onDrop',
+        'onCopy', 'onCut', 'onPaste', 'onLoad', 'onError',
+        'tabIndex',
+    ];
+
+    /** Boolean attributes that don't need a value */
+    private const BOOLEAN_ATTRIBUTES = [
+        'disabled', 'hidden', 'checked', 'readOnly', 'required',
+        'multiple', 'autoFocus', 'autoPlay', 'controls', 'loop',
+        'muted', 'open', 'reversed', 'selected', 'async', 'defer',
+        'noValidate', 'noModule', 'formNoValidate', 'allowFullScreen',
+        'inert', 'playsInline', 'isMap', 'default',
+        'draggable', 'spellCheck', 'contentEditable',
     ];
 
     public function complete(TextDocumentItem $document, int $line, int $character): array
@@ -96,12 +91,15 @@ final class CompletionProvider
         }
 
         // Attribute name completion inside a tag (may span multiple lines)
-        elseif ($this->isInsideTag($document, $line, $character) && preg_match('/\s(\w*)$/', $prefix, $matches)) {
-            $partial = $matches[1];
-            $items = array_merge(
-                $items,
-                $this->completeAttribute($partial),
-            );
+        elseif (preg_match('/\s(\w*)$/', $prefix, $matches)) {
+            $tagContext = $this->getTagContext($document, $line, $character);
+            if ($tagContext !== null) {
+                $partial = $matches[1];
+                $items = array_merge(
+                    $items,
+                    $this->completeAttribute($partial, $tagContext),
+                );
+            }
         }
 
         return $items;
@@ -166,27 +164,40 @@ final class CompletionProvider
         ];
     }
 
-    /** Attributes that typically take expression values {…} rather than string "…" */
-    private const EXPRESSION_ATTRIBUTES = [
-        'style', 'data', 'aria', 'key', 'dangerouslySetInnerHTML',
-        'onClick', 'onChange', 'onSubmit',
-        'tabIndex',
-    ];
-
-    private function completeAttribute(string $partial): array
+    /**
+     * Complete attributes for the given tag, using per-element attribute data.
+     */
+    private function completeAttribute(string $partial, string $tagName): array
     {
         $items = [];
+        $attributes = HTMLAttributes::forElement($tagName);
 
-        foreach (self::COMMON_ATTRIBUTES as $attr => $description) {
+        foreach ($attributes as $attr => [$type, $description]) {
             if ($partial === '' || str_starts_with(strtolower($attr), strtolower($partial))) {
-                // Use {…} for expression attributes, "…" for string attributes
                 $isExpression = in_array($attr, self::EXPRESSION_ATTRIBUTES, true);
-                $valuePlaceholder = $isExpression ? '={$1}' : '="$1"';
+                $isBoolean = in_array($attr, self::BOOLEAN_ATTRIBUTES, true);
+
+                if ($isExpression) {
+                    $valuePlaceholder = '={$1}';
+                } elseif ($isBoolean) {
+                    // Boolean attributes: insert just the name (no value needed in JSX)
+                    $items[] = [
+                        'label' => $attr,
+                        'kind' => self::KIND_PROPERTY,
+                        'detail' => $type,
+                        'documentation' => $description,
+                        'insertText' => $attr,
+                    ];
+                    continue;
+                } else {
+                    $valuePlaceholder = '="$1"';
+                }
 
                 $items[] = [
                     'label' => $attr,
                     'kind' => self::KIND_PROPERTY,
-                    'detail' => $description,
+                    'detail' => $type,
+                    'documentation' => $description,
                     'insertText' => $attr . $valuePlaceholder,
                     'insertTextFormat' => 2,
                 ];
@@ -202,43 +213,63 @@ final class CompletionProvider
     }
 
     /**
-     * Check if the cursor is inside an opening tag's attribute area.
+     * Get the tag name the cursor is inside, or null if not inside a tag.
+     *
      * Analyzes all document text up to the cursor position (not just the
      * current line) to handle multi-line opening tags like:
      *   <div
      *     className="x"
      *     |  ← cursor here should trigger attribute completion
      */
-    private function isInsideTag(TextDocumentItem $document, int $line, int $character): bool
+    private function getTagContext(TextDocumentItem $document, int $line, int $character): ?string
     {
         $lines = $document->getLines();
         $source = implode("\n", array_slice($lines, 0, $line)) . "\n" . substr($lines[$line] ?? '', 0, $character);
 
         try {
-            // Ensure TokensList.php is loaded — its file-scope TX_* constants
-            // are needed by the tokenizer but won't autoload on their own.
             class_exists(\Attitude\PHPX\Parser\TokensList::class);
             $tokens = \Attitude\PHPX\Parser\Token::tokenize($source);
         } catch (\Throwable) {
-            // Fallback: simple heuristic for mid-typing states where incomplete
-            // source cannot be tokenized. Cursor is inside a tag when the last
-            // '<' appears after the last '>'.
+            // Fallback: simple heuristic for mid-typing states
             $lastOpen = strrpos($source, '<');
             $lastClose = strrpos($source, '>');
-            return $lastOpen !== false && ($lastClose === false || $lastOpen > $lastClose);
+
+            if ($lastOpen === false || ($lastClose !== false && $lastClose > $lastOpen)) {
+                return null;
+            }
+
+            // Extract tag name after the last '<'
+            $after = substr($source, $lastOpen + 1);
+            if (preg_match('/^([a-zA-Z][a-zA-Z0-9-]*)/', $after, $m)) {
+                return strtolower($m[1]);
+            }
+
+            return null;
         }
 
-        // Walk tokens: track whether we're inside an opening tag
+        // Walk tokens: track whether we're inside an opening tag and which tag
         $insideTag = false;
-        foreach ($tokens as $token) {
+        $currentTag = null;
+
+        foreach ($tokens as $i => $token) {
             if ($token->id === \Attitude\PHPX\Parser\TX_ELEMENT_OPENING_OPEN) {
                 $insideTag = true;
+                // The next T_STRING token is the tag name
+                $next = $tokens[$i + 1] ?? null;
+                if ($next !== null && $next->id === T_STRING) {
+                    $currentTag = $next->text;
+                } else {
+                    $currentTag = null;
+                }
             } elseif ($token->id === \Attitude\PHPX\Parser\TX_ELEMENT_OPENING_CLOSE) {
                 $insideTag = false;
+                $currentTag = null;
             }
         }
 
-        return $insideTag;
+        // Only a real tag name gives context; inside `</…` or right after `<`
+        // there is none, so return null rather than an empty-tag lookup.
+        return ($insideTag && $currentTag !== null) ? strtolower($currentTag) : null;
     }
 
     /**

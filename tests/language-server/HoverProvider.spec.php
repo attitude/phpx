@@ -176,5 +176,14 @@ describe('HoverProvider', function () {
             expect($hover['range']['end'])->toHaveKey('line');
             expect($hover['range']['end'])->toHaveKey('character');
         });
+
+        it('does not show attribute hover for a matching word in text content', function () {
+            // `className` here is body text, not an attribute — no tag context,
+            // so no attribute hover should be produced.
+            $doc = new TextDocumentItem('file:///test.phpx', 'phpx', 1, '<div>className here</div>');
+            $hover = $this->provider->hover($doc, 0, 7);
+
+            expect($hover)->toBeNull();
+        });
     });
 });
