@@ -52,6 +52,7 @@ final class DiagnosticsProvider
         $count = count($tokens);
         $insideTag = false;
         $currentTag = '';
+        $currentTagIsComponent = false;
 
         for ($i = 0; $i < $count; $i++) {
             $token = $tokens[$i];
@@ -60,6 +61,9 @@ final class DiagnosticsProvider
                 // Next T_STRING is the tag name
                 $next = $tokens[$i + 1] ?? null;
                 if ($next !== null && $next->id === T_STRING) {
+                    // Uppercase-first tags are PHPX components — check case before
+                    // lowercasing, otherwise the component skip below never fires.
+                    $currentTagIsComponent = ctype_upper($next->text[0] ?? '');
                     $currentTag = strtolower($next->text);
                     $insideTag = true;
                     $i++; // skip the tag name token
@@ -101,9 +105,8 @@ final class DiagnosticsProvider
             // Build the full attribute name (handles hyphenated like data-foo)
             $attrName = $token->text;
 
-            // Check against known attributes for this element
-            // Skip uppercase-first tags (PHPX components — we don't know their props)
-            if (ctype_upper($currentTag[0] ?? '')) {
+            // Skip PHPX components (uppercase-first tags) — we don't know their props.
+            if ($currentTagIsComponent) {
                 continue;
             }
 
