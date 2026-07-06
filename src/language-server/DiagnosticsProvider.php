@@ -110,13 +110,11 @@ final class DiagnosticsProvider
                 continue;
             }
 
-            // Skip data-* and aria-* attributes
-            if (str_starts_with($attrName, 'data') || str_starts_with($attrName, 'aria')) {
-                // Check if next token is `-` (hyphenated data-* / aria-*)
-                $nextToken = $tokens[$i + 1] ?? null;
-                if ($nextToken !== null && $nextToken->text === '-') {
-                    continue;
-                }
+            // Skip the open-ended data-* / aria-* namespaces (name is exactly
+            // `data`/`aria` followed by a `-`; `data-foo` tokenizes as data,-,foo).
+            if (($attrName === 'data' || $attrName === 'aria')
+                && ($tokens[$i + 1] ?? null)?->text === '-') {
+                continue;
             }
 
             $known = HTMLAttributes::lookup($currentTag, $attrName);
