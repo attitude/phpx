@@ -104,6 +104,28 @@ describe('Parser accepts PHP keyword names', function () {
     });
 });
 
+describe('Parser disambiguates < as less-than', function () {
+    // A tag can never start with a digit, so `<` immediately followed by a number
+    // is a comparison, not an element opener.
+    $cases = [
+        '{$x<1}' => '{$x<1}',
+        '{$x<2}' => '{$x<2}',
+        '{1<$x}' => '{1<$x}',
+        '{$x<$y}' => '{$x<$y}',
+    ];
+
+    foreach ($cases as $source => $expected) {
+        it("keeps {$source} as an expression", function () use ($source, $expected) {
+            expect(phpxCompile($source))->toBe($expected);
+        });
+    }
+
+    it('disambiguates <0 (less-than) from <p> (element) in one expression', function () {
+        expect(phpxCompile('<div>{$count<0 ? <p>x</p> : null}</div>'))
+            ->toBe("['\$', 'div', null, [(\$count<0 ? ['\$', 'p', null, ['x']] : null)]]");
+    });
+});
+
 describe('Parser error handling', function () {
     $invalid = [
         'mismatched closing tag' => ['<div></span>', 'closing tag to match'],
@@ -132,6 +154,24 @@ describe('Token::tokenize', function () {
     it('throws when a <?php tag appears mid-source', function () {
         expect(fn() => Token::tokenize('markup <?php echo 1;'))
             ->toThrow(\ParseError::class, '<?php');
+    });
+
+    // The TX_* constants Token::tokenize() depends on must be autoloaded even when
+    // Token::tokenize() is the very first call in a fresh process (composer "files").
+    it('works as the first call in a fresh process (constants autoloaded)', function () {
+        $autoload = realpath(__DIR__ . '/../../vendor/autoload.php');
+        expect($autoload)->not->toBeFalse();
+
+        $script = '<?php require ' . var_export($autoload, true) . ';'
+            . 'echo \\Attitude\\PHPX\\Parser\\Token::tokenize("<>hi</>")[0]->id'
+            . ' === \\Attitude\\PHPX\\Parser\\TX_FRAGMENT_ELEMENT_OPEN ? "OK" : "MISMATCH";';
+
+        $tmp = tempnam(sys_get_temp_dir(), 'phpx_autoload_');
+        file_put_contents($tmp, $script);
+        $output = shell_exec(escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($tmp));
+        unlink($tmp);
+
+        expect(trim((string) $output))->toBe('OK');
     });
 });
 

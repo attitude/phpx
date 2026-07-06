@@ -22,8 +22,8 @@ abstract class AbstractFormatter implements FormatterInterface {
    * Drop trailing empty parts and replace any remaining empty part with 'null',
    * so `[type, config, children]` collapses to the shortest valid argument list.
    *
-   * @param array<?string> $parts
-   * @return string[]
+   * @param list<string|null> $parts
+   * @return list<string>
    */
   protected static function normalizeParts(array $parts): array {
     while ($parts !== [] && self::isEmptyPart(end($parts))) {

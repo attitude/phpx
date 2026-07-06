@@ -157,8 +157,8 @@ final class Parser {
 			throw new \ParseError("Unexpected end of input, expected element name");
 		}
 		// Tag names may be PHP keyword tokens (e.g. <use>, <var>, <list>), not just
-		// T_STRING — accept any word token and reject anything that isn't a name.
-		if ($this->tokens->tokenAtCursorIsWord() === null) {
+		// T_STRING, but must start with a letter or underscore — reject anything else.
+		if ($this->tokens->tokenAtCursorIsNameStart() === null) {
 			$token = $this->tokens->tokenAtCursor();
 			throw new \ParseError("Unexpected token '{$token->text}', expected element name at line {$token->line}");
 		}
@@ -417,7 +417,7 @@ final class Parser {
 				TX_PARENTHESIS_OPEN,
 				TX_SQUARE_BRACKET_OPEN => $this->parseParentheses(),
 				TX_FRAGMENT_ELEMENT_OPEN => $this->parseFragmentElement(),
-				TX_ELEMENT_OPENING_OPEN => $this->tokens->tokenAtCursorIsWord(1)
+				TX_ELEMENT_OPENING_OPEN => $this->tokens->tokenAtCursorIsNameStart(1)
 				? $this->parseElement()
 				: $this->tokens->tokenAtCursorAndForward(),
 				TX_TEMPLATE_LITERAL => $this->parseTemplateLiteral(),
