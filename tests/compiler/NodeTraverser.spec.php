@@ -122,9 +122,45 @@ describe('NodeTraverser', function () {
 
         expect($out[0]['openingElement'][1]->text)->toBe('baz');
     });
+
+    it('leaves associative (non-node) array fields untouched', function () {
+        // A hypothetical node field that is an associative metadata array must not
+        // be reindexed by the list traversal.
+        $node = ['$$type' => NodeType::PHPX_TEXT, 'tokens' => [], 'meta' => ['a' => 1, 'b' => 2]];
+        $out = (new NodeTraverser(new class extends AbstractNodeVisitor {}))->traverse([$node]);
+
+        expect($out[0]['meta'])->toBe(['a' => 1, 'b' => 2]);
+    });
+
+    it('throws when enterNode returns an invalid value', function () {
+        $bad = new class extends AbstractNodeVisitor {
+            public function enterNode(array $node): array|int|null {
+                return ['not' => 'a node']; // array without a $$type
+            }
+        };
+
+        expect(fn() => (new NodeTraverser($bad))->traverse(astOf('<br />')))
+            ->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('throws when leaveNode returns an unknown int', function () {
+        $bad = new class extends AbstractNodeVisitor {
+            public function leaveNode(array $node): array|int|null {
+                return 999;
+            }
+        };
+
+        expect(fn() => (new NodeTraverser($bad))->traverse(astOf('<br />')))
+            ->toThrow(\InvalidArgumentException::class);
+    });
 });
 
 describe('NodeTraverser via Compiler', function () {
+    it('rejects non-NodeVisitor entries at construction', function () {
+        expect(fn() => new Compiler(visitors: ['not a visitor']))
+            ->toThrow(\InvalidArgumentException::class, 'NodeVisitor');
+    });
+
     it('produces identical output with no visitors', function () {
         $src = '<div id="x">hi</div>';
         $plain = (new Compiler())->compile($src);
@@ -170,7 +206,7 @@ describe('NodeTraverser via Compiler', function () {
     });
 
     it('removes an attribute node end-to-end', function () {
-        $dropDataX = new class extends AbstractNodeVisitor {
+        $dropId = new class extends AbstractNodeVisitor {
             public function leaveNode(array $node): array|int|null {
                 if ($node['$$type'] !== NodeType::PHPX_ATTRIBUTE) return null;
                 $name = $node['name'];
@@ -181,7 +217,7 @@ describe('NodeTraverser via Compiler', function () {
             }
         };
 
-        expect((new Compiler(visitors: [$dropDataX]))->compile('<div id="x" className="y">hi</div>'))
+        expect((new Compiler(visitors: [$dropId]))->compile('<div id="x" className="y">hi</div>'))
             ->toBe("['\$', 'div', ['className'=>\"y\"], ['hi']]");
     });
 });

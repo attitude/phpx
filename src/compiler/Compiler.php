@@ -27,6 +27,13 @@ final class Compiler {
 	) {
 		$this->parser = $parser ?? new Parser(logger: $this->logger);
 		$this->formatter = $formatter ?? new Formatter();
+
+		foreach ($visitors as $visitor) {
+			if (!$visitor instanceof NodeVisitor) {
+				$given = get_debug_type($visitor);
+				throw new \InvalidArgumentException("Compiler \$visitors must all be NodeVisitor instances, {$given} given.");
+			}
+		}
 		$this->visitors = $visitors;
 	}
 

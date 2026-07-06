@@ -75,15 +75,19 @@ final class NodeTraverser
         $traverseChildren = true;
 
         $entered = $visitor->enterNode($node);
-        if (is_int($entered)) {
-            if ($entered === self::REMOVE_NODE) {
-                return self::REMOVE_NODE;
-            }
-            if ($entered === self::DONT_TRAVERSE_CHILDREN) {
-                $traverseChildren = false;
-            }
+        if ($entered === null) {
+            // keep node unchanged
+        } elseif ($entered === self::REMOVE_NODE) {
+            return self::REMOVE_NODE;
+        } elseif ($entered === self::DONT_TRAVERSE_CHILDREN) {
+            $traverseChildren = false;
         } elseif (self::isNode($entered)) {
             $node = $entered;
+        } else {
+            throw new \InvalidArgumentException(
+                'NodeVisitor::enterNode() must return null, a node array with a $$type, '
+                . 'or a NodeTraverser control constant (REMOVE_NODE / DONT_TRAVERSE_CHILDREN).',
+            );
         }
 
         if ($traverseChildren) {
@@ -91,11 +95,17 @@ final class NodeTraverser
         }
 
         $left = $visitor->leaveNode($node);
-        if ($left === self::REMOVE_NODE) {
+        if ($left === null) {
+            // keep node unchanged
+        } elseif ($left === self::REMOVE_NODE) {
             return self::REMOVE_NODE;
-        }
-        if (self::isNode($left)) {
+        } elseif (self::isNode($left)) {
             $node = $left;
+        } else {
+            throw new \InvalidArgumentException(
+                'NodeVisitor::leaveNode() must return null, a node array with a $$type, '
+                . 'or NodeTraverser::REMOVE_NODE.',
+            );
         }
 
         return $node;
@@ -116,10 +126,10 @@ final class NodeTraverser
                 if ($visited !== self::REMOVE_NODE) {
                     $node[$key] = $visited;
                 }
-            } elseif (is_array($value)) {
+            } elseif (is_array($value) && array_is_list($value)) {
                 $node[$key] = $this->traverseList($value, $visitor);
             }
-            // else: Token / scalar / bool — leaf.
+            // else: Token / scalar / bool, or an associative (non-node) array — leaf.
         }
 
         return $node;
