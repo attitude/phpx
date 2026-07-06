@@ -128,6 +128,41 @@ Backtick template literals with `${ }` interpolation are compiled to PHP string 
 'Hello, my name is '.($name).', and I come from '.($country).'!'
 ```
 
+#### Extending the compiler with AST visitors
+
+PHPX has two independent extension points:
+
+- **`FormatterInterface`** controls the *shape* of the emitted PHP — array tuples vs `pragma(...)` calls (see above).
+- **`NodeVisitor`** transforms the *AST* between parsing and compilation — inspect, rewrite, or remove nodes before they are compiled.
+
+A visitor implements `enterNode()` (top-down) and/or `leaveNode()` (bottom-up); extend `AbstractNodeVisitor` to override only what you need. Each hook returns:
+
+- `null` — keep the node unchanged;
+- a node array — replace the node;
+- `NodeTraverser::REMOVE_NODE` — drop the node (inside a list, e.g. children or attributes);
+- `NodeTraverser::DONT_TRAVERSE_CHILDREN` (from `enterNode()`) — skip the node's subtree.
+
+Nodes are associative arrays tagged with `'$$type' => NodeType`. The traverser visits every semantic node; structural tokens (brackets, whitespace) are left alone. Register visitors on the compiler — they run in registration order, each as a full pass:
+
+```php
+use Attitude\PHPX\Compiler\{Compiler, AbstractNodeVisitor, NodeTraverser};
+use Attitude\PHPX\Parser\NodeType;
+
+$stripComments = new class extends AbstractNodeVisitor {
+    public function leaveNode(array $node): array|int|null {
+        return $node['$$type'] === NodeType::PHPX_COMMENT
+            ? NodeTraverser::REMOVE_NODE
+            : null;
+    }
+};
+
+$compiler = new Compiler(visitors: [$stripComments]);
+$compiler->compile('<div>a{/* note */}b</div>');
+// ['$', 'div', null, ['a', 'b']]
+```
+
+With no visitors, the output is byte-for-byte identical to the default compiler.
+
 ---
 
 ### Renderer
