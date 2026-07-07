@@ -163,6 +163,57 @@ $compiler->compile('<div>a{/* note */}b</div>');
 
 With no visitors, the output is byte-for-byte identical to the default compiler.
 
+#### Extending the parser with syntax recognizers
+
+The third extension point is the *recognition* layer. `SyntaxRecognizer` lets you teach the parser new token patterns — JSX is conceptually just one of the options, like a Babel parser plugin. A recognizer implements:
+
+- **`claims(TokensList $tokens): bool`** — return true when the tokens at the cursor start your construct. It MUST NOT move the cursor.
+- **`parse(TokensList $tokens, Parser $parser): array`** — parse the construct into a node and advance the cursor past it. It may call `$parser->parseNext()` to recurse into standard parsing for nested constructs.
+
+The node you return carries `'$$type' => NodeType|string`. A **string** `$$type` is a custom node kind: it travels through `NodeTraverser` like any node, so a `NodeVisitor` must **lower** it to a built-in `NodeType` node before compilation. A custom node that reaches the compiler unlowered throws.
+
+Register recognizers on the parser and the lowering visitor on the compiler:
+
+```php
+use Attitude\PHPX\Compiler\{Compiler, AbstractNodeVisitor};
+use Attitude\PHPX\Parser\{NodeType, Parser, SyntaxRecognizer, Token, TokensList};
+
+$macro = new class implements SyntaxRecognizer {
+    public function claims(TokensList $tokens): bool {
+        return $tokens->tokenAtCursorMatches(['%', '%']) !== null;
+    }
+    public function parse(TokensList $tokens, Parser $parser): array {
+        $tokens->tokenAtCursorAndForward(); // %
+        $tokens->tokenAtCursorAndForward(); // %
+        $inner = [];
+        while ($tokens->exist() && $tokens->tokenAtCursorMatches(['%', '%']) === null) {
+            $inner[] = $tokens->tokenAtCursorAndForward();
+        }
+        $tokens->tokenAtCursorAndForward(); // %
+        $tokens->tokenAtCursorAndForward(); // %
+        return ['$$type' => 'Macro', 'tokens' => $inner];
+    }
+};
+
+$lowerMacro = new class extends AbstractNodeVisitor {
+    public function enterNode(array $node): array|int|null {
+        return ($node['$$type'] ?? null) === 'Macro'
+            ? ['$$type' => NodeType::EXPRESSION, 'value' => new Token(T_STRING, 'time()', 1, 0)]
+            : null;
+    }
+};
+
+$compiler = new Compiler(parser: new Parser(recognizers: [$macro]), visitors: [$lowerMacro]);
+$compiler->compile('%%now%%'); // time()
+```
+
+Two limitations in this release:
+
+- Recognizers are consulted only at **node boundaries** (top level, and inside `(...)`/`[...]`/`{...}` and element children). They do not interrupt a JSX text run — place custom syntax right after `{...}` or an element, not mid-text.
+- **Attributes are not yet pluggable** — recognizers do not run inside a tag's attribute list.
+
+With no recognizers, the parser output is byte-for-byte identical to the default parser.
+
 ---
 
 ### Renderer

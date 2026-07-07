@@ -4,4 +4,5 @@ require_once __DIR__ . '/constants.php';
 require_once __DIR__ . '/NodeType.php';
 require_once __DIR__ . '/TokensList.php';
 require_once __DIR__ . '/Token.php';
+require_once __DIR__ . '/SyntaxRecognizer.php';
 require_once __DIR__ . '/Parser.php';
