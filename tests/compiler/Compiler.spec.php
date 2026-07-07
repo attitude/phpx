@@ -1066,6 +1066,7 @@ function compileAndEval(string $source, array $scope = []): mixed {
   $out = newCompiler(parser: newParser())->compile($source);
 
   $tmp = tempnam(sys_get_temp_dir(), 'phpx_lint_');
+  expect($tmp)->toBeString();
   file_put_contents($tmp, "<?php \$v = {$out};\n");
   exec(escapeshellarg(PHP_BINARY) . ' -l ' . escapeshellarg($tmp) . ' 2>&1', $lint, $rc);
   unlink($tmp);
@@ -1146,6 +1147,7 @@ describe('Compiler production behaviour (assertions disabled)', function () {
       . ' catch (\\Throwable $e) { echo "OTHER:" . get_class($e); }';
 
     $tmp = tempnam(sys_get_temp_dir(), 'phpx_prod_');
+    expect($tmp)->toBeString();
     file_put_contents($tmp, $script);
     $output = shell_exec(escapeshellarg(PHP_BINARY) . ' -d zend.assertions=-1 ' . escapeshellarg($tmp));
     unlink($tmp);

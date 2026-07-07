@@ -199,7 +199,7 @@ final class Compiler {
 	private function compilePHPXElement(array $node): string {
 		$this->logger?->debug('compilePHPXElement', $node);
 
-		if (($node['$$type'] ?? null) !== NodeType::PHPX_ELEMENT || !is_array($node['openingElement'] ?? null)) {
+		if (($node['$$type'] ?? null) !== NodeType::PHPX_ELEMENT || !isset($node['openingElement'][1]) || !is_array($node['openingElement'])) {
 			throw new \InvalidArgumentException('compilePHPXElement expected a PHPX_ELEMENT node with an openingElement.');
 		}
 
