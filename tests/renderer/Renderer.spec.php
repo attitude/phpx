@@ -1313,4 +1313,114 @@ HTML;
       expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
     });
   });
+
+  describe('duplicate attribute normalization', function () {
+    it('renders class once when className and class both normalize to class (class wins)', function () {
+      $html = ['$', 'div', ['className' => 'a', 'class' => 'b'], null];
+
+      expect((new Renderer)($html))->toBe('<div class="b"></div>');
+    });
+
+    it('renders class once when class and className both normalize to class (className wins)', function () {
+      $html = ['$', 'div', ['class' => 'b', 'className' => 'a'], null];
+
+      expect((new Renderer)($html))->toBe('<div class="a"></div>');
+    });
+
+    it('renders a single title attribute when title and Title both normalize to title', function () {
+      $html = ['$', 'div', ['title' => 'a', 'Title' => 'b'], null];
+
+      $rendered = (new Renderer)($html);
+
+      expect(substr_count($rendered, 'title='))->toBe(1);
+      expect($rendered)->toBe('<div title="b"></div>');
+    });
+  });
+
+  describe('data/aria sub-key casing', function () {
+    it('kebab-cases camelCase data sub-keys', function () {
+      $html = ['$', 'div', ['data' => ['userId' => 5, 'longKeyName' => 'v']], null];
+
+      expect((new Renderer)($html))->toBe('<div data-user-id="5" data-long-key-name="v"></div>');
+    });
+
+    it('leaves already-kebab data sub-keys unchanged', function () {
+      $html = ['$', 'div', ['data' => ['user-id' => 5]], null];
+
+      expect((new Renderer)($html))->toBe('<div data-user-id="5"></div>');
+    });
+
+    it('keeps aria sub-keys lowercased without mid-word hyphens (per real ARIA attribute names)', function () {
+      $html = ['$', 'div', ['aria' => ['userId' => 5, 'longKeyName' => 'v']], null];
+
+      expect((new Renderer)($html))->toBe('<div aria-userid="5" aria-longkeyname="v"></div>');
+    });
+
+    it('still kebab-cases camelCase style properties (regression)', function () {
+      $html = ['$', 'div', ['style' => (object) ['backgroundColor' => 'red']], null];
+
+      expect((new Renderer)($html))->toBe('<div style="background-color:red"></div>');
+    });
+  });
+
+  describe('void element children guard', function () {
+    it('throws InvalidArgumentException when a void element is given children', function () {
+      $html = ['$', 'img', ['src' => 'a'], 'CHILD'];
+
+      expect(fn() => (new Renderer)($html))->toThrow(\InvalidArgumentException::class);
+    });
+
+    it('renders a void element without children without throwing', function () {
+      $html = ['$', 'img', ['src' => 'a']];
+
+      expect((new Renderer)($html))->toBe('<img src="a" />');
+    });
+
+    it('renders a void element with null children without throwing', function () {
+      $html = ['$', 'br', null, null];
+
+      expect((new Renderer)($html))->toBe('<br />');
+    });
+  });
+
+  describe('Traversable/generator nodes', function () {
+    it('renders a generator used as element children in order', function () {
+      $generateChildren = function (): \Generator {
+        yield ['$', 'li', null, 'One'];
+        yield ['$', 'li', null, 'Two'];
+      };
+
+      $html = ['$', 'ul', null, $generateChildren()];
+
+      expect((new Renderer)($html))->toBe('<ul><li>One</li><li>Two</li></ul>');
+    });
+
+    it('renders a component that returns a generator', function () {
+      $component = function (): \Generator {
+        yield ['$', 'li', null, 'A'];
+        yield ['$', 'li', null, 'B'];
+      };
+
+      $html = ['$', 'ul', null, [
+        ['$', $component, null],
+      ]];
+
+      expect((new Renderer)($html))->toBe('<ul><li>A</li><li>B</li></ul>');
+    });
+
+    it('renders a generator nested among plain children in order', function () {
+      $generateChildren = function (): \Generator {
+        yield ['$', 'b', null, 'X'];
+        yield ['$', 'b', null, 'Y'];
+      };
+
+      $html = ['$', 'div', null, [
+        'Start ',
+        $generateChildren(),
+        ' End',
+      ]];
+
+      expect((new Renderer)($html))->toBe('<div>Start <b>X</b><b>Y</b> End</div>');
+    });
+  });
 });

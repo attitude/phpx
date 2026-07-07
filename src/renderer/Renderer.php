@@ -88,7 +88,10 @@ final class Renderer {
     return strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $value));
   }
 
-  private function renderNode(bool|int|float|string|array|null $node, int $nesting): string {
+  private function renderNode(bool|int|float|string|array|null|\Traversable $node, int $nesting): string {
+    if ($node instanceof \Traversable) {
+      $node = iterator_to_array($node, false);
+    }
     if (is_string($node) || is_numeric($node)) {
       return $this->escape($node);
     }
@@ -149,7 +152,11 @@ final class Renderer {
     }
 
     $open = "<$type" . ($attrs !== '' ? " $attrs" : '');
-    if (in_array($type, ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'])) {
+    $isVoidElement = in_array($type, ['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr']);
+    if ($isVoidElement) {
+      if ($childrenHtml !== '') {
+        throw new \InvalidArgumentException("`{$type}` is a void element and must not have children.");
+      }
       return $open . ($this->void ? '>' : ' />');
     }
     return "$open>$childrenHtml</$type>";
@@ -192,7 +199,7 @@ final class Renderer {
   }
 
   private function renderAttributes(array $props): string {
-    $parts = [];
+    $attrs = [];
 
     foreach ($props as $key => $value) {
       $key = match ($key) {
@@ -211,20 +218,20 @@ final class Renderer {
 
       if (is_bool($value)) {
         if (str_contains($key, '-')) {
-          $parts[] = $this->formatAttribute($key, $value ? 'true' : 'false');
+          $attrs[$key] = $this->formatAttribute($key, $value ? 'true' : 'false');
         } elseif ($value) {
-          $parts[] = $key;
+          $attrs[$key] = $key;
         }
         continue;
       }
 
       if ($value instanceof \DateTimeInterface) {
-        $parts[] = $this->formatAttribute($key, $value->format('Y-m-d\TH:i:s'));
+        $attrs[$key] = $this->formatAttribute($key, $value->format('Y-m-d\TH:i:s'));
         continue;
       }
 
       if ($value instanceof \Stringable) {
-        $parts[] = $this->formatAttribute($key, $value);
+        $attrs[$key] = $this->formatAttribute($key, $value);
         continue;
       }
 
@@ -241,7 +248,7 @@ final class Renderer {
             $css .= $this->toKebabCase((string) $prop) . ":$sv;";
           }
           if ($css !== '')
-            $parts[] = $this->formatAttribute('style', rtrim($css, ';'));
+            $attrs['style'] = $this->formatAttribute('style', rtrim($css, ';'));
           continue;
         }
 
@@ -250,14 +257,14 @@ final class Renderer {
         if ($key === 'class' && (!empty($resolved) || $value instanceof \stdClass || (is_array($value) && !array_is_list($value)))) {
           $classes = array_keys(array_filter($resolved));
           if (!empty($classes))
-            $parts[] = $this->formatAttribute('class', implode(' ', $classes));
+            $attrs['class'] = $this->formatAttribute('class', implode(' ', $classes));
           continue;
         }
 
         if (!empty($resolved) && preg_match('/^[a-z][a-z0-9]*$/', $key)) {
-          $count = count($parts);
+          $addedSubAttrs = false;
           foreach ($resolved as $subKey => $subValue) {
-            $subKey = strtolower((string) $subKey);
+            $subKey = $key === 'data' ? $this->toKebabCase((string) $subKey) : strtolower((string) $subKey);
             if (!preg_match('/^[a-z][a-z0-9\-:._]*$/', $subKey)) {
               throw new \InvalidArgumentException("Invalid `{$key}-*` attribute key: `{$subKey}`");
             }
@@ -265,9 +272,10 @@ final class Renderer {
               continue;
             if (is_bool($subValue))
               $subValue = $subValue ? 'true' : 'false';
-            $parts[] = $this->formatAttribute("$key-$subKey", $subValue);
+            $attrs["$key-$subKey"] = $this->formatAttribute("$key-$subKey", $subValue);
+            $addedSubAttrs = true;
           }
-          if (count($parts) > $count)
+          if ($addedSubAttrs)
             continue;
         }
 
@@ -278,15 +286,15 @@ final class Renderer {
               $flat[] = $item;
           });
           if (!empty($flat))
-            $parts[] = $this->formatAttribute($key, implode(' ', $flat));
+            $attrs[$key] = $this->formatAttribute($key, implode(' ', $flat));
         }
         continue;
       }
 
-      $parts[] = $this->formatAttribute($key, $value);
+      $attrs[$key] = $this->formatAttribute($key, $value);
     }
 
-    return implode(' ', $parts);
+    return implode(' ', $attrs);
   }
 
   private function renderFragment(array $node, int $nesting): string {
@@ -316,6 +324,9 @@ final class Renderer {
     $length = count($array);
 
     foreach ($array as $index => $item) {
+      if ($item instanceof \Traversable) {
+        $item = iterator_to_array($item, false);
+      }
       if (is_string($item) || is_numeric($item)) {
         $escapedValue = $this->escape($item);
         if ($this->react) {
