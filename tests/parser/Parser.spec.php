@@ -88,11 +88,11 @@ describe('Parser accepts PHP keyword names', function () {
     // PHP tokenizes these names as keyword tokens (T_USE, T_FOR, T_READONLY),
     // not T_STRING. They are valid HTML/SVG names and must parse.
     it('accepts a keyword tag name', function () {
-        expect(phpxCompile('<use href="#icon" />'))->toBe('[\'$\', \'use\', [\'href\'=>"#icon"]]');
+        expect(phpxCompile('<use href="#icon" />'))->toBe('[\'$\', \'use\', [\'href\'=>\'#icon\']]');
     });
 
     it('accepts a keyword attribute name (for)', function () {
-        expect(phpxCompile('<label for="x">Hi</label>'))->toBe('[\'$\', \'label\', [\'for\'=>"x"], [\'Hi\']]');
+        expect(phpxCompile('<label for="x">Hi</label>'))->toBe('[\'$\', \'label\', [\'for\'=>\'x\'], [\'Hi\']]');
     });
 
     it('accepts a keyword boolean attribute (readonly)', function () {
@@ -100,19 +100,19 @@ describe('Parser accepts PHP keyword names', function () {
     });
 
     it('accepts a namespaced attribute name', function () {
-        expect(phpxCompile('<use xmlns:xlink="ns" />'))->toBe('[\'$\', \'use\', [\'xmlns:xlink\'=>"ns"]]');
+        expect(phpxCompile('<use xmlns:xlink="ns" />'))->toBe('[\'$\', \'use\', [\'xmlns:xlink\'=>\'ns\']]');
     });
 
     // Regression for #32: keyword tag names must parse as elements in CHILD
     // position too, not just at the top level (SVG <use> sprites break otherwise).
     it('parses a self-closing keyword child as an element', function () {
         expect(phpxCompile('<div><use href="#x" /></div>'))
-            ->toBe('[\'$\', \'div\', null, [[\'$\', \'use\', [\'href\'=>"#x"]]]]');
+            ->toBe('[\'$\', \'div\', null, [[\'$\', \'use\', [\'href\'=>\'#x\']]]]');
     });
 
     it('parses a paired keyword child as an element', function () {
         expect(phpxCompile('<svg><use href="#x"></use></svg>'))
-            ->toBe('[\'$\', \'svg\', null, [[\'$\', \'use\', [\'href\'=>"#x"]]]]');
+            ->toBe('[\'$\', \'svg\', null, [[\'$\', \'use\', [\'href\'=>\'#x\']]]]');
     });
 
     it('parses another keyword child (<list>) as an element', function () {

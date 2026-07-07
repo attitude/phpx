@@ -102,7 +102,10 @@ final class Compiler {
 
 	private function compilePHPXFragmentElement(array $node): string {
 		$this->logger?->debug('compilePHPXFragmentElement', $node);
-		assert($node['$$type'] === NodeType::PHPX_FRAGMENT);
+
+		if (($node['$$type'] ?? null) !== NodeType::PHPX_FRAGMENT) {
+			throw new \InvalidArgumentException('compilePHPXFragmentElement expected a PHPX_FRAGMENT node.');
+		}
 
 		return $this->formatter->formatFragment(
 			$this->compilePHPXChildrenArray($node['children'])
@@ -124,11 +127,17 @@ final class Compiler {
 		};
 
 		if (!$assignment) {
-			assert($value === true);
+			if ($value !== true) {
+				throw new \InvalidArgumentException('A valueless PHPX attribute must carry value true.');
+			}
 			return $this->formatter->formatAttributeExpression($nameText, 'true');
 		} else if ($assignment->text === '=') {
 			if ($value instanceof Token) {
-				return $this->formatter->formatAttributeExpression($nameText, $value->text);
+				// An attribute value is the literal characters between the quotes — no
+				// escape interpretation (JSX/HTML semantics). Strip the source quotes and
+				// re-emit as a single-quoted PHP string so nothing is reinterpreted.
+				$literal = substr($value->text, 1, -1);
+				return $this->formatter->formatAttributeExpression($nameText, '\'' . addcslashes($literal, "\\'") . '\'');
 			} else {
 				$expression = $this->compileBlock($value, '(', ')');
 
@@ -141,7 +150,10 @@ final class Compiler {
 
 	private function compilePHPXAttributesPropsExpression(array $node): string {
 		$this->logger?->debug('compilePHPXAttributesPropsExpression', $node);
-		assert($node['$$type'] === NodeType::BLOCK);
+
+		if (($node['$$type'] ?? null) !== NodeType::BLOCK) {
+			throw new \InvalidArgumentException('compilePHPXAttributesPropsExpression expected a BLOCK node.');
+		}
 
 		['children' => $children] = $node;
 
@@ -186,6 +198,10 @@ final class Compiler {
 
 	private function compilePHPXElement(array $node): string {
 		$this->logger?->debug('compilePHPXElement', $node);
+
+		if (($node['$$type'] ?? null) !== NodeType::PHPX_ELEMENT || !isset($node['openingElement'][1]) || !is_array($node['openingElement'])) {
+			throw new \InvalidArgumentException('compilePHPXElement expected a PHPX_ELEMENT node with an openingElement.');
+		}
 
 		[
 			'$$type' => $type,
@@ -234,7 +250,10 @@ final class Compiler {
 		$this->logger?->debug('compilePHPXExpressionContainer', $node);
 
 		['expression' => $expression] = $node;
-		assert(is_array($expression) && $expression['$$type'] === NodeType::BLOCK);
+
+		if (!is_array($expression) || ($expression['$$type'] ?? null) !== NodeType::BLOCK) {
+			throw new \InvalidArgumentException('A PHPX expression container must wrap a BLOCK node.');
+		}
 		['children' => $children] = $expression;
 
 		$code = '';
@@ -262,13 +281,16 @@ final class Compiler {
 
 	private function compileBlock(array $node, ?string $replaceOpening = null, ?string $replaceClosing = null): string {
 		$this->logger?->debug('compileBlock', $node);
-		assert($node['$$type'] === NodeType::BLOCK);
+
+		if (($node['$$type'] ?? null) !== NodeType::BLOCK) {
+			throw new \InvalidArgumentException('compileBlock expected a BLOCK node.');
+		}
 
 		['opening' => $opening, 'children' => $children, 'closing' => $closing] = $node;
 
-		assert($opening instanceof Token);
-		assert(is_array($children));
-		assert($closing instanceof Token);
+		if (!$opening instanceof Token || !is_array($children) || !$closing instanceof Token) {
+			throw new \InvalidArgumentException('A BLOCK node must have a Token opening, list children, and a Token closing.');
+		}
 
 		return ($replaceOpening !== null ? $replaceOpening : $opening->text)
 			. implode('', array_map(fn(array|Token $value) => match ($value instanceof Token) {
@@ -291,7 +313,7 @@ final class Compiler {
 		['children' => $children] = $node;
 
 		$children = array_map(fn(mixed $child) => match ($child instanceof Token) {
-			true => '\'' . addcslashes($child->text, '\'') . '\'',
+			true => '\'' . addcslashes($child->text, "\\'") . '\'',
 			false => match ($child['$$type']) {
 					NodeType::BLOCK => $this->compileBlock($child, '(', ')'),
 					default => throw new \RuntimeException("Unknown child type: {$child['$$type']}"),
@@ -329,7 +351,7 @@ final class Compiler {
 			$text = rtrim($text, ' ');
 		}
 
-		return '\'' . $text . '\', ';
+		return '\'' . addcslashes($text, "\\'") . '\', ';
 	}
 
 	public function __toString(): string {

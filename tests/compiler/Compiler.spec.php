@@ -212,7 +212,7 @@ PHP
     $defaultCompiler->compile('<img src={$src} alt="An image of PHPX" />');
     expect($defaultCompiler->getAST())->toMatchSnapshot();
     expect($defaultCompiler->getCompiled())->toBe(
-      "['$', 'img', ['src'=>(\$src), 'alt'=>\"An image of PHPX\"]]"
+      "['$', 'img', ['src'=>(\$src), 'alt'=>'An image of PHPX']]"
     );
 
     $pragmaCompiler = newCompiler(
@@ -223,7 +223,7 @@ PHP
     $pragmaCompiler->compile('<img src={$src} alt="An image of PHPX" />');
     expect($pragmaCompiler->getAST())->toMatchSnapshot();
     expect($pragmaCompiler->getCompiled())->toBe(
-      "html('img', ['src'=>(\$src), 'alt'=>\"An image of PHPX\"])"
+      "html('img', ['src'=>(\$src), 'alt'=>'An image of PHPX'])"
     );
   });
 
@@ -272,7 +272,7 @@ PHP
     $defaultCompiler->compile('<input type="checkbox" checked={$checked} disabled />');
     expect($defaultCompiler->getAST())->toMatchSnapshot();
     expect($defaultCompiler->getCompiled())->toBe(
-      "['$', 'input', ['type'=>\"checkbox\", 'checked'=>(\$checked), 'disabled'=>true]]"
+      "['$', 'input', ['type'=>'checkbox', 'checked'=>(\$checked), 'disabled'=>true]]"
     );
 
     $pragmaCompiler = newCompiler(
@@ -283,7 +283,7 @@ PHP
     $pragmaCompiler->compile('<input type="checkbox" checked={$checked} disabled />');
     expect($pragmaCompiler->getAST())->toMatchSnapshot();
     expect($pragmaCompiler->getCompiled())->toBe(
-      "html('input', ['type'=>\"checkbox\", 'checked'=>(\$checked), 'disabled'=>true])"
+      "html('input', ['type'=>'checkbox', 'checked'=>(\$checked), 'disabled'=>true])"
     );
   });
 
@@ -312,7 +312,7 @@ PHP
     $defaultCompiler->compile('<li className="meals-item" data-as-table={$meal->priceFormatted instanceof StringList} />');
     expect($defaultCompiler->getAST())->toMatchSnapshot();
     expect($defaultCompiler->getCompiled())->toBe(
-      "['$', 'li', ['className'=>\"meals-item\", 'data-as-table'=>(\$meal->priceFormatted instanceof StringList)]]"
+      "['$', 'li', ['className'=>'meals-item', 'data-as-table'=>(\$meal->priceFormatted instanceof StringList)]]"
     );
 
     $pragmaCompiler = newCompiler(
@@ -323,7 +323,7 @@ PHP
     $pragmaCompiler->compile('<li className="meals-item" data-as-table={$meal->priceFormatted instanceof StringList} />');
     expect($pragmaCompiler->getAST())->toMatchSnapshot();
     expect($pragmaCompiler->getCompiled())->toBe(
-      "html('li', ['className'=>\"meals-item\", 'data-as-table'=>(\$meal->priceFormatted instanceof StringList)])"
+      "html('li', ['className'=>'meals-item', 'data-as-table'=>(\$meal->priceFormatted instanceof StringList)])"
     );
   });
 
@@ -352,7 +352,7 @@ PHP
     $defaultCompiler->compile('<img {$loading} src="about:blank" {...$props} alt=\'Never overridden alt\' />');
     expect($defaultCompiler->getAST())->toMatchSnapshot();
     expect($defaultCompiler->getCompiled())->toBe(
-      "['$', 'img', ['loading'=>\$loading, 'src'=>\"about:blank\", ...\$props, 'alt'=>'Never overridden alt']]"
+      "['$', 'img', ['loading'=>\$loading, 'src'=>'about:blank', ...\$props, 'alt'=>'Never overridden alt']]"
     );
 
     $pragmaCompiler = newCompiler(
@@ -363,7 +363,7 @@ PHP
     $pragmaCompiler->compile('<img {$loading} src="about:blank" {...$props} alt=\'Never overridden alt\' />');
     expect($pragmaCompiler->getAST())->toMatchSnapshot();
     expect($pragmaCompiler->getCompiled())->toBe(
-      "html('img', ['loading'=>\$loading, 'src'=>\"about:blank\", ...\$props, 'alt'=>'Never overridden alt'])"
+      "html('img', ['loading'=>\$loading, 'src'=>'about:blank', ...\$props, 'alt'=>'Never overridden alt'])"
     );
   });
 
@@ -377,7 +377,7 @@ PHPX
     expect($defaultCompiler->getAST())->toMatchSnapshot();
     expect($defaultCompiler->getCompiled())->toBe(
 <<<'PHP'
-  ['$', 'h1', ['className'=>"title"], ['Hello, ', ($name ?? ucfirst($type)), '!']]
+  ['$', 'h1', ['className'=>'title'], ['Hello, ', ($name ?? ucfirst($type)), '!']]
 PHP
     );
 
@@ -394,7 +394,7 @@ PHPX
     expect($pragmaCompiler->getAST())->toMatchSnapshot();
     expect($pragmaCompiler->getCompiled())->toBe(
 <<<'PHP'
-  html('h1', ['className'=>"title"], ['Hello, ', ($name ?? ucfirst($type)), '!'])
+  html('h1', ['className'=>'title'], ['Hello, ', ($name ?? ucfirst($type)), '!'])
 PHP
     );
   });
@@ -417,10 +417,10 @@ PHPX
     expect($defaultCompiler->getCompiled())->toBe(
 <<<'PHP'
 [
-  ['$', 'h1', ['className'=>"title"], ['Hello, ', ($name ?? ucfirst($type)), '!']],
+  ['$', 'h1', ['className'=>'title'], ['Hello, ', ($name ?? ucfirst($type)), '!']],
   ['$', 'p', null, [
     'Welcome to the world of PHPX, where you can write PHP code in a JSX-like syntax.',
-    ['$', 'img', ['src'=>"about:blank", 'alt'=>"Happy coding!"]], ' forever!',
+    ['$', 'img', ['src'=>'about:blank', 'alt'=>'Happy coding!']], ' forever!',
   ]],
 ]
 PHP
@@ -448,10 +448,10 @@ PHPX
     expect($pragmaCompiler->getCompiled())->toBe(
 <<<'PHP'
 fragment([
-  html('h1', ['className'=>"title"], ['Hello, ', ($name ?? ucfirst($type)), '!']),
+  html('h1', ['className'=>'title'], ['Hello, ', ($name ?? ucfirst($type)), '!']),
   html('p', null, [
     'Welcome to the world of PHPX, where you can write PHP code in a JSX-like syntax.',
-    html('img', ['src'=>"about:blank", 'alt'=>"Happy coding!"]), ' forever!',
+    html('img', ['src'=>'about:blank', 'alt'=>'Happy coding!']), ' forever!',
   ]),
 ])
 PHP
@@ -483,7 +483,7 @@ HTML
     expect($defaultCompiler->getAST())->toMatchSnapshot();
     expect($defaultCompiler->getCompiled())->toBe(
 <<<'PHP'
-['$', 'p', null, ['©', ($year), ' ', ['$', 'a', ['href'=>"https://threads.com/@martin_adamko"], ['@martin_adamko']]]]
+['$', 'p', null, ['©', ($year), ' ', ['$', 'a', ['href'=>'https://threads.com/@martin_adamko'], ['@martin_adamko']]]]
 PHP
     );
 
@@ -499,7 +499,7 @@ HTML
     expect($pragmaCompiler->getAST())->toMatchSnapshot();
     expect($pragmaCompiler->getCompiled())->toBe(
 <<<'PHP'
-html('p', null, ['©', ($year), ' ', html('a', ['href'=>"https://threads.com/@martin_adamko"], ['@martin_adamko'])])
+html('p', null, ['©', ($year), ' ', html('a', ['href'=>'https://threads.com/@martin_adamko'], ['@martin_adamko'])])
 PHP
     );
   });
@@ -716,7 +716,7 @@ $a = 'These\'are quotes in a string and that\'s okay.';
 $b = (
   [
     'Hello, ', ($name ?? 'unnamed'), '!
-    These\'re quotes in a string and that\'s okay too!',
+    These\\\'re quotes in a string and that\\\'s okay too!',
   ]
 );
 PHP
@@ -745,7 +745,7 @@ $a = 'These\'are quotes in a string and that\'s okay.';
 $b = (
   fragment([
     'Hello, ', ($name ?? 'unnamed'), '!
-    These\'re quotes in a string and that\'s okay too!',
+    These\\\'re quotes in a string and that\\\'s okay too!',
   ])
 );
 PHP
@@ -783,9 +783,9 @@ PHPX
 <<<'PHP'
 ['$', 'div', null, [
   ['$', 'p', [
-    'className'=>"text-center",
-    'style'=>"color: red;",
-    'data-foo'=>"bar",
+    'className'=>'text-center',
+    'style'=>'color: red;',
+    'data-foo'=>'bar',
   ], [
     'Hello, ', ($name ?? 'unnamed'), '!',
   ]],
@@ -816,9 +816,9 @@ PHPX
 <<<'PHP'
 html('div', null, [
   html('p', [
-    'className'=>"text-center",
-    'style'=>"color: red;",
-    'data-foo'=>"bar",
+    'className'=>'text-center',
+    'style'=>'color: red;',
+    'data-foo'=>'bar',
   ], [
     'Hello, ', ($name ?? 'unnamed'), '!',
   ]),
@@ -852,7 +852,7 @@ PHP
     $defaultCompiler->compile('<Button type="submit">Submit</Button>');
     expect($defaultCompiler->getAST())->toMatchSnapshot();
     expect($defaultCompiler->getCompiled())->toBe(
-      "['$', \$Button, ['type'=>\"submit\"], ['Submit']]"
+      "['$', \$Button, ['type'=>'submit'], ['Submit']]"
     );
 
     $pragmaCompiler = newCompiler(
@@ -863,7 +863,7 @@ PHP
     $pragmaCompiler->compile('<Button type="submit">Submit</Button>');
     expect($pragmaCompiler->getAST())->toMatchSnapshot();
     expect($pragmaCompiler->getCompiled())->toBe(
-      "html(\$Button, ['type'=>\"submit\"], ['Submit'])"
+      "html(\$Button, ['type'=>'submit'], ['Submit'])"
     );
   });
 
@@ -937,7 +937,7 @@ PHP
     $defaultCompiler->compile('<my-el data-value="42" />');
     expect($defaultCompiler->getAST())->toMatchSnapshot();
     expect($defaultCompiler->getCompiled())->toBe(
-      "['$', 'my-el', ['data-value'=>\"42\"]]"
+      "['$', 'my-el', ['data-value'=>'42']]"
     );
 
     $pragmaCompiler = newCompiler(
@@ -948,7 +948,7 @@ PHP
     $pragmaCompiler->compile('<my-el data-value="42" />');
     expect($pragmaCompiler->getAST())->toMatchSnapshot();
     expect($pragmaCompiler->getCompiled())->toBe(
-      "html('my-el', ['data-value'=>\"42\"])"
+      "html('my-el', ['data-value'=>'42'])"
     );
   });
 
@@ -1058,5 +1058,100 @@ describe('unexpected end of input', function () {
     $compiler = newCompiler(parser: newParser());
     expect(fn() => $compiler->compile('<div></div attr'))
       ->toThrow(\ParseError::class, "expected '>'");
+  });
+});
+
+/** Compile, `php -l` the emitted PHP, then eval it — proving the output is valid PHP. */
+function compileAndEval(string $source, array $scope = []): mixed {
+  $out = newCompiler(parser: newParser())->compile($source);
+
+  $tmp = tempnam(sys_get_temp_dir(), 'phpx_lint_');
+  expect($tmp)->toBeString();
+  file_put_contents($tmp, "<?php \$v = {$out};\n");
+  exec(escapeshellarg(PHP_BINARY) . ' -l ' . escapeshellarg($tmp) . ' 2>&1', $lint, $rc);
+  unlink($tmp);
+  expect($rc)->toBe(0, "emitted PHP failed to lint: {$out}\n" . implode("\n", $lint));
+
+  extract($scope);
+  return eval("return {$out};");
+}
+
+describe('escaping (output must evaluate to the literal characters written)', function () {
+  it('keeps a trailing backslash in text', function () {
+    // <p>foo\</p> — the character after "foo" is a single backslash.
+    expect(compileAndEval('<p>foo\\</p>'))->toBe(['$', 'p', null, ['foo\\']]);
+  });
+
+  it('keeps interior double backslashes in text without collapsing them', function () {
+    // C:\\Users\\me — two backslashes before Users and before me.
+    expect(compileAndEval('<p>C:\\\\Users\\\\me</p>'))
+      ->toBe(['$', 'p', null, ['C:\\\\Users\\\\me']]);
+  });
+
+  it('keeps a backslash in text mixed with an expression', function () {
+    // path\{$x} — a backslash immediately before the expression container.
+    expect(compileAndEval('<p>path\\{$x}</p>', ['x' => 'X']))
+      ->toBe(['$', 'p', null, ['path\\', 'X']]);
+  });
+
+  it('keeps a trailing backslash in multi-line text', function () {
+    $out = compileAndEval("<p>line one\\\nline two</p>");
+    expect($out)->toBe(['$', 'p', null, ["line one\\\nline two"]]);
+  });
+
+  it('treats a double-quoted attribute value as literal characters', function () {
+    // data-x="a\tb" — the value is 4 characters: a, backslash, t, b (not a TAB).
+    $out = compileAndEval('<div data-x="a\tb"></div>');
+    expect($out[2]['data-x'])->toBe('a\tb');
+    expect(strlen($out[2]['data-x']))->toBe(4);
+  });
+
+  it('does not collapse a double backslash in an attribute value', function () {
+    // alt="C:\\x" — two backslashes.
+    expect(compileAndEval('<img alt="C:\\\\x" />')[2]['alt'])->toBe('C:\\\\x');
+  });
+
+  it('leaves an octal-looking attribute value untouched', function () {
+    // style="--x:\2014" must not become a PHP octal escape / corrupted bytes.
+    expect(compileAndEval('<div style="--x:\2014"></div>')[2]['style'])->toBe('--x:\2014');
+  });
+
+  it('treats a single-quoted attribute value as literal characters', function () {
+    expect(compileAndEval("<div data-x='a\\tb'></div>")[2]['data-x'])->toBe('a\tb');
+    expect(compileAndEval("<img alt='C:\\\\x' />")[2]['alt'])->toBe('C:\\\\x');
+  });
+
+  it('does not collapse a double backslash in a template literal', function () {
+    // `C:\\x` — two backslashes.
+    expect(compileAndEval('`C:\\\\x`'))->toBe('C:\\\\x');
+  });
+});
+
+describe('Compiler production behaviour (assertions disabled)', function () {
+  // With zend.assertions=-1 (the production default) an assert() is a no-op, so a
+  // NodeVisitor returning a malformed node produced silent, empty output. The
+  // shape checks are now explicit throws — prove they fire regardless of the setting.
+  it('rejects a malformed node from a visitor with zend.assertions=-1', function () {
+    $autoload = realpath(__DIR__ . '/../../vendor/autoload.php');
+    expect($autoload)->not->toBeFalse();
+
+    $script = '<?php require ' . var_export($autoload, true) . ';'
+      . '$breaker = new class extends \\Attitude\\PHPX\\Compiler\\AbstractNodeVisitor {'
+      . '  public function leaveNode(array $node): array|int|null {'
+      . '    return $node[\'$$type\'] === \\Attitude\\PHPX\\Parser\\NodeType::PHPX_ELEMENT'
+      . '      ? [\'$$type\' => \\Attitude\\PHPX\\Parser\\NodeType::PHPX_ELEMENT] : null;'
+      . '  }'
+      . '};'
+      . 'try { (new \\Attitude\\PHPX\\Compiler\\Compiler(visitors: [$breaker]))->compile("<div />"); echo "NO_THROW"; }'
+      . ' catch (\\InvalidArgumentException $e) { echo "INVALID_ARGUMENT"; }'
+      . ' catch (\\Throwable $e) { echo "OTHER:" . get_class($e); }';
+
+    $tmp = tempnam(sys_get_temp_dir(), 'phpx_prod_');
+    expect($tmp)->toBeString();
+    file_put_contents($tmp, $script);
+    $output = shell_exec(escapeshellarg(PHP_BINARY) . ' -d zend.assertions=-1 ' . escapeshellarg($tmp));
+    unlink($tmp);
+
+    expect(trim((string) $output))->toBe('INVALID_ARGUMENT');
   });
 });

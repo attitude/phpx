@@ -31,7 +31,7 @@ function PageHeader(array $props): array {
 
   return (
     ['$', 'header', null, [
-      ['$', 'a', ['href'=>"/"], ['Home']],
+      ['$', 'a', ['href'=>'/'], ['Home']],
       ['$', 'h1', null, [($title)]],
       ['$', 'ul', null, [
         (array_map(fn($tag) => (
@@ -48,13 +48,13 @@ function Page(): array {
   $css = '/styles.css';
 
   return (
-    ['$', 'html', ['lang'=>"en"], [
+    ['$', 'html', ['lang'=>'en'], [
       ['$', 'head', null, [
-        ['$', 'meta', ['charset'=>"UTF-8"]],
-        ['$', 'meta', ['name'=>"viewport", 'content'=>"width=device-width, initial-scale=1.0"]],
+        ['$', 'meta', ['charset'=>'UTF-8']],
+        ['$', 'meta', ['name'=>'viewport', 'content'=>'width=device-width, initial-scale=1.0']],
         ['$', 'title', null, [($title ?? 'None'), ' by Attitude']],
-        ['$', 'meta', ['name'=>"description", 'content'=>($description)]],
-        ['$', 'link', ['rel'=>"stylesheet", 'href'=>($css)]],
+        ['$', 'meta', ['name'=>'description', 'content'=>($description)]],
+        ['$', 'link', ['rel'=>'stylesheet', 'href'=>($css)]],
       ]],
       ['$', 'body', null, [
         (PageHeader(['title' => $title, 'tags' => ['test', 'example']])),

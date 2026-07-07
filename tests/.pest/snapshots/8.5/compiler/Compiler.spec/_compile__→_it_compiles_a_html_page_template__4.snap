@@ -1,14 +1,14 @@
-html('html', ['lang'=>"en"], [
+html('html', ['lang'=>'en'], [
 	html('head', null, [
-		html('meta', ['charset'=>"UTF-8"]),
-		html('meta', ['name'=>"viewport", 'content'=>"width=device-width, initial-scale=1.0"]),
+		html('meta', ['charset'=>'UTF-8']),
+		html('meta', ['name'=>'viewport', 'content'=>'width=device-width, initial-scale=1.0']),
 		html('title', null, [($title ?? 'None'), ' by Attitude']),
-		html('meta', ['name'=>"description", 'content'=>($description)]),
-		html('link', ['rel'=>"stylesheet", 'href'=>($css)]),
+		html('meta', ['name'=>'description', 'content'=>($description)]),
+		html('link', ['rel'=>'stylesheet', 'href'=>($css)]),
 	]),
 	html('body', null, [
 		html('header', null, [
-			html('a', ['href'=>"/"], ['Home']),
+			html('a', ['href'=>'/'], ['Home']),
 			html('h1', null, [($title)]),
 			html('ul', null, [($tagsHTML)]),
 		]),
@@ -21,7 +21,7 @@ html('html', ['lang'=>"en"], [
 			($content),
 		]),
 		html('footer', null, [
-			html('p', null, ['©', ($year), ' ', html('a', ['href'=>"https://threads.com/@martin_adamko"], ['@martin_adamko'])]),
+			html('p', null, ['©', ($year), ' ', html('a', ['href'=>'https://threads.com/@martin_adamko'], ['@martin_adamko'])]),
 		]),
 	]),
 ])
