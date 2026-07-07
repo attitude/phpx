@@ -18,7 +18,7 @@ final class TokensList implements \JsonSerializable, \Iterator {
 	private function tokenAtCursorMatchesSequence(array $sequence): Token|null {
 		foreach ($sequence as $i => $text) {
 			if (!is_string($text) && !is_int($text)) {
-				throw new \InvalidArgumentException("Sequence element must be string or int, got " . gettype($text));
+				throw new \InvalidArgumentException("Sequence element must be string or int, got " . get_debug_type($text));
 			}
 
 			if ($this->exist()) {
@@ -97,7 +97,7 @@ final class TokensList implements \JsonSerializable, \Iterator {
 				return null;
 			}
 		} else {
-			throw new \InvalidArgumentException("Invalid value type " . gettype($value));
+			throw new \InvalidArgumentException("Invalid value type " . get_debug_type($value));
 		}
 	}
 
