@@ -73,24 +73,26 @@ final class Message
      */
     public static function fromArray(array $data): self
     {
-        $jsonrpc = $data['jsonrpc'] ?? null;
-        if ($jsonrpc !== null && !is_string($jsonrpc)) {
-            throw new InvalidMessageException(null, 'jsonrpc must be a string');
-        }
-
-        // Resolve the id first so later violations can echo it back. An integral
-        // float (e.g. 2.0 from JSON) coerces to int; a fractional float, bool,
-        // array, or other scalar is not a valid JSON-RPC id.
+        // Resolve the id first so every later violation can echo it back. An
+        // integral float within int range (e.g. 2.0 from JSON) coerces to int;
+        // a fractional or out-of-range float, bool, array, or other scalar is
+        // not a valid JSON-RPC id.
         $rawId = $data['id'] ?? null;
         $id = null;
         if ($rawId !== null) {
             if (is_int($rawId) || is_string($rawId)) {
                 $id = $rawId;
-            } elseif (is_float($rawId) && is_finite($rawId) && floor($rawId) === $rawId) {
+            } elseif (is_float($rawId) && is_finite($rawId) && floor($rawId) === $rawId
+                && $rawId >= PHP_INT_MIN && $rawId <= PHP_INT_MAX) {
                 $id = (int) $rawId;
             } else {
                 throw new InvalidMessageException(null, 'id must be an integer or string');
             }
+        }
+
+        $jsonrpc = $data['jsonrpc'] ?? null;
+        if ($jsonrpc !== null && !is_string($jsonrpc)) {
+            throw new InvalidMessageException($id, 'jsonrpc must be a string');
         }
 
         $method = $data['method'] ?? null;
@@ -98,9 +100,12 @@ final class Message
             throw new InvalidMessageException($id, 'method must be a string');
         }
 
+        // JSON-RPC allows params by-name (object) or by-position (array), so
+        // any array shape passes; LSP handlers read named keys and treat a
+        // positional list as missing params.
         $params = $data['params'] ?? null;
         if ($params !== null && !is_array($params)) {
-            throw new InvalidMessageException($id, 'params must be an object');
+            throw new InvalidMessageException($id, 'params must be a structured value');
         }
 
         $error = $data['error'] ?? null;

@@ -84,6 +84,25 @@ describe('Message::fromArray validation', function () {
         expect($msg->id)->toBe(2);
     });
 
+    it('rejects an integral float id outside the int range', function () {
+        expect(fn() => Message::fromArray(['jsonrpc' => '2.0', 'id' => 1.0e30, 'method' => 'x']))
+            ->toThrow(InvalidMessageException::class);
+    });
+
+    it('rejects a non-string jsonrpc, echoing the recoverable id', function () {
+        try {
+            Message::fromArray(['jsonrpc' => 2.0, 'id' => 7, 'method' => 'x']);
+            expect(false)->toBeTrue('expected InvalidMessageException');
+        } catch (InvalidMessageException $e) {
+            expect($e->recoverableId)->toBe(7);
+        }
+    });
+
+    it('accepts by-position (list) params per JSON-RPC', function () {
+        $msg = Message::fromArray(['jsonrpc' => '2.0', 'id' => 8, 'method' => 'x', 'params' => [1, 2]]);
+        expect($msg->params)->toBe([1, 2]);
+    });
+
     it('rejects an array id', function () {
         expect(fn() => Message::fromArray(['id' => [1], 'method' => 'x']))
             ->toThrow(InvalidMessageException::class);
