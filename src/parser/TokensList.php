@@ -9,13 +9,17 @@ final class TokensList implements \JsonSerializable, \Iterator {
 
 	public function __construct(private array $tokens) {
 		foreach ($this->tokens as $token) {
-			assert($token instanceof Token);
+			if (!($token instanceof Token)) {
+				throw new \TypeError('TokensList expects an array of Token instances.');
+			}
 		}
 	}
 
 	private function tokenAtCursorMatchesSequence(array $sequence): Token|null {
 		foreach ($sequence as $i => $text) {
-			assert(is_string($text) || is_int($text));
+			if (!is_string($text) && !is_int($text)) {
+				throw new \InvalidArgumentException("Sequence element must be string or int, got " . gettype($text));
+			}
 
 			if ($this->exist()) {
 				if (is_string($text)) {
