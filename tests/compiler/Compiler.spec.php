@@ -1030,10 +1030,11 @@ describe('unexpected end of input', function () {
       ->toThrow(\ParseError::class, "expected closing ']'");
   });
 
-  it('throws ParseError for truncated opening tag with no element name', function () {
+  it('treats a lone < as a less-than expression, not a truncated tag', function () {
+    // A `<` not followed by a name-start is disambiguated as less-than (same as
+    // inside parentheses), so it passes through instead of erroring.
     $compiler = newCompiler(parser: newParser());
-    expect(fn() => $compiler->compile('<'))
-      ->toThrow(\ParseError::class, "expected element name");
+    expect($compiler->compile('<'))->toBe('<');
   });
 
   it('throws ParseError for truncated opening tag missing closing bracket', function () {

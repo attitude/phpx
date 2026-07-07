@@ -136,8 +136,8 @@ describe('Editing Sessions', function () {
             expect(count($diags))->toBeGreaterThanOrEqual(4);
 
             // First: empty file - may or may not error depending on implementation
-            // Second: "<" should have error (malformed)
-            expect($diags[1]->params['diagnostics'])->not->toBe([]);
+            // Second: "<" alone is a valid less-than operator (not a truncated tag) - no error
+            expect($diags[1]->params['diagnostics'])->toBe([]);
 
             // Third: "<div>" unclosed should have error
             expect($diags[2]->params['diagnostics'])->not->toBe([]);

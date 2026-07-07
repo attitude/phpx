@@ -148,6 +148,62 @@ describe('Parser disambiguates < as less-than', function () {
     });
 });
 
+describe('Parser disambiguates top-level < as less-than', function () {
+    // A top-level `<` not followed by a name-start is a comparison operator, not an
+    // element opener — it must pass through unchanged, just like inside parentheses.
+    $cases = [
+        '$ok = $a < $b;' => '$ok = $a < $b;',
+        'return $a < $b ? 1 : 2;' => 'return $a < $b ? 1 : 2;',
+        'fn() < 5' => 'fn() < 5',
+        '$x < $y > $z' => '$x < $y > $z',
+        'if ($a < $b) {}' => 'if ($a < $b) {}',
+    ];
+
+    foreach ($cases as $source => $expected) {
+        it("compiles {$source} unchanged", function () use ($source, $expected) {
+            expect(phpxCompile($source))->toBe($expected);
+        });
+    }
+
+    it('still parses a real element at the top level', function () {
+        expect(phpxCompile('<div>hi</div>'))->toBe('[\'$\', \'div\', null, [\'hi\']]');
+    });
+});
+
+describe('Parser error-level cleanliness', function () {
+    /** Run $fn under E_ALL, returning the PHP warning/notice messages it emits. */
+    function phpxCaptureWarnings(callable $fn): array
+    {
+        $previous = error_reporting(E_ALL);
+        $warnings = [];
+        set_error_handler(function (int $errno, string $errstr) use (&$warnings): bool {
+            $warnings[] = $errstr;
+            return true;
+        });
+        try {
+            $fn();
+        } catch (\ParseError $e) {
+            // expected for some inputs; we only care about the warnings collected
+        } finally {
+            restore_error_handler();
+            error_reporting($previous);
+        }
+        return $warnings;
+    }
+
+    it('throws ParseError for a truncated attribute at EOF with no PHP warning', function () {
+        $warnings = phpxCaptureWarnings(fn() => phpxParse('<div a='));
+        expect($warnings)->toBe([]);
+        expect(fn() => phpxParse('<div a='))
+            ->toThrow(\ParseError::class, 'expected attribute "value" or {expression}');
+    });
+
+    it('parses an element inside an expression container with no PHP warning', function () {
+        $warnings = phpxCaptureWarnings(fn() => phpxParse('<div>{<span/>}</div>'));
+        expect($warnings)->toBe([]);
+    });
+});
+
 describe('Parser error handling', function () {
     $invalid = [
         'mismatched closing tag' => ['<div></span>', 'closing tag to match'],

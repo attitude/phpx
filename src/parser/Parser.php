@@ -31,7 +31,9 @@ final class Parser {
 				TX_PARENTHESIS_OPEN,
 				TX_SQUARE_BRACKET_OPEN => $this->parseParentheses(),
 				TX_FRAGMENT_ELEMENT_OPEN => $this->parseFragmentElement(),
-				TX_ELEMENT_OPENING_OPEN => $this->parseElement(),
+				TX_ELEMENT_OPENING_OPEN => $this->isElementStart()
+					? $this->parseElement()
+					: ['$$type' => NodeType::EXPRESSION, 'value' => $this->tokens->tokenAtCursorAndForward()],
 				TX_TEMPLATE_LITERAL => $this->parseTemplateLiteral(),
 				default => ['$$type' => NodeType::EXPRESSION, 'value' => $this->tokens->tokenAtCursorAndForward()],
 			};
@@ -61,7 +63,9 @@ final class Parser {
 	private function parseElement(): array {
 		$this->debugCurrentToken(__FUNCTION__);
 		$openingElementStart = $this->tokens->tokenAtCursorAndForward();
-		assert($openingElementStart->id === TX_ELEMENT_OPENING_OPEN);
+		if ($openingElementStart->id !== TX_ELEMENT_OPENING_OPEN) {
+			throw new \LogicException("parseElement() entered without an element opener");
+		}
 
 		$this->debugCurrentToken(__FUNCTION__);
 		$elementName = $this->parseElementName();
@@ -71,11 +75,15 @@ final class Parser {
 		if ($this->tokens->tokenAtCursorMatches(TX_ELEMENT_SELF_CLOSING_SEQUENCE)) {
 			$this->debugCurrentToken(__FUNCTION__);
 			$closingElementSlash = $this->tokens->tokenAtCursorAndForward();
-			assert($closingElementSlash->text === '/');
+			if ($closingElementSlash->text !== '/') {
+				throw new \LogicException("Expected '/' in self-closing sequence");
+			}
 
 			$this->debugCurrentToken(__FUNCTION__);
 			$closingElementEnd = $this->tokens->tokenAtCursorAndForward();
-			assert($closingElementEnd->text === '>');
+			if ($closingElementEnd->text !== '>') {
+				throw new \LogicException("Expected '>' in self-closing sequence");
+			}
 
 			return [
 				'$$type' => NodeType::PHPX_ELEMENT,
@@ -87,7 +95,9 @@ final class Parser {
 		} else if ($this->tokens->tokenAtCursorMatches(TX_ELEMENT_OPENING_CLOSE)) {
 			$this->debugCurrentToken(__FUNCTION__);
 			$openingElementEnd = $this->tokens->tokenAtCursorAndForward();
-			assert($openingElementEnd->id === TX_ELEMENT_OPENING_CLOSE);
+			if ($openingElementEnd->id !== TX_ELEMENT_OPENING_CLOSE) {
+				throw new \LogicException("Expected '>' closing the opening tag");
+			}
 
 			$elementNameText = is_array($elementName)
 				? implode('', array_map(fn(Token $t) => $t->text, $elementName))
@@ -102,11 +112,15 @@ final class Parser {
 
 			$this->debugCurrentToken(__FUNCTION__);
 			$closingElementStart = $this->tokens->tokenAtCursorAndForward();
-			assert($closingElementStart->text === TX_ELEMENT_CLOSING_OPEN_SEQUENCE[0]);
+			if ($closingElementStart->text !== TX_ELEMENT_CLOSING_OPEN_SEQUENCE[0]) {
+				throw new \LogicException("Expected '<' opening the closing tag");
+			}
 
 			$this->debugCurrentToken(__FUNCTION__);
 			$closingElementSlash = $this->tokens->tokenAtCursorAndForward();
-			assert($closingElementSlash->text === TX_ELEMENT_CLOSING_OPEN_SEQUENCE[1]);
+			if ($closingElementSlash->text !== TX_ELEMENT_CLOSING_OPEN_SEQUENCE[1]) {
+				throw new \LogicException("Expected '/' in the closing tag");
+			}
 
 			$this->debugCurrentToken(__FUNCTION__);
 			$closingElementName = $this->parseElementName();
@@ -178,7 +192,9 @@ final class Parser {
 
 	private function parseExpressionContainer(): array {
 		$this->debugCurrentToken(__FUNCTION__);
-		assert($this->tokens->tokenAtCursorMatches(TX_CURLY_BRACKET_OPEN));
+		if ($this->tokens->tokenAtCursorMatches(TX_CURLY_BRACKET_OPEN) === null) {
+			throw new \LogicException("parseExpressionContainer() entered without '{'");
+		}
 
 		$expression = $this->parseParentheses();
 
@@ -187,7 +203,7 @@ final class Parser {
 				return $expression['children'][0];
 			}
 
-			if ($expression['children'][0]->id === T_COMMENT) {
+			if ($expression['children'][0] instanceof Token && $expression['children'][0]->id === T_COMMENT) {
 				return [
 					'$$type' => NodeType::PHPX_COMMENT,
 					'comment' => $expression['children'][0],
@@ -298,7 +314,9 @@ final class Parser {
 		}
 
 		$closer = $this->tokens->tokenAtCursorAndForward();
-		assert($closer->id === TX_TEMPLATE_LITERAL);
+		if ($closer->id !== TX_TEMPLATE_LITERAL) {
+			throw new \LogicException("Expected template literal closer");
+		}
 
 		return [
 			'$$type' => NodeType::TEMPLATE_LITERAL,
@@ -382,6 +400,9 @@ final class Parser {
 
 		if ($this->tokens->tokenAtCursorMatches('=')) {
 			$assignment = $this->tokens->tokenAtCursorAndForward();
+			if (!$this->tokens->exist()) {
+				throw new \ParseError($this->unexpectedTokenMessage('attribute "value" or {expression}'));
+			}
 			$value = match ($this->tokens->tokenAtCursor()->id) {
 				T_CURLY_OPEN,
 				TX_CURLY_BRACKET_OPEN => $this->parseParentheses(),
@@ -429,7 +450,7 @@ final class Parser {
 				TX_PARENTHESIS_OPEN,
 				TX_SQUARE_BRACKET_OPEN => $this->parseParentheses(),
 				TX_FRAGMENT_ELEMENT_OPEN => $this->parseFragmentElement(),
-				TX_ELEMENT_OPENING_OPEN => $this->tokens->tokenAtCursorIsNameStart(1)
+				TX_ELEMENT_OPENING_OPEN => $this->isElementStart()
 				? $this->parseElement()
 				: $this->tokens->tokenAtCursorAndForward(),
 				TX_TEMPLATE_LITERAL => $this->parseTemplateLiteral(),
@@ -464,6 +485,10 @@ final class Parser {
 	}
 
 	private function debugCurrentToken(string $method): void {
+		if ($this->logger === null) {
+			return;
+		}
+
 		$token = $this->tokens->tokenAtCursor();
 
 		if ($token === null) {
