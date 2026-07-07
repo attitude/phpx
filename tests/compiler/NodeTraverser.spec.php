@@ -218,6 +218,6 @@ describe('NodeTraverser via Compiler', function () {
         };
 
         expect((new Compiler(visitors: [$dropId]))->compile('<div id="x" className="y">hi</div>'))
-            ->toBe("['\$', 'div', ['className'=>\"y\"], ['hi']]");
+            ->toBe("['\$', 'div', ['className'=>'y'], ['hi']]");
     });
 });
