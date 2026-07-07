@@ -9,9 +9,19 @@ use Psr\Log\LoggerInterface;
 final class Parser {
 	private TokensList $tokens;
 	private array $ast;
+	/** @var SyntaxRecognizer[] */
+	private array $recognizers;
 	public function __construct(
 		private ?LoggerInterface $logger = null,
+		array $recognizers = [],
 	) {
+		foreach ($recognizers as $recognizer) {
+			if (!$recognizer instanceof SyntaxRecognizer) {
+				$given = get_debug_type($recognizer);
+				throw new \InvalidArgumentException("Parser \$recognizers must all be SyntaxRecognizer instances, {$given} given.");
+			}
+		}
+		$this->recognizers = $recognizers;
 	}
 
 	public function parse(TokensList $tokens): array {
@@ -24,24 +34,57 @@ final class Parser {
 		while ($this->tokens->exist()) {
 			$this->debugCurrentToken(__FUNCTION__);
 
-			$this->ast[] = match ($this->tokens->tokenAtCursor()->id) {
-				T_CURLY_OPEN,
-				T_DOLLAR_OPEN_CURLY_BRACES,
-				TX_CURLY_BRACKET_OPEN,
-				TX_PARENTHESIS_OPEN,
-				TX_SQUARE_BRACKET_OPEN => $this->parseParentheses(),
-				TX_FRAGMENT_ELEMENT_OPEN => $this->parseFragmentElement(),
-				TX_ELEMENT_OPENING_OPEN => $this->isElementStart()
-					? $this->parseElement()
-					: ['$$type' => NodeType::EXPRESSION, 'value' => $this->tokens->tokenAtCursorAndForward()],
-				TX_TEMPLATE_LITERAL => $this->parseTemplateLiteral(),
-				default => ['$$type' => NodeType::EXPRESSION, 'value' => $this->tokens->tokenAtCursorAndForward()],
-			};
+			$this->ast[] = $this->parseNext();
 		}
 
 		$this->logger?->debug('AST', $this->ast);
 
 		return $this->ast;
+	}
+
+	/**
+	 * Parse exactly one node at the cursor: first any registered SyntaxRecognizer,
+	 * then the built-in dispatch. Exposed so a recognizer can recurse into standard
+	 * parsing for nested constructs — only callable while a parse is in progress.
+	 */
+	public function parseNext(): array {
+		return $this->parseRecognized() ?? match ($this->tokens->tokenAtCursor()->id) {
+			T_CURLY_OPEN,
+			T_DOLLAR_OPEN_CURLY_BRACES,
+			TX_CURLY_BRACKET_OPEN,
+			TX_PARENTHESIS_OPEN,
+			TX_SQUARE_BRACKET_OPEN => $this->parseParentheses(),
+			TX_FRAGMENT_ELEMENT_OPEN => $this->parseFragmentElement(),
+			TX_ELEMENT_OPENING_OPEN => $this->isElementStart()
+				? $this->parseElement()
+				: ['$$type' => NodeType::EXPRESSION, 'value' => $this->tokens->tokenAtCursorAndForward()],
+			TX_TEMPLATE_LITERAL => $this->parseTemplateLiteral(),
+			default => ['$$type' => NodeType::EXPRESSION, 'value' => $this->tokens->tokenAtCursorAndForward()],
+		};
+	}
+
+	/**
+	 * Consult registered recognizers at the cursor. For the first that claims the
+	 * tokens, parse and return its node; return null when none claims.
+	 */
+	private function parseRecognized(): ?array {
+		foreach ($this->recognizers as $recognizer) {
+			if (!$recognizer->claims($this->tokens)) {
+				continue;
+			}
+
+			$before = $this->tokens->index();
+			$node = $recognizer->parse($this->tokens, $this);
+
+			if ($this->tokens->index() === $before) {
+				$class = $recognizer::class;
+				throw new \LogicException("SyntaxRecognizer {$class} claimed the tokens but did not advance the cursor.");
+			}
+
+			return $node;
+		}
+
+		return null;
 	}
 
 	private function parseFragmentElement(): array {
@@ -336,6 +379,12 @@ final class Parser {
 		) {
 			$this->debugCurrentToken(__FUNCTION__);
 
+			$recognized = $this->parseRecognized();
+			if ($recognized !== null) {
+				$children[] = $recognized;
+				continue;
+			}
+
 			$children[] = match ($this->tokens->tokenAtCursor()->id) {
 				TX_CURLY_BRACKET_OPEN => $this->parseExpressionContainer(),
 				TX_PARENTHESIS_OPEN => $this->parseParentheses(),
@@ -442,6 +491,12 @@ final class Parser {
 
 		while ($this->tokens->exist() && !$this->tokens->tokenAtCursorMatches($closerId)) {
 			$this->debugCurrentToken(__FUNCTION__);
+
+			$recognized = $this->parseRecognized();
+			if ($recognized !== null) {
+				$children[] = $recognized;
+				continue;
+			}
 
 			$children[] = match ($this->tokens->tokenAtCursor()->id) {
 				T_CURLY_OPEN,

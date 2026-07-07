@@ -37,6 +37,11 @@ final class Compiler {
 		$this->visitors = $visitors;
 	}
 
+	private static function unknownNodeTypeError(mixed $type): \RuntimeException {
+		$name = $type instanceof NodeType ? $type->value : (is_string($type) ? $type : get_debug_type($type));
+		return new \RuntimeException("Unhandled node type '{$name}'. Custom nodes produced by a SyntaxRecognizer must be lowered to built-in NodeType nodes by a NodeVisitor before compilation.");
+	}
+
 	public function compile(string $source): string {
 		$this->source = $source;
 		$this->tokens = new TokensList(Token::tokenize($source));
@@ -56,7 +61,7 @@ final class Compiler {
 				NodeType::PHPX_ELEMENT => $this->compilePHPXElement($node),
 				NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($node),
 				NodeType::PHPX_ATTRIBUTE => $this->compilePHPXAttribute($node),
-				default => throw new \RuntimeException("Unknown node type: {$node['$$type']}"),
+				default => throw self::unknownNodeTypeError($node['$$type']),
 			};
 		}
 		return $this->compiled;
@@ -93,7 +98,7 @@ final class Compiler {
 				NodeType::PHPX_TEXT => $this->compilePHPXText($child, $index, $childrenCount),
 				NodeType::PHPX_EXPRESSION_CONTAINER => $this->compilePHPXExpressionContainer($child) . ', ',
 				NodeType::PHPX_COMMENT => $this->compilePHPXComment($child),
-				default => throw new \RuntimeException("Unknown child type: {$child['$$type']->value}"),
+				default => throw self::unknownNodeTypeError($child['$$type']),
 			};
 		}
 
@@ -271,7 +276,7 @@ final class Compiler {
 					NodeType::BLOCK => $this->compileBlock($child),
 					NodeType::PHPX_ELEMENT => $this->compilePHPXElement($child),
 					NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($child),
-					default => throw new \RuntimeException("Unknown child type: {$child['$$type']}"),
+					default => throw self::unknownNodeTypeError($child['$$type']),
 				};
 			}
 		}
@@ -301,7 +306,7 @@ final class Compiler {
 						NodeType::PHPX_FRAGMENT => $this->compilePHPXFragmentElement($value),
 						NodeType::PHPX_EXPRESSION_CONTAINER => $this->compilePHPXExpressionContainer($value),
 						NodeType::TEMPLATE_LITERAL => $this->compileTemplateLiteral($value),
-						default => throw new \RuntimeException("Unknown child type: {$value['$$type']}"),
+						default => throw self::unknownNodeTypeError($value['$$type']),
 					},
 			}, $children))
 			. ($replaceClosing !== null ? $replaceClosing : $closing->text);
