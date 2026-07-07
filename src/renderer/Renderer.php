@@ -213,6 +213,7 @@ final class Renderer {
       }
 
       if ($value === null) {
+        unset($attrs[$key]);
         continue;
       }
 
@@ -221,6 +222,8 @@ final class Renderer {
           $attrs[$key] = $this->formatAttribute($key, $value ? 'true' : 'false');
         } elseif ($value) {
           $attrs[$key] = $key;
+        } else {
+          unset($attrs[$key]);
         }
         continue;
       }

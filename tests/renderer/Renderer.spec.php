@@ -1335,6 +1335,24 @@ HTML;
       expect(substr_count($rendered, 'title='))->toBe(1);
       expect($rendered)->toBe('<div title="b"></div>');
     });
+
+    it('removes an earlier boolean attribute when a later duplicate is false', function () {
+      $html = ['$', 'button', ['disabled' => true, 'Disabled' => false], null];
+
+      expect((new Renderer)($html))->toBe('<button></button>');
+    });
+
+    it('removes an earlier attribute when a later duplicate is null', function () {
+      $html = ['$', 'div', ['title' => 'a', 'Title' => null], null];
+
+      expect((new Renderer)($html))->toBe('<div></div>');
+    });
+
+    it('keeps a boolean attribute when the later duplicate is true', function () {
+      $html = ['$', 'button', ['disabled' => false, 'Disabled' => true], null];
+
+      expect((new Renderer)($html))->toBe('<button disabled></button>');
+    });
   });
 
   describe('data/aria sub-key casing', function () {
