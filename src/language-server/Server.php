@@ -15,6 +15,8 @@ final class Server
     private bool $initialized = false;
     private bool $running = false;
     private bool $shutdownRequested = false;
+    /** Negotiated LSP position encoding: 'utf-16' (LSP default) or 'utf-8'. */
+    private string $positionEncoding = 'utf-16';
     private ?LoggerInterface $logger;
 
     public function __construct(
@@ -35,13 +37,27 @@ final class Server
         $this->running = true;
 
         while ($this->running) {
-            $message = $this->transport->read();
+            $message = null;
 
-            if ($message === null) {
-                break;
+            try {
+                $message = $this->transport->read();
+
+                if ($message === null) {
+                    break; // EOF — stream closed
+                }
+
+                $this->handleMessage($message);
+            } catch (InvalidMessageException $e) {
+                // Malformed frame shape — answer -32600 and keep reading.
+                $this->logger?->warning("Invalid message: {$e->getMessage()}");
+                $this->transport->write(Message::error($e->recoverableId, -32600, 'Invalid Request'));
+            } catch (\Throwable $e) {
+                // Any other failure during dispatch must not kill the server.
+                $this->logger?->error("Uncaught error handling message: {$e->getMessage()}");
+                if ($message !== null && $message->id !== null) {
+                    $this->transport->write(Message::error($message->id, -32603, 'Internal error'));
+                }
             }
-
-            $this->handleMessage($message);
         }
     }
 
@@ -120,17 +136,18 @@ final class Server
     {
         $this->initialized = true;
 
-        // Negotiate UTF-8 position encoding. PHP strings are byte-indexed,
-        // so UTF-8 positions map directly to strlen/substr offsets.
-        // We only advertise utf-8 because we don't implement UTF-16 code unit
-        // conversion. If the client doesn't support utf-8, we omit positionEncoding
-        // entirely (LSP default is utf-16, and for ASCII-only PHPX source files
-        // byte offsets happen to equal UTF-16 code units).
+        // Negotiate the position encoding. PHP strings are byte-indexed, so we
+        // prefer utf-8 (positions map directly to strlen/substr offsets, no
+        // conversion needed). When the client doesn't offer utf-8 we omit the
+        // capability and the LSP default (utf-16) applies — incoming/outgoing
+        // positions are then converted between UTF-16 code units and bytes at
+        // the protocol boundary (see toByteCharacter()/encodePositions()).
         $clientEncodings = $params['capabilities']['general']['positionEncodings'] ?? [];
         if (!is_array($clientEncodings)) {
             $clientEncodings = [];
         }
         $positionEncoding = in_array('utf-8', $clientEncodings, true) ? 'utf-8' : null;
+        $this->positionEncoding = $positionEncoding ?? 'utf-16';
 
         $capabilities = [
             'textDocumentSync' => [
@@ -271,7 +288,9 @@ final class Server
             return [];
         }
 
-        return $this->completion->complete($document, $line, $character);
+        $character = $this->toByteCharacter($document, $line, $character);
+
+        return $this->encodePositions($this->completion->complete($document, $line, $character), $document);
     }
 
     private function handleHover(array $params): ?array
@@ -288,7 +307,9 @@ final class Server
             return null;
         }
 
-        return $this->hover->hover($document, $line, $character);
+        $character = $this->toByteCharacter($document, $line, $character);
+
+        return $this->encodePositions($this->hover->hover($document, $line, $character), $document);
     }
 
     private function handlePrepareRename(array $params): ?array
@@ -305,7 +326,9 @@ final class Server
             return null;
         }
 
-        return $this->rename->prepareRename($document, $line, $character);
+        $character = $this->toByteCharacter($document, $line, $character);
+
+        return $this->encodePositions($this->rename->prepareRename($document, $line, $character), $document);
     }
 
     private function handleRename(array $params): ?array
@@ -323,7 +346,9 @@ final class Server
             return null;
         }
 
-        return $this->rename->rename($document, $line, $character, $newName);
+        $character = $this->toByteCharacter($document, $line, $character);
+
+        return $this->encodePositions($this->rename->rename($document, $line, $character, $newName), $document);
     }
 
     // ── Helpers ──────────────────────────────────────────────────────────────
@@ -336,11 +361,49 @@ final class Server
             return;
         }
 
-        $diagnostics = $this->diagnostics->diagnose($document);
+        $diagnostics = $this->encodePositions($this->diagnostics->diagnose($document), $document);
 
         $this->transport->write(Message::notification('textDocument/publishDiagnostics', [
             'uri' => $uri,
             'diagnostics' => $diagnostics,
         ]));
+    }
+
+    /**
+     * Convert an incoming Position's character from the negotiated encoding to a
+     * byte offset on its line. Identity when the negotiated encoding is utf-8.
+     */
+    private function toByteCharacter(TextDocumentItem $document, int $line, int $character): int
+    {
+        if ($this->positionEncoding === 'utf-8') {
+            return $character;
+        }
+
+        return PositionEncoding::utf16ToByte($document->getLine($line) ?? '', $character);
+    }
+
+    /**
+     * Recursively convert every LSP Position ({line, character}) in a provider
+     * result from byte offsets back to the negotiated encoding. Identity when
+     * the negotiated encoding is utf-8. Each Position's character is converted
+     * against its own line's text, so ranges spanning multiple lines are handled.
+     */
+    private function encodePositions(mixed $value, TextDocumentItem $document): mixed
+    {
+        if ($this->positionEncoding === 'utf-8' || !is_array($value)) {
+            return $value;
+        }
+
+        if (isset($value['line'], $value['character']) && is_int($value['line']) && is_int($value['character'])) {
+            $lineText = $document->getLine($value['line']) ?? '';
+            $value['character'] = PositionEncoding::byteToUtf16($lineText, $value['character']);
+            return $value;
+        }
+
+        foreach ($value as $key => $item) {
+            $value[$key] = $this->encodePositions($item, $document);
+        }
+
+        return $value;
     }
 }

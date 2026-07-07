@@ -49,7 +49,7 @@ final class Message
         );
     }
 
-    public static function error(int|string $id, int $code, string $message, mixed $data = null): self
+    public static function error(int|string|null $id, int $code, string $message, mixed $data = null): self
     {
         return new self(
             jsonrpc: '2.0',
@@ -61,15 +61,65 @@ final class Message
         );
     }
 
+    /**
+     * Build a Message from a decoded JSON frame, validating the JSON-RPC shape.
+     *
+     * The strict-typed constructor would raise an uncaught TypeError (killing
+     * the server) on a malformed field, so each field is checked here first.
+     * A violation throws InvalidMessageException carrying the recoverable id,
+     * letting the server answer -32600 Invalid Request and keep reading.
+     *
+     * @throws InvalidMessageException
+     */
     public static function fromArray(array $data): self
     {
+        // Resolve the id first so every later violation can echo it back. An
+        // integral float within int range (e.g. 2.0 from JSON) coerces to int;
+        // a fractional or out-of-range float, bool, array, or other scalar is
+        // not a valid JSON-RPC id.
+        $rawId = $data['id'] ?? null;
+        $id = null;
+        if ($rawId !== null) {
+            if (is_int($rawId) || is_string($rawId)) {
+                $id = $rawId;
+            } elseif (is_float($rawId) && is_finite($rawId) && floor($rawId) === $rawId
+                && $rawId >= PHP_INT_MIN && $rawId <= PHP_INT_MAX) {
+                $id = (int) $rawId;
+            } else {
+                throw new InvalidMessageException(null, 'id must be an integer or string');
+            }
+        }
+
+        $jsonrpc = $data['jsonrpc'] ?? null;
+        if ($jsonrpc !== null && !is_string($jsonrpc)) {
+            throw new InvalidMessageException($id, 'jsonrpc must be a string');
+        }
+
+        $method = $data['method'] ?? null;
+        if ($method !== null && !is_string($method)) {
+            throw new InvalidMessageException($id, 'method must be a string');
+        }
+
+        // JSON-RPC allows params by-name (object) or by-position (array), so
+        // any array shape passes; LSP handlers read named keys and treat a
+        // positional list as missing params.
+        $params = $data['params'] ?? null;
+        if ($params !== null && !is_array($params)) {
+            throw new InvalidMessageException($id, 'params must be a structured value');
+        }
+
+        $error = $data['error'] ?? null;
+        if ($error !== null && !is_array($error)) {
+            throw new InvalidMessageException($id, 'error must be an object');
+        }
+
         return new self(
-            jsonrpc: $data['jsonrpc'] ?? null,
-            method: $data['method'] ?? null,
-            id: $data['id'] ?? null,
-            params: $data['params'] ?? null,
+            jsonrpc: $jsonrpc,
+            method: $method,
+            id: $id,
+            params: $params,
             result: $data['result'] ?? null,
-            error: $data['error'] ?? null,
+            error: $error,
         );
     }
 
@@ -105,6 +155,9 @@ final class Message
         }
 
         if ($this->error !== null) {
+            // JSON-RPC error responses must carry an id — null when the request
+            // id could not be recovered from the malformed frame.
+            $data['id'] = $this->id;
             $data['error'] = $this->error;
         } elseif ($this->isResponse()) {
             $data['result'] = $this->result;
